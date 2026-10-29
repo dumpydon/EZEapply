@@ -9,7 +9,7 @@ EZEapply 3.0.0 · 29 October 2026.
 - Browser review verified profile saves, popup structure, quick goal editing and progress-ring rendering with synthetic data.
 - Dependency audit reported zero known vulnerabilities.
 - Runtime packaging includes a file inventory, SHA-256 checksum and required third-party notices; development fixtures, private data, backups and source maps are excluded.
-- Original installation film: 15 seconds, 1920×1440, 30 fps H.264; 960×720 GIF preview and text captions.
+- Revised installation film: 30 seconds, 1920×1440, 30 fps H.264; 960×720 GIF preview and seven timed caption chapters. Exported video decoded without errors; reviewed GitHub scrolling, URL typing, Developer mode, Load unpacked, folder selection and the final job form.
 
 The browser preview uses synthetic data. Provider requests are mocked in tests. These checks establish represented behavior, not a compatibility percentage for all websites. Review filled values and website upload status before submitting.
 

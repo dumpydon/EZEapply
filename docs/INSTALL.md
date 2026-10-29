@@ -11,7 +11,7 @@
 7. Open Chrome’s puzzle-piece menu and pin EZEapply. Click its teal briefcase icon.
 8. Open **Profile** to save your details. **Quick Access** opens the sidebar; **Add field** saves a reusable answer. AI is optional: configure your own provider in **AI settings**.
 
-[Watch the 15-second illustrated film](media/install-ezeapply.mp4).
+[Watch the 30-second illustrated film](media/install-ezeapply.mp4).
 
 ## If something does not work
 

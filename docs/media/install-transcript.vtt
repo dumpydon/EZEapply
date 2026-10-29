@@ -1,19 +1,22 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:02.500
-Download the extension ZIP. Open the latest GitHub release and choose EZEapply.zip.
+00:00:00.000 --> 00:00:06.000
+Start on the EZEapply GitHub page. Scroll to the README and click Download EZEapply for Chrome.
 
-00:00:02.500 --> 00:00:05.000
-Find it. Unzip it. Keep the folder. In Downloads, double-click EZEapply.zip to extract EZEapply.
+00:00:06.000 --> 00:00:10.000
+Open Downloads. Extract EZEapply.zip. Double-click the ZIP. Keep the extracted EZEapply folder.
 
-00:00:05.000 --> 00:00:07.500
-Open Chrome’s extension manager. Go to chrome://extensions and switch Developer mode on.
+00:00:10.000 --> 00:00:13.000
+Type chrome://extensions, then press Return. Use Chrome’s address bar to open its extension manager.
 
-00:00:07.500 --> 00:00:10.000
-Choose Load unpacked. Chrome opens a folder picker. Select the extracted EZEapply folder.
+00:00:13.000 --> 00:00:18.000
+Turn Developer mode on. The switch is at the top right. Load unpacked appears at the top left.
 
-00:00:10.000 --> 00:00:12.500
-Select the folder with manifest.json. Choose the EZEapply folder itself, then click Select.
+00:00:18.000 --> 00:00:21.000
+Click Load unpacked. Choose the button at the top left to open the folder picker.
 
-00:00:12.500 --> 00:00:15.000
-You’re ready. Open EZEapply. Pin it in Chrome’s Extensions menu. Open your profile and start applying.
+00:00:21.000 --> 00:00:25.000
+Select the folder containing manifest.json. Choose the extracted EZEapply folder, then click Select.
+
+00:00:25.000 --> 00:00:30.000
+EZEapply is ready for your next application. Open EZEapply on a job form and click Fill this page.

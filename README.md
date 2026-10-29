@@ -2,7 +2,7 @@
 <p align="center">Your answers. Your AI. Fewer repetitive forms.</p>
 <p align="center">Created by <a href="https://github.com/dumpydon">Piyush Agarwal</a></p>
 
-<p align="center"><a href="https://github.com/dumpydon/EZEapply/releases/latest/download/EZEapply.zip"><strong>↓ Download EZEapply for Chrome</strong></a> · <a href="docs/media/install-ezeapply.mp4">Watch the 15-second install film</a></p>
+<p align="center"><a href="https://github.com/dumpydon/EZEapply/releases/latest/download/EZEapply.zip"><strong>↓ Download EZEapply for Chrome</strong></a> · <a href="docs/media/install-ezeapply.mp4">Watch the 30-second install film</a></p>
 
 ## Install
 

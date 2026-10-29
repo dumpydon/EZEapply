@@ -62,7 +62,30 @@
         flex-wrap: wrap;
         margin-top: 20px;
       }
+      .chapters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 22px;
+      }
+      .chapters button {
+        font: inherit;
+        font-size: 13px;
+        color: #b4c8cc;
+        border: 1px solid #2c424c;
+        border-radius: 10px;
+        background: #14222b;
+        padding: 8px 13px;
+        cursor: pointer;
+      }
+      .chapters button:hover,
+      .chapters button[aria-current='step'] {
+        color: #b4f4df;
+        background: #1c3a35;
+        border-color: #458f7b;
+      }
       a:focus-visible,
+      button:focus-visible,
       video:focus-visible {
         outline: 2px solid #69d0b0;
         outline-offset: 4px;
@@ -88,9 +111,9 @@
       <header>
         <div>
           <h1>EZEapply, ready in a few clicks.</h1>
-          <p>The 15-second installation film.</p>
+          <p>Revised 30-second installation film · Local preview for approval</p>
         </div>
-        <a href="/downloads/EZEapply.zip">Download extension ↓</a>
+        <a href="/media/install-ezeapply.mp4" download>Download video ↓</a>
       </header>
       <video
         controls
@@ -104,14 +127,42 @@
         Your browser cannot play this video.
         <a href="/media/install-ezeapply.mp4">Download the film.</a>
       </video>
+      <nav class="chapters" aria-label="Installation film chapters">
+        <button type="button" data-time="0" aria-current="step">0:00 · GitHub README</button>
+        <button type="button" data-time="6">0:06 · Extract ZIP</button>
+        <button type="button" data-time="10">0:10 · Type address</button>
+        <button type="button" data-time="13">0:13 · Developer mode</button>
+        <button type="button" data-time="18">0:18 · Load unpacked</button>
+        <button type="button" data-time="21">0:21 · Select folder</button>
+        <button type="button" data-time="25">0:25 · Job form</button>
+      </nav>
       <footer>
         <span>1920 × 1440 · 30 fps · Original illustrated macOS / Chrome workflow</span
-        ><a href="/analytics.html">View analytics preview ↗</a>
+        ><a href="/media/install-ezeapply.gif">View GIF ↗</a>
       </footer>
       <p class="note">
         Download the ZIP, extract it, enable Developer mode, select Load unpacked, and choose the
         folder containing manifest.json. Keep the extracted folder after installation.
       </p>
     </main>
+    <script>
+      const video = document.querySelector('video');
+      const chapters = [...document.querySelectorAll('[data-time]')];
+      for (const button of chapters) {
+        button.addEventListener('click', () => {
+          video.currentTime = Number(button.dataset.time);
+          video.play().catch(() => {});
+        });
+      }
+      video.addEventListener('timeupdate', () => {
+        const current = chapters.findLast(
+          (button) => video.currentTime >= Number(button.dataset.time),
+        );
+        for (const button of chapters) {
+          if (button === current) button.setAttribute('aria-current', 'step');
+          else button.removeAttribute('aria-current');
+        }
+      });
+    </script>
   </body>
 </html>

@@ -1,6 +1,6 @@
 # Installation walkthrough
 
-- [Watch the 15-second MP4](install-ezeapply.mp4) — 1920 × 1440, 30 fps.
+- [Watch the 30-second MP4](install-ezeapply.mp4) — 1920 × 1440, 30 fps.
 - [GIF preview](install-ezeapply.gif) — 960 × 720, 12 fps.
 - [Poster](install-poster.png) and [captions](install-transcript.vtt).
 
