@@ -1,8 +1,10 @@
 # Installation film
 
 An original illustrated macOS / Chrome walkthrough inspired by Cue's clear,
-chaptered first-launch presentation. No Cue artwork or code is reused. No real
-desktop recording, personal data, account, application or API key appears.
+chaptered first-launch presentation. At the creator’s request, the desktop uses
+the exact original `macos-sunrise.svg` from their Cue project, copied into
+`assets/` with centered cover sizing. No real desktop recording, personal data,
+account, application or API key appears.
 
 - Master: **1920 × 1440**, 30 frames/second, 30 seconds, H.264 CRF 16.
 - README preview: **960 × 720** GIF, 12 frames/second, optimized palette.
