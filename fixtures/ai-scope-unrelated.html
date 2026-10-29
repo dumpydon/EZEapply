@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Messages and search</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        padding: 26px;
+        margin: 0;
+        background: #20262e;
+        color: #e6edf3;
+        font:
+          14px/1.5 -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+      }
+      h1 {
+        font-size: 23px;
+      }
+      h2 {
+        font-size: 17px;
+      }
+      form {
+        background: #2a343f;
+        border: 1px solid #4b5a67;
+        border-radius: 12px;
+        padding: 18px;
+        margin: 0 0 18px;
+      }
+      label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: 600;
+      }
+      textarea,
+      input,
+      [contenteditable] {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        min-height: 45px;
+        background: #1b242d;
+        color: #e6edf3;
+        border: 1px solid #657581;
+        border-radius: 7px;
+        font: inherit;
+      }
+      textarea {
+        height: 100px;
+      }
+      p {
+        color: #adbdc9;
+      }
+      .note {
+        font-size: 12px;
+      }
+    </style>
+    <script src="/demo-api.js"></script>
+    <script defer src="/ai-demo.js"></script>
+    <script defer src="/custom/content.js"></script>
+  </head>
+  <body>
+    <h1>Ordinary text boxes</h1>
+    <p>No AI button should appear in any of these.</p>
+    <form class="chat-composer" onsubmit="return false">
+      <h2>Direct message</h2>
+      <div contenteditable="true" role="textbox" aria-label="Message @Example"></div>
+    </form>
+    <form class="reply-composer" onsubmit="return false">
+      <h2>Email reply</h2>
+      <div contenteditable="true" role="textbox" aria-label="Message body"></div>
+    </form>
+    <form role="search" onsubmit="return false">
+      <label for="search">Product search</label
+      ><input id="search" type="search" placeholder="Search products" />
+    </form>
+    <form onsubmit="return false">
+      <label for="survey">Describe your experience using this product.</label
+      ><textarea id="survey"></textarea>
+      <p class="note">A normal feedback form also stays free of applicant AI.</p>
+    </form>
+  </body>
+</html>

@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>EZEapply · Local verification</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #17202b;
+        color: #edf0f7;
+        font:
+          15px/1.5 -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          sans-serif;
+      }
+      main {
+        max-width: 780px;
+        margin: 40px auto;
+        padding: 24px;
+      }
+      small {
+        color: #b6b0ff;
+        letter-spacing: 0.1em;
+      }
+      h1 {
+        font-size: 30px;
+        letter-spacing: -0.03em;
+        margin: 8px 0;
+      }
+      p {
+        color: #b4bfd0;
+      }
+      #results {
+        padding: 18px 22px;
+        border: 1px solid #536249;
+        background: #25382f;
+        border-radius: 12px;
+        margin: 24px 0;
+      }
+      #results p {
+        margin: 6px 0;
+        color: #cfecdc;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      label {
+        display: grid;
+        gap: 7px;
+        color: #bac6d7;
+        font-size: 12px;
+      }
+      input {
+        background: #202d3d;
+        border: 1px solid #40516a;
+        color: #f4f5fa;
+        padding: 11px 12px;
+        border-radius: 7px;
+        font: 14px inherit;
+      }
+      fieldset {
+        border: 1px solid #3c4e65;
+        padding: 18px;
+        border-radius: 10px;
+      }
+      legend {
+        font-size: 12px;
+        color: #c9d3e1;
+      }
+      button {
+        margin: 22px 0;
+        background: #7366e9;
+        color: white;
+        padding: 10px 15px;
+        border: 0;
+        border-radius: 7px;
+        cursor: pointer;
+      }
+      .note {
+        font-size: 12px;
+      }
+      #manual input {
+        background: #263448;
+      }
+      @media (max-width: 550px) {
+        main {
+          margin: 12px auto;
+          padding: 20px;
+        }
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <small>LOCAL INSTALLATION CHECK</small>
+      <h1>Your installed extension, verified.</h1>
+      <p>
+        This page contains empty form fields. It loads no demo profile or extension code. The
+        installed extension supplies the answers.
+      </p>
+      <section id="results" aria-live="polite">
+        <strong>Waiting for the installed extension…</strong>
+      </section>
+      <form autocomplete="off">
+        <fieldset>
+          <legend>Imported profile shortcuts</legend>
+          <div class="grid">
+            <label>First name<input id="first" name="firstName" autocomplete="off" /></label>
+            <label>Last name<input id="last" name="lastName" autocomplete="off" /></label>
+            <label>Middle name<input id="middle" name="middleName" autocomplete="off" /></label>
+            <label>Full name<input id="full" name="fullName" autocomplete="off" /></label>
+            <label
+              >Phone number without country code<input
+                id="national"
+                name="nationalPhone"
+                type="tel"
+                autocomplete="off"
+            /></label>
+            <label
+              >Phone with country code<input
+                id="international"
+                name="internationalPhone"
+                type="tel"
+                autocomplete="off"
+            /></label>
+            <label
+              >Phone country code<input
+                id="code"
+                name="phoneCountryCode"
+                type="tel"
+                autocomplete="off"
+            /></label>
+          </div>
+        </fieldset>
+      </form>
+      <button id="dynamic" type="button">Test a dynamically loaded field</button>
+      <div id="extra"></div>
+      <fieldset style="margin-top: 22px">
+        <legend>Installed AI control</legend>
+        <label
+          >Why are you interested in this role?<textarea
+            id="ai-check"
+            rows="4"
+            maxlength="300"
+            style="
+              font: inherit;
+              background: #202d3d;
+              color: #edf0f7;
+              border: 1px solid #40516a;
+              border-radius: 7px;
+              padding: 12px;
+            "
+          ></textarea>
+        </label>
+        <p class="note">
+          Focus this question to check the teal Answer with AI control. No provider request runs
+          until you explicitly choose Generate.
+        </p>
+      </fieldset>
+      <p class="note">
+        Everything stays on this laptop. There is no submission endpoint and no network access from
+        this page.
+      </p>
+      <script>
+        const value = (id) => document.getElementById(id).value.trim();
+        function render() {
+          const results = document.getElementById('results');
+          const names = Boolean(value('first') && value('last') && value('full'));
+          const national = value('national'),
+            international = value('international'),
+            code = value('code');
+          const phones = Boolean(
+            national &&
+              code &&
+              international === code + national &&
+              /^\d+$/.test(national) &&
+              /^\+\d+$/.test(code),
+          );
+          const dynamic = document.getElementById('extra-phone');
+          results.replaceChildren();
+          const title = document.createElement('strong');
+          title.textContent =
+            names && phones
+              ? 'Installed extension is filling correctly'
+              : 'Waiting for the installed extension…';
+          results.append(title);
+          const items = [
+            names ? '✓ Imported first, last and full names filled' : '○ Name shortcuts pending',
+            phones
+              ? '✓ Number-only, international number and country code agree'
+              : '○ Phone variants pending',
+          ];
+          if (dynamic)
+            items.push(
+              dynamic.value === national && national
+                ? '✓ Dynamically inserted field filled'
+                : '○ Dynamic field pending',
+            );
+          for (const text of items) {
+            const p = document.createElement('p');
+            p.textContent = text;
+            results.append(p);
+          }
+        }
+        document.addEventListener('input', render);
+        document.addEventListener('change', render);
+        document
+          .querySelector('form')
+          .addEventListener('submit', (event) => event.preventDefault());
+        document.getElementById('dynamic').addEventListener('click', () => {
+          const label = document.createElement('label');
+          label.textContent = 'Mobile number without country code';
+          const input = document.createElement('input');
+          input.id = 'extra-phone';
+          input.type = 'tel';
+          input.autocomplete = 'off';
+          label.append(input);
+          document.getElementById('extra').replaceChildren(label);
+          render();
+        });
+        render();
+      </script>
+    </main>
+  </body>
+</html>

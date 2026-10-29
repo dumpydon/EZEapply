@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>EZEapply · Compatibility lab</title>
+    <link rel="stylesheet" href="/custom/theme.css" />
+    <link rel="icon" href="/custom/icon/32.png" />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #18212b;
+        color: #edf2fa;
+        font:
+          14px/1.5 -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          sans-serif;
+      }
+      header {
+        min-height: 72px;
+        padding: 15px 22px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        border-bottom: 1px solid #40525f;
+        background: #202b32;
+      }
+      header img {
+        width: 34px;
+        height: 34px;
+      }
+      header b {
+        font-size: 17px;
+      }
+      header small {
+        color: #b5c5d1;
+        margin-left: auto;
+      }
+      header span {
+        padding: 3px 7px;
+        border: 1px solid #658593;
+        border-radius: 5px;
+        color: #cfe4ef;
+        font-size: 10px;
+        letter-spacing: 0.1em;
+      }
+      main {
+        height: calc(100dvh - 72px);
+        display: grid;
+        grid-template-columns: minmax(320px, 390px) minmax(0, 1fr);
+        gap: 1px;
+        background: #3a4a57;
+      }
+      iframe {
+        border: 0;
+        width: 100%;
+        height: 100%;
+        background: #202b32;
+      }
+      #application {
+        background: #f4f6f9;
+      }
+      @media (max-width: 720px) {
+        header {
+          padding: 12px;
+          flex-wrap: wrap;
+        }
+        header small {
+          width: 100%;
+          margin: 0;
+          font-size: 11px;
+        }
+        main {
+          display: block;
+          height: auto;
+        }
+        #panel {
+          height: 930px;
+        }
+        #application {
+          height: 2600px;
+        }
+      }
+    </style>
+    <script src="/demo-api.js"></script>
+  </head>
+  <body>
+    <header>
+      <img src="/custom/icon/128.png" alt="EZEapply logo" /><b>EZEapply</b
+      ><span>COMPATIBILITY LAB</span
+      ><small>Synthetic profile · Local fixtures · No application is sent</small>
+    </header>
+    <main>
+      <iframe
+        id="panel"
+        title="EZEapply side panel"
+        src="/panel.html"
+        allow="clipboard-write"
+      ></iframe
+      ><iframe
+        id="application"
+        title="Application compatibility cases"
+        src="/apply/compatibility-form.html"
+      ></iframe>
+    </main>
+  </body>
+</html>

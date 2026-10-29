@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Application form test</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 32px;
+        color: #283245;
+        background: #f4f5f9;
+        font:
+          14px/1.5 -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+      }
+      main {
+        max-width: 760px;
+        margin: auto;
+      }
+      h1 {
+        font-size: 27px;
+        letter-spacing: -0.04em;
+        margin: 4px 0 10px;
+      }
+      p {
+        color: #667186;
+        margin: 6px 0 24px;
+      }
+      .tag {
+        font-size: 10px;
+        font-weight: 750;
+        color: #6154bc;
+        letter-spacing: 0.12em;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+      }
+      label {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+      input,
+      select,
+      textarea {
+        font: inherit;
+        width: 100%;
+        padding: 11px 12px;
+        border: 1px solid #cbd0dc;
+        border-radius: 7px;
+        background: white;
+        color: #202a3d;
+      }
+      input:focus,
+      textarea:focus {
+        outline: 2px solid #8c83ed;
+        outline-offset: 2px;
+      }
+      fieldset {
+        margin: 22px 0;
+        padding: 16px;
+        border: 1px solid #cbd0dc;
+        border-radius: 9px;
+      }
+      fieldset label,
+      .consent {
+        display: inline-flex;
+        flex-direction: row;
+        align-items: center;
+        margin: 10px 22px 0 0;
+      }
+      input[type='radio'],
+      input[type='checkbox'] {
+        width: auto;
+      }
+      legend {
+        font-size: 12px;
+        font-weight: 600;
+      }
+      button {
+        font: inherit;
+        color: #584ba7;
+        background: #ebe8fb;
+        border: 1px solid #d4ccef;
+        padding: 10px 14px;
+        border-radius: 7px;
+        cursor: pointer;
+      }
+      #dynamic label {
+        margin-top: 18px;
+      }
+      .note {
+        font-size: 11px;
+        margin-top: 9px;
+      }
+      hr {
+        border: 0;
+        border-top: 1px solid #d8dce5;
+        margin: 24px 0;
+      }
+      @media (max-width: 600px) {
+        body {
+          padding: 22px 18px;
+        }
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+    <script src="/demo-api.js"></script>
+    <script src="/ai-demo.js"></script>
+    <script defer src="/custom/content.js"></script>
+  </head>
+  <body>
+    <main>
+      <span class="tag">APPLICATION SANDBOX</span>
+      <h1>Your answers. The right fields.</h1>
+      <p>
+        Use <strong>Fill this page</strong> in the panel. Then add a custom answer for current
+        compensation and try again. These are synthetic examples, not your profile.
+      </p>
+      <form onsubmit="event.preventDefault()">
+        <div class="grid">
+          <label>First name<input name="firstName" autocomplete="off" /></label
+          ><label>Last name<input name="lastName" autocomplete="off" /></label>
+          <label>Phone number without country code<input type="tel" name="phone" /></label
+          ><label>Phone with country code<input type="tel" name="internationalPhone" /></label>
+          <label>College or Institution name *<input name="collegeInstitution" /></label>
+          <label>Expected salary<input type="number" name="expectedSalary" min="0" /></label
+          ><label>Current salary<input type="number" name="currentSalary" min="0" /></label>
+          <label
+            >Notice period<select name="notice">
+              <option value="">Choose an option</option>
+              <option>Immediate</option>
+              <option>30 days</option>
+              <option>60 days</option>
+            </select></label
+          >
+          <label
+            >Email — existing answer<input
+              type="email"
+              name="email"
+              value="already-entered@example.test"
+          /></label>
+        </div>
+        <fieldset>
+          <legend>Are you willing to relocate?</legend>
+          <label><input type="radio" name="relocation" value="yes" />Yes</label
+          ><label><input type="radio" name="relocation" value="no" />No</label>
+        </fieldset>
+        <label
+          >Why are you interested in this role?<textarea rows="3" name="motivation"></textarea>
+        </label>
+        <label
+          >Describe the best AI agent or LLM project you have built. What could it do, which
+          models/APIs/tools did it use, and where is the code or demo (link)?<textarea
+            rows="3"
+            name="bestProject"
+            aria-describedby="project-guidance"
+          ></textarea>
+        </label>
+        <p id="project-guidance" class="note">Minimum 4–5 sentences. Maximum 150 words.</p>
+        <label
+          >What was the hardest problem in that project, and exactly how did you solve it?<input
+            name="projectProblem"
+        /></label>
+        <div class="form-group">
+          <label>A custom skill or tool you have built for your daily work *</label
+          ><app-text-field id="shadow-tool"></app-text-field>
+        </div>
+        <hr />
+        <h2>CTC wording and unit variants</h2>
+        <p>
+          The synthetic saved answers are 8 for a question without units, 800000 for INR, and 8.5
+          for lakhs/LPA.
+        </p>
+        <div class="grid">
+          <label>What's your expected CTC?<input type="number" name="ctcGeneric" /></label>
+          <label>What is your expected CTC in INR?<input type="number" name="ctcRupees" /></label>
+          <label>Expected CTC in LPA<input type="number" name="ctcLakhs" /></label>
+        </div>
+        <hr />
+        <h2>Longer questions and experience</h2>
+        <p>
+          The current CTC questions use the saved “(In Lacs)” and INR variants. General and Python
+          experience use separate saved values.
+        </p>
+        <div class="grid">
+          <label
+            >What is your current CTC per annum (including any variable components)?<input
+              type="number"
+              name="currentCtcAnnual"
+          /></label>
+          <label
+            >What is your current CTC per annum in INR?<input type="number" name="currentCtcRupees"
+          /></label>
+          <label
+            >What is your expected CTC salary in Lakh Per Annum?*<input
+              type="number"
+              name="expectedCtcSalary"
+          /></label>
+          <label
+            >What is your current CTC salary in Lakh Per Annum?*<input
+              type="number"
+              name="currentCtcSalary"
+          /></label>
+          <label
+            >How many years have you worked in these fields?<input
+              type="number"
+              name="professionalExperience"
+          /></label>
+          <label
+            >How many years have you been working with Python?<input
+              type="number"
+              name="pythonExperience"
+          /></label>
+        </div>
+        <label
+          >What is your notice period? If you are on notice already, when are you available to
+          join?<input name="noticeWithFollowup"
+        /></label>
+        <label
+          >If offered the role, within how many days will you be able to join?*<input
+            name="joiningDuration"
+        /></label>
+        <label>What is your current notice period?*<input name="currentNoticePeriod" /></label>
+        <label class="consent"
+          ><input type="checkbox" name="terms" />I agree to the terms (always left for you)</label
+        >
+        <hr />
+        <button type="button" id="add-step">Reveal another application step</button>
+        <div id="dynamic"></div>
+        <p class="note">This tests forms that load more questions after the page opens.</p>
+        <label
+          >Clipboard test pad<textarea
+            id="clipboard-pad"
+            rows="2"
+            placeholder="Click a value in the panel, then paste here"
+          ></textarea>
+        </label>
+      </form>
+    </main>
+    <script>
+      document.getElementById('shadow-tool').attachShadow({ mode: 'open' }).innerHTML =
+        '<div><div><div><input placeholder="Enter Here" style="box-sizing:border-box;width:100%;padding:12px;border:1px solid #cbd0dc;border-radius:7px"></div></div></div>';
+      document.getElementById('add-step').addEventListener('click', () => {
+        const label = document.createElement('label');
+        label.textContent = 'When can you start?';
+        const input = document.createElement('input');
+        input.name = 'availableStart';
+        label.append(input);
+        document.getElementById('dynamic').replaceChildren(label);
+      });
+    </script>
+  </body>
+</html>

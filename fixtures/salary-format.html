@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>EZEapply · Salary format verification</title>
+    <link rel="stylesheet" href="/custom/theme.css" />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #19262d;
+        color: #e7f4ee;
+        font:
+          14px/1.5 -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+      }
+      header {
+        padding: 18px 24px;
+        border-bottom: 1px solid #456157;
+      }
+      header b {
+        font-size: 20px;
+      }
+      header p {
+        margin: 4px 0 0;
+        color: #aac7ba;
+      }
+      main {
+        display: grid;
+        grid-template-columns: 390px minmax(350px, 1fr);
+        height: calc(100dvh - 100px);
+        gap: 1px;
+        background: #456157;
+      }
+      iframe {
+        border: 0;
+        width: 100%;
+        height: 100%;
+      }
+      @media (max-width: 750px) {
+        main {
+          grid-template-columns: 1fr;
+          height: auto;
+        }
+        iframe {
+          height: 900px;
+        }
+      }
+    </style>
+    <script src="/demo-api.js"></script>
+  </head>
+  <body>
+    <header>
+      <b>EZEapply · Salary format verification</b>
+      <p>
+        Synthetic application · CSS-only units · controlled numeric validation · no employer
+        requests or submissions
+      </p>
+    </header>
+    <main>
+      <iframe id="panel" title="EZEapply saved answers" src="/panel.html"></iframe
+      ><iframe
+        id="application"
+        title="Salary application form"
+        src="/talent/all-opportunities"
+      ></iframe>
+    </main>
+  </body>
+</html>

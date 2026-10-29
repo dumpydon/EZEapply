@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.local/
+coverage/
+docs/media/
+.github/
+package-lock.json

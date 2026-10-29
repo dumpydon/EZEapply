@@ -1,0 +1,38 @@
+{
+  "name": "ezeapply",
+  "version": "3.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "preview": "node scripts/preview.mjs",
+    "verify": "npm run typecheck && npm test && npm run build",
+    "format": "prettier --write src tests fixtures scripts media-src docs README.md package.json tsconfig.json .prettierrc.json vitest.config.ts THIRD-PARTY-NOTICES.md",
+    "format:check": "prettier --check src tests fixtures scripts media-src docs README.md package.json tsconfig.json .prettierrc.json vitest.config.ts THIRD-PARTY-NOTICES.md",
+    "check:bundles": "node scripts/check-bundles.mjs",
+    "verify:source": "npm run typecheck && npm test && npm run check:bundles",
+    "media:stills": "node media-src/install-film.mjs --stills",
+    "media:render": "node media-src/install-film.mjs",
+    "package:local": "npm run build && node scripts/package-local.mjs",
+    "package": "npm run build && node scripts/package-local.mjs"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.1.24",
+    "@types/node": "^22.0.0",
+    "esbuild": "^0.28.2",
+    "fake-indexeddb": "^6.2.6",
+    "jsdom": "^26.0.0",
+    "prettier": "3.6.2",
+    "sharp": "^0.35.5",
+    "typescript": "^5.7.0",
+    "vitest": "^5.0.5"
+  },
+  "dependencies": {
+    "libphonenumber-js": "^1.13.15",
+    "pdfjs-dist": "^6.4.299"
+  },
+  "author": "Piyush Agarwal (@dumpydon)",
+  "license": "UNLICENSED"
+}

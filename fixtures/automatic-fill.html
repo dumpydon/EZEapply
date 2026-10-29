@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>EZEapply · Automatic saved answers</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #19262d;
+        color: #e7f4ee;
+        font:
+          14px/1.5 -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+      }
+      header {
+        padding: 14px 22px;
+        border-bottom: 1px solid #456157;
+      }
+      h1 {
+        font-size: 20px;
+        margin: 0;
+      }
+      header p {
+        margin: 4px 0;
+        color: #aac7ba;
+      }
+      main {
+        display: grid;
+        grid-template-columns: 320px minmax(340px, 1fr) 380px;
+        height: calc(100dvh - 94px);
+        gap: 1px;
+        background: #456157;
+      }
+      iframe {
+        border: 0;
+        width: 100%;
+        height: 100%;
+        background: #19262d;
+      }
+      @media (max-width: 1050px) {
+        main {
+          grid-template-columns: 300px minmax(350px, 1fr);
+          height: 1100px;
+        }
+        #panel {
+          grid-column: 1/-1;
+          height: 950px;
+        }
+      }
+    </style>
+    <script src="/demo-api.js"></script>
+  </head>
+  <body>
+    <header>
+      <h1>EZEapply · Automatic saved answers</h1>
+      <p>
+        Turn on “Auto-fill saved answers” in the popup. Reload the form or reveal its next step.
+        Synthetic applicant; submission disabled.
+      </p>
+    </header>
+    <main>
+      <iframe id="popup" title="EZEapply toolbar popup" src="/popup.html"></iframe
+      ><iframe
+        id="application"
+        title="Job application form"
+        src="/careers/apply/dropdown-form"
+      ></iframe
+      ><iframe id="panel" title="EZEapply saved answers" src="/panel.html"></iframe>
+    </main>
+  </body>
+</html>

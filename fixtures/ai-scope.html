@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>EZEapply · Application-only AI verification</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #19262d;
+        color: #e7f4ee;
+        font:
+          14px/1.5 -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+      }
+      header {
+        padding: 20px 28px;
+        border-bottom: 1px solid #456157;
+      }
+      h1 {
+        font-size: 23px;
+        margin: 0;
+      }
+      header p {
+        margin: 6px 0;
+        color: #b5d2c5;
+      }
+      main {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        height: calc(100dvh - 110px);
+      }
+      iframe {
+        border: 0;
+        width: 100%;
+        height: 100%;
+      }
+      iframe + iframe {
+        border-left: 1px solid #456157;
+      }
+      @media (max-width: 750px) {
+        main {
+          grid-template-columns: 1fr;
+          height: auto;
+        }
+        iframe {
+          height: 700px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>EZEapply · AI stays in job applications</h1>
+      <p>
+        Production field detection · synthetic forms and provider · no email, chat, or application
+        is sent.
+      </p>
+    </header>
+    <main>
+      <iframe id="application" title="Job application" src="/careers/apply/ai-scope"></iframe
+      ><iframe id="unrelated" title="Unrelated text boxes" src="/scope/conversation"></iframe>
+    </main>
+  </body>
+</html>

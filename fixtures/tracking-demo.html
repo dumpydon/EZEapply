@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>EZEapply tracking verification</title>
+    <style>
+      body {
+        margin: 0;
+        background: #14262a;
+        color: #d9eee6;
+        font: 14px/1.5 system-ui;
+      }
+      header {
+        padding: 16px 22px;
+        border-bottom: 1px solid #446359;
+      }
+      header p {
+        margin: 4px 0;
+        color: #a3c7b8;
+      }
+      nav {
+        display: flex;
+        gap: 8px;
+        margin-top: 10px;
+      }
+      a {
+        color: #a1dfc5;
+      }
+      main {
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        height: calc(100vh - 150px);
+      }
+      iframe {
+        border: 0;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+    <script src="/native-api.js"></script>
+    <script src="/tracking-api.js"></script>
+  </head>
+  <body>
+    <header>
+      <b>EZEapply · Submission tracking verification</b>
+      <p>
+        Local synthetic applications. The actual capture and worker pipeline run here; no employer
+        submission.
+      </p>
+      <nav>
+        <a href="/careers/apply/tracking-form?jobId=100001" target="application">External form</a
+        ><a href="/careers/apply/tracking-linkedin" target="application">LinkedIn-shaped review</a
+        ><a href="/careers/apply/tracking-form?jobId=100002" target="application"
+          >Another external form</a
+        ><a href="/analytics.html?sample=1" target="_blank">View sample analytics</a>
+      </nav>
+    </header>
+    <main>
+      <iframe title="EZEapply toolbar popup" src="/popup.html"></iframe
+      ><iframe
+        id="application"
+        name="application"
+        title="Synthetic application"
+        src="/careers/apply/tracking-form?jobId=100001"
+      ></iframe>
+    </main>
+  </body>
+</html>

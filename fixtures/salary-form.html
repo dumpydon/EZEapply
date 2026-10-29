@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Salary application form</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #f4f6f5;
+        color: #23332b;
+        font:
+          14px/1.5 -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        padding: 28px;
+      }
+      h1 {
+        font-size: 23px;
+        margin: 0 0 12px;
+      }
+      p {
+        color: #63756c;
+      }
+      article {
+        padding: 24px;
+        background: white;
+        border: 1px solid #cedcd4;
+        border-radius: 14px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 22px;
+      }
+      .form-group label {
+        display: block;
+        font-weight: 600;
+        font-size: 13px;
+        margin: 8px 0;
+      }
+      .form-group input {
+        width: 100%;
+        font: inherit;
+        border: 1px solid #c4d4ca;
+        background: #f1f5f2;
+        padding: 12px;
+        border-radius: 7px;
+      }
+      .money-input {
+        position: relative;
+      }
+      .money-input input {
+        padding-right: 130px;
+      }
+      .money-input::after {
+        content: 'lacs per annum';
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #728278;
+        font-size: 12px;
+        pointer-events: none;
+      }
+      button {
+        font: inherit;
+        padding: 9px 12px;
+        border: 1px solid #2e8a70;
+        border-radius: 7px;
+        background: #e3f5eb;
+        color: #206751;
+        cursor: pointer;
+        margin: 8px 8px 0 0;
+      }
+      button:disabled {
+        opacity: 0.5;
+        cursor: default;
+      }
+      output {
+        display: block;
+        background: #edf5ef;
+        padding: 14px;
+        margin: 18px 0;
+        border: 1px solid #bbd5c5;
+        border-radius: 9px;
+        color: #20553b;
+      }
+      .note {
+        font-size: 12px;
+      }
+      @media (max-width: 650px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+        body {
+          padding: 16px;
+        }
+        article {
+          padding: 18px;
+        }
+      }
+    </style>
+    <script src="/demo-api.js"></script>
+    <script defer src="/custom/content.js"></script>
+  </head>
+  <body>
+    <article role="dialog" aria-labelledby="apply-title">
+      <h1 id="apply-title">Apply to Example AI Engineer</h1>
+      <p>Your resume · synthetic application; uploading and submission are disabled.</p>
+      <button type="button" disabled>Upload New Resume</button>
+      <form id="salary-form"></form>
+      <button type="button" disabled>Apply Now (disabled)</button>
+    </article>
+    <p>
+      Use <b>Fill this page</b> in the panel. The first two labels say INR, but the CSS suffix
+      requires lakh values. The third field has no scale suffix and requires the saved rupee amount.
+    </p>
+    <button type="button" id="enable-auto">Enable automatic fill for this preview</button
+    ><button type="button" id="new-step">Reveal another application step</button>
+    <output id="accepted" aria-live="polite">Waiting for saved answers…</output>
+    <p id="mode" class="note"></p>
+    <script>
+      (() => {
+        const form = document.getElementById('salary-form'),
+          output = document.getElementById('accepted'),
+          mode = document.getElementById('mode');
+        let step = 0;
+        const key = 'eze.customFields.v1';
+        function render() {
+          step++;
+          const accepted = {};
+          let rejected = 0;
+          form.innerHTML =
+            '<div class="grid"><div class="form-group"><label>Current CTC(INR)</label><div class="money-input"><input id="current_ctc" name="current_ctc" inputmode="numeric" placeholder="Ex: 6.6"></div></div><div class="form-group"><label>Expected CTC (INR)</label><div class="money-input"><input id="expected_ctc" name="expected_ctc" inputmode="numeric" placeholder="Ex: 15.5"></div></div><div class="form-group"><label>Expected CTC in INR</label><input id="rupee_ctc" name="rupee_ctc" inputmode="numeric"></div></div>';
+          function show() {
+            output.textContent =
+              'Step ' +
+              step +
+              ' · Accepted widget state: current ' +
+              (accepted.current_ctc || 'empty') +
+              ' lakh; expected ' +
+              (accepted.expected_ctc || 'empty') +
+              ' lakh; rupee field ' +
+              (accepted.rupee_ctc || 'empty') +
+              ' · rejected writes ' +
+              rejected;
+          }
+          for (const control of form.querySelectorAll('input'))
+            control.addEventListener('input', () => {
+              const value = control.value;
+              if (
+                control.closest('.money-input') &&
+                value !== '' &&
+                (!/^\d+(?:\.\d{0,2})?$/.test(value) || Number(value) >= 1000)
+              ) {
+                rejected++;
+                control.value = accepted[control.id] || '';
+              } else accepted[control.id] = value;
+              show();
+            });
+          show();
+        }
+        form.addEventListener('submit', (event) => event.preventDefault());
+        document.getElementById('new-step').addEventListener('click', render);
+        document.getElementById('enable-auto').addEventListener('click', async () => {
+          const data = await chrome.storage.local.get(key);
+          data[key].profiles.local.autoFill = true;
+          await chrome.storage.local.set({ [key]: data[key] });
+          mode.textContent =
+            'Automatic fill enabled for synthetic data. Reveal another application step to test dynamic detection.';
+        });
+        render();
+      })();
+    </script>
+  </body>
+</html>

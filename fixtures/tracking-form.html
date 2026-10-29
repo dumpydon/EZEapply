@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Engineer job application</title>
+    <style>
+      body {
+        padding: 30px;
+        margin: 0;
+        font: 15px/1.5 system-ui;
+        color: #203a30;
+        background: #f0f6f3;
+      }
+      form,
+      section {
+        background: white;
+        padding: 25px;
+        border: 1px solid #bfcec6;
+        border-radius: 12px;
+      }
+      input,
+      select,
+      button {
+        font: inherit;
+        padding: 9px;
+        margin: 8px 0;
+        border: 1px solid #8caba0;
+        border-radius: 6px;
+      }
+      label {
+        display: block;
+      }
+      button {
+        background: #278c72;
+        color: white;
+        cursor: pointer;
+      }
+      aside {
+        color: #607b6f;
+        font-size: 12px;
+      }
+    </style>
+    <script src="/native-api.js"></script>
+    <script src="/tracking-api.js"></script>
+    <script defer src="/submission-demo.js"></script>
+  </head>
+  <body>
+    <main>
+      <h1>Engineer job application</h1>
+      <aside>Example Company · synthetic applicant · no network submission</aside>
+      <form aria-label="Job application">
+        <p>Review your application and resume.</p>
+        <label>Example applicant<input value="Demo Applicant" readonly /></label
+        ><label
+          >Test outcome<select id="outcome">
+            <option value="success">Confirmation on this page</option>
+            <option value="error">Server rejection</option>
+            <option value="navigate">Navigate to thank-you page</option>
+          </select></label
+        ><button type="submit">Submit application</button>
+      </form>
+      <section id="result" role="status" aria-live="polite"></section>
+    </main>
+  </body>
+</html>

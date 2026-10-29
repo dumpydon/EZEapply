@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Research Engineer | LinkedIn-shaped demo</title>
+    <style>
+      body {
+        padding: 30px;
+        background: #162126;
+        color: #d9ebe4;
+        font: 15px/1.5 system-ui;
+      }
+      dialog {
+        position: relative;
+        margin: 15px 0;
+        padding: 25px;
+        background: #213038;
+        color: inherit;
+        border: 1px solid #5c7774;
+        border-radius: 12px;
+        width: 75%;
+      }
+      button,
+      select {
+        font: inherit;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #7cadaa;
+      }
+      button {
+        color: #102d40;
+        background: #8cc7fa;
+        cursor: pointer;
+      }
+    </style>
+    <script src="/native-api.js"></script>
+    <script src="/tracking-api.js"></script>
+    <script defer src="/submission-demo.js"></script>
+  </head>
+  <body data-tracking-url="https://www.linkedin.com/jobs/view/999888777/">
+    <h1>Research Engineer</h1>
+    <p>Synthetic LinkedIn Easy Apply review · no employer submission.</p>
+    <dialog open>
+      <h2>Apply to Example Labs</h2>
+      <form aria-label="Review your application">
+        <p>Review your application</p>
+        <label
+          >Test outcome
+          <select id="outcome">
+            <option value="success">Application sent</option>
+            <option value="error">Rejected submission</option>
+          </select></label
+        >
+        <p><button type="submit">Submit application</button></p>
+      </form>
+      <section id="result" role="status"></section>
+    </dialog>
+  </body>
+</html>

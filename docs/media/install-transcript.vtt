@@ -1,0 +1,19 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:02.500
+Download the extension ZIP. Open the latest GitHub release and choose EZEapply.zip.
+
+00:00:02.500 --> 00:00:05.000
+Find it. Unzip it. Keep the folder. In Downloads, double-click EZEapply.zip to extract EZEapply.
+
+00:00:05.000 --> 00:00:07.500
+Open Chrome’s extension manager. Go to chrome://extensions and switch Developer mode on.
+
+00:00:07.500 --> 00:00:10.000
+Choose Load unpacked. Chrome opens a folder picker. Select the extracted EZEapply folder.
+
+00:00:10.000 --> 00:00:12.500
+Select the folder with manifest.json. Choose the EZEapply folder itself, then click Select.
+
+00:00:12.500 --> 00:00:15.000
+You’re ready. Open EZEapply. Pin it in Chrome’s Extensions menu. Open your profile and start applying.

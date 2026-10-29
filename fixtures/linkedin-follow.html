@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>EZEapply · LinkedIn follow preference test</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #19242a;
+        color: #e5f3ed;
+        font:
+          14px/1.6 -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        padding: 28px;
+      }
+      main {
+        display: grid;
+        grid-template-columns: 310px minmax(280px, 1fr);
+        gap: 28px;
+        max-width: 1120px;
+        margin: auto;
+      }
+      h1 {
+        font-size: 22px;
+        margin: 0 0 5px;
+      }
+      p {
+        color: #aac2b9;
+      }
+      iframe {
+        width: 310px;
+        height: 710px;
+        border: 1px solid #456158;
+        border-radius: 14px;
+      }
+      .review-dialog {
+        position: static;
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: inherit;
+      }
+      .review-dialog > div {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .review-dialog > div label {
+        flex: 1;
+      }
+      article {
+        align-self: start;
+        padding: 24px;
+        border: 1px solid #456158;
+        border-radius: 14px;
+        background: #21332d;
+      }
+      label {
+        display: flex;
+        gap: 10px;
+        margin: 24px 0;
+        align-items: center;
+      }
+      input {
+        accent-color: #2cb58f;
+        width: 18px;
+        height: 18px;
+      }
+      button {
+        font: inherit;
+        color: #ddf7ec;
+        background: #266e5c;
+        border: 1px solid #5db99b;
+        border-radius: 7px;
+        padding: 8px 12px;
+        cursor: pointer;
+      }
+      button:disabled {
+        background: #34413e;
+        opacity: 0.6;
+        cursor: default;
+      }
+      output {
+        display: block;
+        margin-top: 20px;
+        color: #a2e6c8;
+      }
+      .tag {
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        color: #83c5ae;
+      }
+      @media (max-width: 750px) {
+        main {
+          grid-template-columns: 1fr;
+        }
+        body {
+          padding: 16px;
+        }
+        iframe {
+          max-width: 100%;
+        }
+      }
+    </style>
+    <script src="/native-api.js"></script>
+    <script defer src="/linkedin-follow.js"></script>
+  </head>
+  <body>
+    <main>
+      <div>
+        <p class="tag">ACTUAL TOOLBAR POPUP · SYNTHETIC DATA</p>
+        <iframe id="popup" title="EZEapply toolbar popup" src="/popup.html"></iframe>
+      </div>
+      <article>
+        <span class="tag">SYNTHETIC APPLICATION REVIEW · NO LINKEDIN REQUESTS</span>
+        <h1>Company-follow preference</h1>
+        <p>
+          Enable “Turn off LinkedIn auto-follow” in the popup. The checked follow choice clears; the
+          unrelated application checkbox stays checked. This uses LinkedIn’s native dialog structure
+          and the full production watcher. New steps, opening an existing dialog and property-only
+          rechecks are handled without clicking Fill.
+        </p>
+        <div id="review"></div>
+        <button id="next" type="button">Show another application</button>
+        <button id="prepare" type="button">Prepare closed review</button>
+        <button id="open" type="button">Open prepared review</button>
+        <button id="recheck" type="button">Simulate website recheck</button
+        ><output id="result" aria-live="polite">Loading preview…</output>
+      </article>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>EZEapply compatibility application</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #f4f6f9;
+        color: #293347;
+        font:
+          14px/1.5 -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          sans-serif;
+      }
+      main {
+        max-width: 960px;
+        margin: auto;
+        padding: 30px;
+      }
+      .eyebrow {
+        color: #607a9b;
+        font-size: 10px;
+        letter-spacing: 0.12em;
+        font-weight: 750;
+      }
+      h1 {
+        font-size: 28px;
+        letter-spacing: -0.035em;
+        margin: 7px 0;
+      }
+      h2 {
+        font-size: 16px;
+        margin: 0 0 12px;
+      }
+      p {
+        color: #657286;
+        margin: 8px 0 16px;
+      }
+      .intro {
+        max-width: 720px;
+      }
+      .toolbar {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin: 16px 0;
+      }
+      button {
+        font: inherit;
+        border: 1px solid #b8cbd5;
+        border-radius: 7px;
+        padding: 9px 13px;
+        background: #e7edf7;
+        color: #3b5477;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #dce5f4;
+      }
+      button:focus-visible,
+      input:focus-visible,
+      select:focus-visible,
+      [contenteditable]:focus-visible {
+        outline: 2px solid #718ac8;
+        outline-offset: 2px;
+      }
+      .primary {
+        background: #536fac;
+        border-color: #536fac;
+        color: white;
+      }
+      .primary:hover {
+        background: #405e9f;
+      }
+      .report {
+        border: 1px solid #cad6df;
+        border-radius: 11px;
+        background: white;
+        padding: 17px;
+        margin: 20px 0;
+      }
+      .report-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .report-head strong {
+        font-size: 18px;
+      }
+      .badge {
+        font-size: 11px;
+        border: 1px solid #c7d4dd;
+        border-radius: 20px;
+        padding: 3px 8px;
+        color: #4c6377;
+      }
+      .report p {
+        font-size: 12px;
+        margin-bottom: 8px;
+      }
+      .checks {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 5px 18px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        font-size: 12px;
+      }
+      .checks li {
+        padding: 3px 0;
+      }
+      .checks .pass {
+        color: #287151;
+      }
+      .checks .fail {
+        color: #985b34;
+      }
+      .checks .pending {
+        color: #6e7789;
+      }
+      fieldset {
+        margin: 22px 0;
+        padding: 18px;
+        border: 1px solid #cbd4df;
+        border-radius: 11px;
+        background: #fbfcfe;
+      }
+      legend {
+        font-size: 12px;
+        font-weight: 700;
+        color: #55657c;
+        padding: 0 6px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      .field,
+      label {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #4d5a70;
+      }
+      .field-label {
+        display: block;
+      }
+      .hint {
+        font-size: 10px;
+        font-weight: 400;
+        color: #738098;
+      }
+      .input,
+      input,
+      select,
+      textarea,
+      [contenteditable] {
+        display: block;
+        width: 100%;
+        padding: 10px 11px;
+        border: 1px solid #bdc9d8;
+        border-radius: 7px;
+        background: #fff;
+        color: #28354c;
+        font: 14px/1.45 inherit;
+        min-height: 41px;
+      }
+      textarea,
+      [contenteditable] {
+        min-height: 67px;
+        resize: vertical;
+      }
+      .readonly-value {
+        background: #edf1f6;
+      }
+      .checkbox {
+        flex-direction: row;
+        align-items: center;
+        margin: 16px 0;
+      }
+      .checkbox input {
+        width: 16px;
+        min-height: 16px;
+      }
+      .semantic-strip {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .semantic-strip input {
+        flex: 1;
+        min-width: 150px;
+      }
+      .combo-wrap {
+        position: relative;
+      }
+      .combo-options {
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #aebdd0;
+        box-shadow: 0 8px 25px #20374b22;
+        border-radius: 7px;
+        z-index: 20;
+        max-height: 180px;
+        overflow: auto;
+      }
+      .combo-options[hidden] {
+        display: none;
+      }
+      .combo-options [role='option'] {
+        padding: 9px 11px;
+        cursor: pointer;
+        font-weight: 400;
+      }
+      .combo-options [role='option']:hover,
+      .combo-options [aria-selected='true'] {
+        background: #e6edf9;
+      }
+      .combo-button {
+        width: 100%;
+        background: white;
+        color: #29394c;
+        text-align: left;
+        min-height: 41px;
+      }
+      .upload {
+        border: 1px dashed #b4c4d2;
+        border-radius: 9px;
+        padding: 14px;
+        background: #eef4f7;
+      }
+      .upload label {
+        font-size: 13px;
+      }
+      .upload button {
+        margin-top: 8px;
+        width: fit-content;
+      }
+      .file-badge {
+        display: block;
+        font-size: 11px;
+        font-weight: 400;
+        overflow-wrap: anywhere;
+        margin-top: 7px;
+        color: #526a80;
+      }
+      .file-input-concealed {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+      }
+      iframe {
+        width: 100%;
+        height: 275px;
+        border: 1px solid #c6d2df;
+        border-radius: 8px;
+        background: white;
+      }
+      .dynamic {
+        margin-top: 14px;
+      }
+      .event-note {
+        font-size: 11px;
+        color: #607991;
+        margin-top: 7px;
+      }
+      .footer-note {
+        font-size: 11px;
+        margin-top: 24px;
+      }
+      .submit-note {
+        color: #3b6d60;
+      }
+      @media (max-width: 590px) {
+        main {
+          padding: 21px 17px;
+        }
+        .grid,
+        .checks {
+          grid-template-columns: 1fr;
+        }
+        h1 {
+          font-size: 24px;
+        }
+        fieldset {
+          padding: 14px;
+        }
+        .semantic-strip {
+          display: block;
+        }
+        .semantic-strip input + input {
+          margin-top: 10px;
+        }
+      }
+    </style>
+    <script src="/demo-api.js"></script>
+    <script defer src="/compatibility.js"></script>
+    <script defer src="/custom/content.js"></script>
+  </head>
+  <body data-compatibility-form>
+    <main>
+      <div class="eyebrow">LOCAL APPLICATION PATTERNS</div>
+      <h1>Fill more kinds of forms.</h1>
+      <p class="intro">
+        This lab combines common form structures into one synthetic application. Use
+        <strong>Fill this page</strong> and <strong>Attach resume</strong> in EZEapply, then check
+        the results. A pass verifies this fixture; it does not measure a real-world ATS success
+        rate.
+      </p>
+      <div class="toolbar">
+        <button type="button" id="check-results" class="primary">Check results</button
+        ><button type="button" id="reveal-step">Reveal another application step</button>
+      </div>
+      <section class="report" aria-label="Fixture verification results">
+        <div class="report-head">
+          <strong id="result-summary">Ready to check</strong
+          ><span class="badge">DOM values and events</span>
+        </div>
+        <p id="result-detail">
+          Checks run only when you click Check results, so they cannot trigger an autofill loop.
+        </p>
+        <ul id="result-list" class="checks"></ul>
+      </section>
+      <form id="compatibility-application" autocomplete="off">
+        <fieldset>
+          <legend>Semantic autocomplete with opaque field IDs</legend>
+          <p class="hint">
+            These intentionally omit labels and human-readable names. Their standard autocomplete
+            tokens are the available meaning.
+          </p>
+          <div class="semantic-strip">
+            <input id="opaque-71" name="x71" autocomplete="given-name" /><input
+              id="opaque-72"
+              name="x72"
+              autocomplete="family-name"
+            /><input id="opaque-73" name="x73" autocomplete="email" type="email" /><input
+              id="opaque-74"
+              name="x74"
+              autocomplete="address-line1"
+            />
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Labels separated from their inputs</legend>
+          <div class="grid">
+            <div class="field">
+              <div class="field-label">Address line 2</div>
+              <div class="input-wrapper"><input id="wrapped-address2" name="x81" /></div>
+            </div>
+            <div class="field">
+              <div class="field-label">City</div>
+              <div class="input-wrapper"><input id="wrapped-city" name="x82" /></div>
+            </div>
+            <div class="field">
+              <span class="field-label">State / Province</span>
+              <div class="input-wrapper"><input id="wrapped-state" name="x83" /></div>
+            </div>
+            <div class="field">
+              <span class="field-label">Postal code</span>
+              <div class="input-wrapper"><input id="wrapped-postal" name="x84" /></div>
+            </div>
+            <label
+              >Country<select id="native-country">
+                <option value="">Choose a country</option>
+                <option value="IN">India</option>
+                <option value="US">United States</option>
+                <option value="DE">Germany</option>
+              </select></label
+            >
+            <label>Phone number without country code<input id="national-phone" type="tel" /></label>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Professional details and framework state</legend>
+          <div class="grid">
+            <label>LinkedIn profile<input id="profile-linkedin" type="url" /></label
+            ><label>GitHub profile<input id="profile-github" type="url" /></label>
+            <label>Personal website<input id="profile-website" type="url" /></label
+            ><label>Skills<input id="profile-skills" /></label>
+            <div>
+              <label>First name<input id="framework-first" /></label>
+              <div class="event-note" id="framework-state">
+                Framework state: waiting for an input event
+              </div>
+            </div>
+            <label>Expected salary<input id="expected-salary" type="number" min="0" /></label>
+          </div>
+          <p class="hint">
+            The first-name control has an own-property value tracker. Only an input event with a
+            changed native value updates its simulated framework state. This is a framework pattern
+            test, not React itself.
+          </p>
+        </fieldset>
+        <fieldset>
+          <legend>ARIA dropdowns and an editable answer</legend>
+          <div class="grid">
+            <div class="field combo-wrap">
+              <label for="search-country">Country of residence</label
+              ><input
+                id="search-country"
+                role="combobox"
+                aria-autocomplete="list"
+                aria-controls="search-country-options"
+                aria-expanded="false"
+                autocomplete="off"
+              />
+              <div
+                id="search-country-options"
+                class="combo-options"
+                role="listbox"
+                aria-label="Countries"
+                hidden
+              ></div>
+            </div>
+            <div class="field combo-wrap">
+              <span id="button-country-label">Country</span
+              ><button
+                id="button-country"
+                class="combo-button"
+                type="button"
+                role="combobox"
+                aria-labelledby="button-country-label"
+                aria-controls="button-country-options"
+                aria-expanded="false"
+                aria-haspopup="listbox"
+                data-placeholder="Choose a country"
+              >
+                Choose a country
+              </button>
+              <div
+                id="button-country-options"
+                class="combo-options"
+                role="listbox"
+                aria-label="Country choices"
+                hidden
+              ></div>
+            </div>
+            <div class="field">
+              <span id="notice-label">Notice period</span>
+              <div
+                id="editable-notice"
+                contenteditable="true"
+                role="textbox"
+                aria-labelledby="notice-label"
+                aria-multiline="true"
+              ></div>
+            </div>
+          </div>
+          <p class="hint">
+            The searchable dropdown publishes options after a short delay. EZEapply must select a
+            real option, not leave an uncommitted search string.
+          </p>
+        </fieldset>
+        <fieldset>
+          <legend>Resume and unrelated attachment</legend>
+          <div class="grid">
+            <div class="field upload">
+              <label for="resume-upload">Resume / CV</label
+              ><input
+                id="resume-upload"
+                class="file-input-concealed"
+                type="file"
+                name="resume"
+                accept=".pdf,application/pdf"
+              /><button type="button" id="choose-resume">Choose resume PDF</button
+              ><output id="resume-badge" class="file-badge">No resume selected</output>
+            </div>
+            <div class="field upload">
+              <label for="cover-upload">Cover letter</label
+              ><input
+                id="cover-upload"
+                type="file"
+                name="coverLetter"
+                accept=".pdf,application/pdf"
+              /><output id="cover-badge" class="file-badge">No cover letter selected</output>
+            </div>
+          </div>
+          <p class="hint">
+            This local form displays the FileList and change event. It has no upload endpoint.
+          </p>
+        </fieldset>
+        <fieldset>
+          <legend>Web component and embedded form</legend>
+          <div id="shadow-host"></div>
+          <p class="hint">The email control above lives inside an open shadow root.</p>
+          <iframe
+            id="embedded-application"
+            title="Embedded application fields"
+            src="/apply/compatibility-frame.html"
+          ></iframe>
+        </fieldset>
+        <fieldset>
+          <legend>Preserve existing answers and manual decisions</legend>
+          <label
+            >Email<input
+              id="existing-email"
+              type="email"
+              value="existing-answer@example.test"
+              class="readonly-value" /></label
+          ><label class="checkbox"
+            ><input id="consent" type="checkbox" />I agree to the application terms</label
+          ><label
+            >Current salary — no saved answer<input id="unknown-current" type="number"
+          /></label>
+          <p class="hint">
+            The existing email and consent choice must be preserved. Current salary may match a
+            saved user-created demo answer, so it is displayed but is not part of the blank-field
+            protection score.
+          </p>
+        </fieldset>
+        <div id="dynamic-step" class="dynamic"></div>
+      </form>
+      <p class="footer-note submit-note">
+        All details are synthetic. This page never submits an application or sends files over the
+        network.
+      </p>
+    </main>
+  </body>
+</html>

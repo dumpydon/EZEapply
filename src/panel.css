@@ -1,0 +1,753 @@
+#eze-custom-root {
+  --eze-bg: #222e36;
+  --eze-surface: #2b3942;
+  --eze-border: #43555d;
+  --eze-muted: #adb7c6;
+  --eze-text: #edf1f7;
+  --eze-accent: #78cbb2;
+  --eze-ring: #7ed3b6;
+  --eze-gradient: var(
+    --eze-local-gradient,
+    linear-gradient(115deg, #167f70 0%, #269b83 64%, #359d72 100%)
+  );
+  color-scheme: dark;
+  color: var(--eze-text);
+  font:
+    14px/1.45 -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+  box-sizing: border-box;
+  padding: 8px 10px 0;
+  margin: 0 auto;
+  max-width: 672px;
+}
+#eze-custom-root *,
+#eze-custom-root *::before,
+#eze-custom-root *::after {
+  box-sizing: border-box;
+}
+#eze-custom-root [hidden] {
+  display: none !important;
+}
+#eze-custom-root button,
+#eze-custom-root input,
+#eze-custom-root textarea,
+#eze-custom-root select {
+  font: inherit;
+}
+#eze-custom-root button {
+  cursor: pointer;
+}
+#eze-custom-root button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+#eze-custom-root button:focus-visible,
+#eze-custom-root input:focus-visible,
+#eze-custom-root textarea:focus-visible,
+#eze-custom-root select:focus-visible,
+#eze-custom-root summary:focus-visible {
+  outline: 2px solid var(--eze-ring);
+  outline-offset: 3px;
+}
+#eze-custom-root h2,
+#eze-custom-root h3,
+#eze-custom-root p {
+  margin: 0;
+}
+#eze-custom-root .eze-card {
+  background: var(--eze-bg);
+  border: 1px solid var(--eze-border);
+  border-radius: 12px;
+  box-shadow: 0 5px 24px #00000013;
+}
+#eze-custom-root .eze-sticky {
+  position: fixed;
+  top: 0;
+  z-index: 50;
+  background: var(--eze-bg);
+  border: 1px solid var(--eze-border);
+  border-top: 0;
+  border-radius: 0 0 10px 10px;
+  box-shadow: 0 2px 10px #0002;
+  padding-bottom: 6px;
+}
+#eze-custom-root .eze-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 12px 3px;
+  gap: 8px;
+}
+#eze-custom-root .eze-eyebrow {
+  display: block;
+  color: #a1d9c6;
+  font-size: 10px;
+  line-height: 1.3;
+  font-weight: 750;
+  letter-spacing: 0.13em;
+  margin-bottom: 5px;
+}
+#eze-custom-root .eze-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 17px;
+  line-height: 1.3;
+  letter-spacing: -0.025em;
+  font-weight: 650;
+}
+#eze-custom-root .eze-count {
+  color: #b3e0cf;
+  background: #269b8324;
+  font-size: 11px;
+  letter-spacing: 0;
+  border-radius: 8px;
+  min-width: 24px;
+  text-align: center;
+  padding: 3px 7px;
+}
+#eze-custom-root .eze-body {
+  padding: 0 12px 9px;
+}
+#eze-custom-root .eze-header:has(+ [hidden]) {
+  padding-bottom: 17px;
+}
+#eze-custom-root .eze-subtitle {
+  color: var(--eze-muted);
+  font-size: 11px;
+  margin: 8px 0;
+}
+#eze-custom-root .eze-profile-name {
+  color: #8d98aa;
+}
+#eze-custom-root .eze-toolbar {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+  margin-bottom: 8px;
+}
+#eze-custom-root .eze-search {
+  min-width: 0;
+  flex: 1;
+  background: #1a212b;
+  border: 1px solid var(--eze-border);
+  color: var(--eze-text);
+  border-radius: 7px;
+  padding: 6px 8px;
+  font-size: 12px;
+}
+#eze-custom-root input::placeholder,
+#eze-custom-root textarea::placeholder {
+  color: #96a0b0;
+  opacity: 1;
+}
+#eze-custom-root .eze-button {
+  padding: 5px 8px;
+  border-radius: 6px;
+  border: 1px solid #4d5666;
+  color: var(--eze-text);
+  background: #343e4c;
+  white-space: nowrap;
+  font-weight: 550;
+  font-size: 11px;
+  line-height: 1.4;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+#eze-custom-root .eze-button:hover:not(:disabled) {
+  background: #404b5c;
+  border-color: #7b879a;
+}
+#eze-custom-root .eze-primary {
+  background: var(--eze-gradient);
+  border-color: #61b99d;
+  color: #fff;
+}
+#eze-custom-root .eze-primary:hover:not(:disabled) {
+  background: var(--eze-gradient);
+  border-color: #adcfdb;
+  filter: brightness(1.08);
+}
+#eze-custom-root .eze-quiet {
+  background: transparent;
+  border-color: transparent;
+  color: #c0c8d6;
+}
+#eze-custom-root .eze-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 25px;
+  height: 25px;
+  border-radius: 5px;
+  border: 0;
+  background: transparent;
+  color: #b8c0cf;
+  font-size: 18px;
+  line-height: 1;
+  padding: 0;
+}
+#eze-custom-root .eze-icon-button:hover {
+  color: #fff;
+  background: #ffffff0c;
+}
+#eze-custom-root .eze-hide-panel {
+  position: fixed;
+  z-index: 60;
+  left: 0;
+  width: 20px;
+  height: 38px;
+  transform: translateY(-50%);
+  border-radius: 0 7px 7px 0;
+  background: #30414bb8;
+  color: #a6b6c1;
+  font-size: 17px;
+}
+#eze-custom-root .eze-hide-panel:hover,
+#eze-custom-root .eze-hide-panel:focus-visible {
+  background: #425661;
+  color: #fff;
+}
+#eze-custom-root .eze-hide-panel:focus-visible {
+  outline-offset: -2px;
+}
+#eze-custom-root .eze-hide-panel.eze-panel-left {
+  left: auto;
+  right: 0;
+  border-radius: 7px 0 0 7px;
+}
+#eze-custom-root .eze-group + .eze-group {
+  margin-top: 11px;
+}
+#eze-custom-root .eze-group-heading {
+  color: #a5b0c2;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 1px 7px;
+}
+#eze-custom-root .eze-field-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 14px minmax(0, 1fr) fit-content(48%) 20px;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  margin: 1px 0;
+}
+#eze-custom-root .eze-copy {
+  position: relative;
+  min-width: 0;
+  max-width: 100%;
+  width: fit-content;
+  justify-self: end;
+  text-align: right;
+  border: 0;
+  border-radius: 5px;
+  padding: 4px 6px;
+  color: inherit;
+  background: transparent;
+  transition: background 0.15s;
+}
+#eze-custom-root .eze-copy:hover:not(:disabled),
+#eze-custom-root .eze-copy:focus-visible {
+  background: #3b4e59;
+}
+#eze-custom-root .eze-copy:disabled {
+  opacity: 0.6;
+}
+#eze-custom-root .eze-field-label {
+  color: #b7c3d0;
+  min-width: 0;
+  font-size: 12px;
+  line-height: 1.4;
+  overflow-wrap: break-word;
+  text-wrap: pretty;
+}
+#eze-custom-root .eze-field-value {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 1.4;
+  font-weight: 500;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+#eze-custom-root .eze-copy-mark {
+  display: none;
+}
+#eze-custom-root .eze-row-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  width: 20px;
+  opacity: 0.6;
+}
+#eze-custom-root .eze-field-row:hover .eze-row-actions,
+#eze-custom-root .eze-field-row:focus-within .eze-row-actions {
+  opacity: 1;
+}
+#eze-custom-root .eze-row-actions .eze-more {
+  position: relative;
+  width: 20px;
+  height: 24px;
+  font-size: 10.5px;
+}
+#eze-custom-root .eze-row-actions .eze-more::before {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 16.8px;
+  border-radius: 3.5px;
+  pointer-events: none;
+}
+#eze-custom-root .eze-row-actions .eze-more:hover {
+  background: transparent;
+}
+#eze-custom-root .eze-row-actions .eze-more:hover::before {
+  background: #ffffff0c;
+}
+#eze-custom-root .eze-drag-handle {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: #9aabba;
+  font-size: 16px;
+  line-height: 1;
+  width: 14px;
+  height: 24px;
+  cursor: grab;
+  opacity: 0.5;
+  touch-action: none;
+  user-select: none;
+}
+#eze-custom-root .eze-drag-handle:hover,
+#eze-custom-root .eze-drag-handle:focus-visible {
+  opacity: 1;
+  color: #d3e5eb;
+}
+#eze-custom-root .eze-drag-handle:active {
+  cursor: grabbing;
+}
+#eze-custom-root .eze-dragging {
+  opacity: 0.4;
+}
+#eze-custom-root .eze-drag-ghost {
+  position: fixed;
+  pointer-events: none;
+  z-index: 2147483001;
+  max-width: 220px;
+  padding: 8px 12px;
+  border: 1px solid #7ed3b6;
+  border-radius: 7px;
+  background: var(--eze-surface);
+  color: var(--eze-text);
+  font-size: 12px;
+  box-shadow: 0 5px 18px #0005;
+}
+#eze-custom-root .eze-drop-before::before,
+#eze-custom-root .eze-drop-after::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: #7ed3b6;
+  pointer-events: none;
+}
+#eze-custom-root .eze-drop-before::before {
+  top: -2px;
+}
+#eze-custom-root .eze-drop-after::after {
+  bottom: -2px;
+}
+#eze-custom-root .eze-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+#eze-custom-root .eze-field-menu {
+  position: fixed;
+  z-index: 2147483000;
+  min-width: 190px;
+  max-width: calc(100vw - 16px);
+  background: var(--eze-surface);
+  color: var(--eze-text);
+  border: 1px solid #61717e;
+  border-radius: 9px;
+  padding: 5px;
+  box-shadow: 0 10px 32px #0006;
+}
+#eze-custom-root .eze-menu-item {
+  display: block;
+  width: 100%;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  font-size: 12px;
+  padding: 9px 10px;
+}
+#eze-custom-root .eze-menu-item:hover:not(:disabled),
+#eze-custom-root .eze-menu-item:focus-visible {
+  background: #415561;
+}
+#eze-custom-root .eze-menu-danger {
+  color: #edbcc2;
+  border-top: 1px solid #50616b;
+  margin-top: 4px;
+}
+#eze-custom-root .eze-restore-fields {
+  margin-top: 10px;
+  white-space: normal;
+  text-align: left;
+}
+#eze-custom-root .eze-status-action {
+  margin-left: 10px;
+  color: #e1eeff;
+  text-decoration: underline;
+}
+#eze-custom-root .eze-copy-only {
+  display: inline-block;
+  color: #b6bfce;
+  background: #ffffff0c;
+  font-size: 9px;
+  border-radius: 4px;
+  margin-left: 6px;
+  padding: 0 4px;
+}
+#eze-custom-root .eze-edit {
+  font-size: 19px;
+}
+#eze-custom-root .eze-controls {
+  padding: 0 12px;
+}
+#eze-custom-root .eze-auto-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  margin-left: auto;
+}
+#eze-custom-root .eze-auto-label input {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 32px;
+  height: 19px;
+  flex: 0 0 32px;
+  margin: 0;
+  border-radius: 20px;
+  border: 1px solid #6f7a8e;
+  background: #424c5d;
+  position: relative;
+  transition: background 0.15s;
+  cursor: pointer;
+}
+#eze-custom-root .eze-auto-label input::after {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #eef0f8;
+  transition: transform 0.15s;
+}
+#eze-custom-root .eze-auto-label input:checked {
+  background: var(--eze-gradient);
+  border-color: #70bfa7;
+}
+#eze-custom-root .eze-auto-label input:checked::after {
+  transform: translateX(13px);
+}
+#eze-custom-root .eze-auto-label strong {
+  display: block;
+  font-size: 11px;
+  font-weight: 550;
+}
+#eze-custom-root .eze-auto-label small {
+  display: block;
+  color: #a5afbf;
+  font-size: 10px;
+  margin-top: 1px;
+}
+#eze-custom-root .eze-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+#eze-custom-root .eze-zoom-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  margin-left: auto;
+}
+#eze-custom-root .eze-zoom-controls .eze-icon-button {
+  width: 20px;
+  height: 24px;
+  font-size: 15px;
+}
+#eze-custom-root .eze-zoom-reset {
+  color: #bacbd8;
+  background: none;
+  border: 0;
+  padding: 2px;
+  font-size: 10px;
+  min-width: 30px;
+}
+#eze-custom-root .eze-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #8e9aab;
+  font-size: 10px;
+  margin-top: 13px;
+}
+#eze-custom-root .eze-footer > span {
+  flex: 1;
+}
+#eze-custom-root .eze-text-button {
+  padding: 3px 0;
+  background: transparent;
+  color: #9bdcc5;
+  border: 0;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+#eze-custom-root .eze-text-button:hover {
+  color: #d5edee;
+  text-decoration: underline;
+}
+#eze-custom-root .eze-text-button.eze-ai-draft {
+  padding: 4px 7px;
+  border: 1px solid #47bda36b;
+  border-radius: 6px;
+  background: #238e7622;
+  color: #83e0c4;
+}
+#eze-custom-root .eze-empty {
+  padding: 18px 2px;
+  color: #c9d0dd;
+}
+#eze-custom-root .eze-empty strong {
+  font-size: 13px;
+}
+#eze-custom-root .eze-empty p {
+  color: #a7b0c0;
+  font-size: 12px;
+  margin: 5px 0;
+}
+#eze-custom-root .eze-status {
+  font-size: 12px;
+  margin-top: 10px;
+  border-radius: 8px;
+  background: #233e39;
+  border: 1px solid #3b645a;
+  padding: 9px 10px;
+  color: #bdeadd;
+  overflow-wrap: anywhere;
+}
+#eze-custom-root .eze-status.eze-error {
+  background: #452f36;
+  border-color: #76505b;
+  color: #ffd0d7;
+}
+#eze-custom-root .eze-report {
+  margin-bottom: 10px;
+  padding: 8px;
+  border: 1px solid #49536a;
+  border-radius: 8px;
+  background: #1b232f;
+}
+#eze-custom-root .eze-report-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+}
+#eze-custom-root .eze-report-title .eze-icon-button {
+  width: 22px;
+  height: 22px;
+}
+#eze-custom-root .eze-questions {
+  max-height: 300px;
+  overflow: auto;
+}
+#eze-custom-root .eze-question {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding-top: 10px;
+  margin-top: 9px;
+  border-top: 1px solid #344053;
+}
+#eze-custom-root .eze-question > div:first-child {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+#eze-custom-root .eze-question-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+#eze-custom-root .eze-question small {
+  display: block;
+}
+#eze-custom-root .eze-help {
+  color: #a5b0c2;
+  font-size: 11px;
+  line-height: 1.55;
+  margin-top: 4px;
+  font-weight: 400;
+}
+#eze-custom-root .eze-dialog {
+  position: fixed;
+  color: var(--eze-text);
+  background: #252e3b;
+  border: 1px solid #69728a;
+  border-radius: 14px;
+  padding: 0;
+  width: min(460px, calc(100vw - 24px));
+  max-height: calc(100dvh - 24px);
+  margin: auto;
+  overflow: auto;
+  box-shadow: 0 18px 80px #0008;
+}
+#eze-custom-root .eze-dialog::backdrop {
+  background: #0b1017b3;
+  backdrop-filter: blur(3px);
+}
+#eze-custom-root .eze-editor {
+  padding: 17px;
+}
+#eze-custom-root .eze-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+#eze-custom-root .eze-dialog-header h2 {
+  font-size: 19px;
+  font-weight: 700;
+}
+#eze-custom-root .eze-input-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 14px;
+  color: #d0d7e4;
+  font-size: 12px;
+  font-weight: 600;
+}
+#eze-custom-root .eze-input {
+  width: 100%;
+  padding: 9px 10px;
+  background: #1a2330;
+  color: #f0f3f9;
+  border: 1px solid #535e72;
+  border-radius: 7px;
+  font-size: 13px;
+  line-height: 1.45;
+  font-weight: 400;
+  min-width: 0;
+}
+#eze-custom-root textarea.eze-input {
+  resize: vertical;
+  min-height: 62px;
+}
+#eze-custom-root .eze-input:focus {
+  border-color: #7ed3b6;
+}
+#eze-custom-root .eze-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  margin-top: 15px;
+  cursor: pointer;
+}
+#eze-custom-root .eze-checkbox-label input {
+  width: 16px;
+  height: 16px;
+  accent-color: #748fc9;
+  margin: 0;
+}
+#eze-custom-root .eze-advanced {
+  margin-top: 16px;
+  border-top: 1px solid #414c5e;
+  padding-top: 12px;
+}
+#eze-custom-root .eze-advanced summary {
+  color: #acc7e4;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+#eze-custom-root .eze-editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 7px;
+  padding-top: 18px;
+}
+#eze-custom-root .eze-danger {
+  color: #ffc1c9;
+  background: transparent;
+  border-color: #76545c;
+  margin-right: auto;
+}
+#eze-custom-root .eze-editor-error {
+  color: #ffc4ce;
+  font-size: 12px;
+  margin-top: 12px;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 350px) {
+  #eze-custom-root {
+    padding: 8px 7px 0;
+  }
+  #eze-custom-root .eze-header {
+    padding: 8px 8px 3px;
+  }
+  #eze-custom-root .eze-body {
+    padding: 0 8px 8px;
+  }
+  #eze-custom-root .eze-controls {
+    padding: 0 8px;
+  }
+  #eze-custom-root .eze-profile-name {
+    display: none;
+  }
+  #eze-custom-root .eze-field-row {
+    gap: 4px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #eze-custom-root *,
+  #eze-custom-root *::after {
+    transition: none !important;
+  }
+}
