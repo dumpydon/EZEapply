@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EZEapply · Familiar layout preview</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 28px;
+        background: #131c22;
+        color: #dfe8ee;
+        font:
+          14px/1.5 -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          sans-serif;
+      }
+      header {
+        max-width: 850px;
+        margin: 0 auto 24px;
+      }
+      header h1 {
+        margin: 0 0 6px;
+        font-size: 25px;
+        letter-spacing: -0.03em;
+      }
+      header p {
+        margin: 0;
+        color: #9aafb9;
+      }
+      header label {
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+        margin-top: 14px;
+        color: #aabfc7;
+        font-size: 12px;
+      }
+      select {
+        border: 1px solid #3b4c55;
+        border-radius: 6px;
+        background: #23323a;
+        color: #dfe8ee;
+        padding: 5px 8px;
+      }
+      main {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 28px;
+      }
+      section {
+        min-width: 0;
+      }
+      h2 {
+        margin: 0 0 8px 2px;
+        color: #8bada9;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+      iframe {
+        display: block;
+        border: 1px solid #3b4c55;
+        border-radius: 14px;
+        box-shadow: 0 15px 45px #0003;
+        background: #202b32;
+      }
+      .popup {
+        width: 342px;
+        height: 702px;
+      }
+      .panel {
+        width: 442px;
+        height: 1100px;
+      }
+      @media (max-width: 460px) {
+        body {
+          padding: 12px;
+        }
+        iframe.panel {
+          width: calc(100vw - 24px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>EZEapply · Familiar, compact, teal.</h1>
+      <p>
+        Live extension UI with synthetic profile data. Click a value to copy it; expand a work entry
+        to read more.
+      </p>
+      <label
+        >Panel width
+        <select aria-label="Preview panel width">
+          <option value="442">440 px</option>
+          <option value="362">360 px</option>
+          <option value="302">300 px</option>
+        </select></label
+      >
+    </header>
+    <main>
+      <section>
+        <h2>Toolbar popup</h2>
+        <iframe class="popup" title="Toolbar popup" src="/popup.html"></iframe>
+      </section>
+      <section>
+        <h2>Side panel</h2>
+        <iframe class="panel" title="Side panel" src="/sidepanel.html"></iframe>
+      </section>
+    </main>
+    <script type="module">
+      const width = document.querySelector('select');
+      width.addEventListener('change', () => {
+        document.querySelector('iframe.panel').style.width = `${Number(width.value)}px`;
+      });
+    </script>
+  </body>
+</html>

@@ -13,6 +13,7 @@ import {
   CONTROL_SELECTOR,
 } from './form-labels';
 import { comboboxValue, fillCombobox } from './widgets';
+import { isDropdownPlaceholder, normalizeOption } from './dropdown';
 import { attachResume, scanResumeInputs } from './resume';
 import { mountPanelDock } from './panel-dock';
 import { mountLinkedInFollow } from './linkedin-follow';
@@ -238,11 +239,13 @@ function collect(root: Document): Target[] {
         blocked,
         kind: radio
           ? 'radio'
-          : control.getAttribute('role') === 'combobox'
-            ? 'combobox'
-            : editable(control)
-              ? 'contenteditable'
-              : control.tagName.toLowerCase(),
+          : control.tagName === 'SELECT'
+            ? 'select'
+            : control.getAttribute('role') === 'combobox'
+              ? 'combobox'
+              : editable(control)
+                ? 'contenteditable'
+                : control.tagName.toLowerCase(),
       });
     }
   }
@@ -251,12 +254,7 @@ function collect(root: Document): Target[] {
 
 function placeholderOption(option: HTMLOptionElement | undefined): boolean {
   if (!option) return true;
-  return (
-    !option.value.trim() ||
-    /^(select|please select|choose|please choose)(\s+(one|an option|option|a value))?[.\s…-]*$/i.test(
-      option.textContent?.trim() || '',
-    )
-  );
+  return !option.value.trim() || isDropdownPlaceholder(option.textContent);
 }
 
 function hasValue(target: Target): boolean {
@@ -324,7 +322,9 @@ function fillTarget(
   if (target.kind === 'radio') {
     const matches = target.controls.filter((option) =>
       [...ownLabels(option), (option as HTMLInputElement).value].some((label) =>
-        [answer, ...valueAliases].some((value) => normalize(label) === normalize(value)),
+        [answer, ...valueAliases].some(
+          (value) => normalizeOption(label) === normalizeOption(value),
+        ),
       ),
     );
     if (matches.length !== 1) return 'No unique radio option matches the saved answer';
@@ -336,8 +336,12 @@ function fillTarget(
     const options = [...select.options].filter(
       (option) =>
         !option.disabled &&
+        !option.closest('optgroup[disabled]') &&
+        !placeholderOption(option) &&
         [option.value, option.textContent || ''].some((label) =>
-          [answer, ...valueAliases].some((value) => normalize(label) === normalize(value)),
+          [answer, ...valueAliases].some(
+            (value) => normalizeOption(label) === normalizeOption(value),
+          ),
         ),
     );
     if (options.length !== 1) return 'No unique dropdown option matches the saved answer';

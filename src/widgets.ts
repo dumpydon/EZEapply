@@ -1,11 +1,10 @@
 import { normalize } from './matcher';
+import { isDropdownPlaceholder, normalizeOption } from './dropdown';
 
 export interface WidgetResult {
   filled: boolean;
   reason: string;
 }
-const PLACEHOLDER =
-  /^(?:select|choose|please select|please choose|select an option|choose an option|select one|select\.\.\.|select…|search|search\.\.\.|search…|select or search|search and select|none selected)$/i;
 function clean(value: string | null | undefined): string {
   return (value || '').replace(/\s+/g, ' ').trim();
 }
@@ -32,24 +31,39 @@ function inputOf(element: HTMLElement): HTMLInputElement | null {
     : element.querySelector<HTMLInputElement>('input:not([type="hidden"])');
 }
 function backingSelect(element: HTMLElement): HTMLSelectElement | null {
-  return element.querySelector<HTMLSelectElement>('select');
+  const contained = element.querySelector<HTMLSelectElement>('select');
+  if (contained) return contained;
+  // Some ATS widgets render a labelled hidden select immediately before their
+  // trigger. Require the same accessible label to avoid borrowing another field.
+  const sibling = element.previousElementSibling;
+  const label = normalize(element.getAttribute('aria-label') || '');
+  return sibling?.tagName === 'SELECT' &&
+    !visible(sibling) &&
+    label &&
+    normalize(sibling.getAttribute('aria-label') || '') === label
+    ? (sibling as HTMLSelectElement)
+    : null;
 }
 function committedValue(element: HTMLElement): string {
   const select = backingSelect(element);
   if (select) {
     const option = select.selectedOptions[0];
-    if (option?.value && !option.disabled && !PLACEHOLDER.test(clean(option.textContent)))
+    if (option?.value && !option.disabled && !isDropdownPlaceholder(option.textContent))
       return clean(option.textContent) || option.value;
+    return '';
   }
   const ariaValue = clean(element.getAttribute('aria-valuetext'));
-  if (ariaValue && !PLACEHOLDER.test(ariaValue)) return ariaValue;
+  if (ariaValue && !isDropdownPlaceholder(ariaValue)) return ariaValue;
   // Search text and the highlighted listbox option are not committed values.
   // Choices and React Select render a separate selected item when accepted.
   const scope = element.closest('[class*="-control"],[class*="__control"]') || element;
   const selected = scope.querySelector(
     '[class*="singleValue"],[class*="single-value"],[class*="__single-value"],.choices__list--single [data-item]',
   );
-  return selected && visible(selected) && !selected.closest('[role="listbox"]')
+  return selected &&
+    visible(selected) &&
+    !selected.closest('[role="listbox"]') &&
+    !isDropdownPlaceholder(selected.textContent)
     ? clean(selected.textContent)
     : '';
 }
@@ -59,11 +73,11 @@ function rootsOf(element: Element): (Document | ShadowRoot)[] {
 }
 function popupNodes(element: HTMLElement): Element[] {
   const input = inputOf(element);
+  const controls = [element, input].filter((node): node is HTMLElement => !!node);
   const ids = [
     ...new Set(
-      [element, input]
-        .filter(Boolean)
-        .flatMap((node) => [node!.getAttribute('aria-controls'), node!.getAttribute('aria-owns')])
+      controls
+        .flatMap((node) => [node.getAttribute('aria-controls'), node.getAttribute('aria-owns')])
         .flatMap((value) => (value || '').split(/\s+/).filter(Boolean)),
     ),
   ];
@@ -78,6 +92,27 @@ function popupNodes(element: HTMLElement): Element[] {
       )
         nodes.push(node);
     }
+  for (const control of controls) {
+    const activeId = control.getAttribute('aria-activedescendant');
+    if (!activeId) continue;
+    for (const root of rootsOf(element)) {
+      const option = root.getElementById(activeId);
+      const list = option?.matches('[role="option"]') ? option.closest('[role="listbox"]') : null;
+      if (list && visible(list)) nodes.push(list);
+    }
+  }
+  // A popup may be the trigger's adjacent sibling rather than its descendant.
+  // Follow that container's explicit ARIA ownership only to a contained listbox;
+  // never search arbitrary siblings, other questions or the page's global menus.
+  for (const sibling of [element.previousElementSibling, element.nextElementSibling]) {
+    if (!sibling?.hasAttribute('aria-expanded') || sibling.querySelector('label')) continue;
+    for (const id of (sibling.getAttribute('aria-owns') || '').split(/\s+/).filter(Boolean)) {
+      const list = sibling.getRootNode() as Document | ShadowRoot;
+      const node = list.getElementById(id);
+      if (node?.matches('[role="listbox"]') && sibling.contains(node) && visible(node))
+        nodes.push(node);
+    }
+  }
   // A contained listbox has an explicit structural relationship; unrelated page
   // listboxes never participate in selection.
   for (const node of element.querySelectorAll('[role="listbox"]'))
@@ -100,7 +135,7 @@ export function comboboxValue(element: HTMLElement): string {
   const placeholder = clean(
     element.getAttribute('data-placeholder') || element.getAttribute('aria-placeholder'),
   );
-  return value === placeholder || PLACEHOLDER.test(value) ? '' : value;
+  return value === placeholder || isDropdownPlaceholder(value) ? '' : value;
 }
 function setInput(input: HTMLInputElement, value: string): void {
   const win = input.ownerDocument.defaultView!;
@@ -170,7 +205,7 @@ function wait(document: Document, milliseconds: number): Promise<void> {
   return new Promise((resolve) => document.defaultView!.setTimeout(resolve, milliseconds));
 }
 function answersMatch(value: string, answers: Set<string>): boolean {
-  return answers.has(normalize(value));
+  return answers.has(normalizeOption(value));
 }
 function optionValues(option: Element): string[] {
   return [
@@ -220,7 +255,7 @@ export async function fillCombobox(
     (element as HTMLButtonElement).type !== 'button'
   )
     return fail('Dropdown trigger could submit the form; select it manually');
-  const answers = new Set([answer, ...valueAliases].map(normalize).filter(Boolean));
+  const answers = new Set([answer, ...valueAliases].map(normalizeOption).filter(Boolean));
   const original = input?.value || '';
   let typed = false;
   let userChanged = false;
@@ -266,6 +301,7 @@ export async function fillCombobox(
       ].filter(
         (option) =>
           visible(option) &&
+          !isDropdownPlaceholder(option.getAttribute('aria-label') || option.textContent) &&
           option.getAttribute('aria-disabled') !== 'true' &&
           !option.hasAttribute('disabled'),
       );

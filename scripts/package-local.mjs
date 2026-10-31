@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { spawn } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { releaseInputs } from './release-inputs.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const built = join(root, 'dist/extension');
@@ -74,6 +75,7 @@ try {
         bytes: bytes.length,
         sha256: digest,
         files: hashes,
+        sources: await releaseInputs(root),
         distribution: 'independent EZEapply runtime',
       },
       null,

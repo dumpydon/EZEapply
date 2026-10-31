@@ -6,6 +6,8 @@ import {
   type ApplicantProfile,
 } from './app-profile';
 import { mountPopupControls } from './popup-controls';
+import { navigationIcon } from './navigation-icon';
+import { mountProfileView } from './profile-view';
 import { mountApplicationCount, applicationCount } from './application-count';
 import { mountActivityControls } from './activity-controls';
 import { aiSettingsHero, aiSideEntry, aiPowerIcon } from './ai-entry';
@@ -44,32 +46,6 @@ function brand(): HTMLImageElement {
   img.width = 236;
   img.height = 40;
   return img;
-}
-function icon(kind: 'applications' | 'profile' | 'settings' | 'bolt'): SVGSVGElement {
-  const node = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  for (const [key, value] of Object.entries({
-    viewBox: '0 0 24 24',
-    fill: 'none',
-    stroke: 'currentColor',
-    'stroke-width': '1.7',
-    'stroke-linecap': 'round',
-    'stroke-linejoin': 'round',
-    'aria-hidden': 'true',
-  }))
-    node.setAttribute(key, value);
-  const path = document.createElementNS(node.namespaceURI, 'path');
-  path.setAttribute(
-    'd',
-    {
-      applications: 'M4 3v18h17M8 17v-5m5 5V7m5 10V9',
-      profile: 'M20 21v-2a7 7 0 0 0-14 0v2M17 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z',
-      settings:
-        'm9 3-1 3-3 1-2 3 2 2v3l2 3h3l2 3 3-1 1-3 3-1 1-3-2-2V9l-3-1-1-3-3-1-2 1ZM16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z',
-      bolt: 'm13 2-9 12h7l-1 8 10-12h-8l1-8Z',
-    }[kind],
-  );
-  node.append(path);
-  return node;
 }
 async function rpc(
   type: string,
@@ -173,103 +149,6 @@ function masterSwitch(initial: boolean): HTMLElement {
   block.append(row, status);
   return block;
 }
-function copyValue(label: string, value: string): HTMLElement {
-  const row = el('div', 'profile-value'),
-    key = el('span', '', label),
-    answer = button(value || 'Not set', 'copy-value');
-  answer.disabled = !value;
-  answer.title = `Copy ${label}`;
-  answer.addEventListener('click', async () => {
-    try {
-      await navigator.clipboard.writeText(value);
-      answer.textContent = 'Copied';
-      setTimeout(() => {
-        answer.textContent = value;
-      }, 1000);
-    } catch {
-      answer.textContent = 'Copy failed';
-      setTimeout(() => {
-        answer.textContent = value;
-      }, 1500);
-    }
-  });
-  row.append(key, answer);
-  return row;
-}
-function profileCards(profile: ApplicantProfile): HTMLElement {
-  const stack = el('div', 'profile-cards');
-  const personal = el('section', 'card');
-  personal.append(el('h2', '', 'Personal details'));
-  const names = profile.nameData,
-    contact = profile.contactData,
-    address = profile.addressData;
-  for (const [label, value] of [
-    ['Legal name', [names.firstName, names.middleName, names.lastName].filter(Boolean).join(' ')],
-    ['Email', string(contact.email)],
-    ['Phone', string(contact.phoneNumber)],
-    [
-      'Address',
-      [
-        address.line1,
-        address.line2,
-        address.city,
-        address.state,
-        address.postalCode,
-        address.country,
-      ]
-        .filter(Boolean)
-        .join(', '),
-    ],
-  ] as const)
-    personal.append(copyValue(label, value));
-  stack.append(personal);
-  for (const [title, items, primary, secondary] of [
-    ['Work history', profile.jobData, 'jobTitle', 'company'],
-    ['Education', profile.educationData, 'school', 'degree'],
-  ] as const) {
-    const section = el('section', 'card');
-    section.append(el('h2', '', title));
-    if (!items.length) section.append(el('p', 'muted', 'Add this in your profile.'));
-    for (const item of items) {
-      const entry = el('div', 'history-summary');
-      entry.append(copyValue(string(item[primary]) || title, string(item[secondary])));
-      if (string(item.description)) entry.append(copyValue('Details', string(item.description)));
-      section.append(entry);
-    }
-    stack.append(section);
-  }
-  const portfolio = el('section', 'card');
-  portfolio.append(el('h2', '', 'Portfolio'));
-  if (string(profile.resumeData.fileName)) {
-    const resume = button(`↓ ${string(profile.resumeData.fileName)}`);
-    resume.addEventListener('click', () => resumeDownload(profile.resumeData));
-    portfolio.append(resume);
-  }
-  for (const [key, value] of Object.entries(profile.websiteData)) {
-    if (typeof value === 'string' && value)
-      portfolio.append(copyValue(key === 'personal' ? 'Website' : key, value));
-    if (key === 'websites' && Array.isArray(value))
-      for (const website of value)
-        if (typeof website === 'string') portfolio.append(copyValue('Website', website));
-  }
-  if (profile.skillsData.length)
-    portfolio.append(copyValue('Skills', profile.skillsData.join(', ')));
-  stack.append(portfolio);
-  if (profile.languageData.length) {
-    const languages = el('section', 'card');
-    languages.append(el('h2', '', 'Languages'));
-    for (const item of profile.languageData)
-      languages.append(copyValue(string(item.language), string(item.proficiency)));
-    stack.append(languages);
-  }
-  const employment = el('section', 'card');
-  employment.append(el('h2', '', 'Employment information'));
-  for (const [key, value] of Object.entries(profile.employmentData))
-    if (typeof value === 'string' || typeof value === 'boolean')
-      employment.append(copyValue(key.replace(/([a-z])([A-Z])/g, '$1 $2'), String(value)));
-  stack.append(employment);
-  return stack;
-}
 function ring(): HTMLElement {
   const chart = el('div', 'daily-ring');
   chart.dataset.chart = 'today';
@@ -337,25 +216,41 @@ export async function mountApp(root: HTMLElement): Promise<() => void> {
   if (popup) {
     const windowId = (await chrome.windows.getCurrent()).id;
     document.body.classList.add('popup-page');
-    root.append(brand(), ring());
+    const extensions = button('', 'popup-extensions');
+    extensions.title = 'Open Chrome extensions';
+    extensions.setAttribute('aria-label', 'Open Chrome extensions');
+    extensions.append(navigationIcon('extensions'));
+    extensions.addEventListener('click', async () => {
+      extensions.disabled = true;
+      try {
+        await chrome.tabs.create({ url: 'chrome://extensions/' });
+        showStatus(status, '');
+      } catch (error) {
+        showStatus(status, errorText(error), true);
+      } finally {
+        extensions.disabled = false;
+      }
+    });
+    root.append(extensions, brand(), ring());
     const shortcuts = el('div', 'popup-shortcuts');
     for (const [title, target, kind] of [
       ['View Applications', 'options.html#/', 'applications'],
       ['Manage Profile', 'options.html#/profile', 'profile'],
       ['Manage Settings', 'options.html#/settings/autofill', 'settings'],
     ] as const) {
-      const control = button('', 'round-shortcut');
+      const control = button('', 'popup-shortcut');
       control.title = title;
       control.setAttribute('aria-label', title);
-      control.append(icon(kind));
+      control.append(navigationIcon(kind));
       control.addEventListener('click', () => {
         void chrome.tabs.create({ url: chrome.runtime.getURL(target) });
       });
       shortcuts.append(control);
     }
     root.append(shortcuts);
-    const quick = button('Quick Access', 'quick-access');
-    quick.prepend(icon('bolt'));
+    const quick = button('Quick Access Sidepane', 'quick-access');
+    quick.prepend(navigationIcon('sidepane'));
+    quick.title = 'Open the EZEapply side panel';
     const status = statusNode();
     quick.addEventListener('click', () => {
       if (windowId === undefined) {
@@ -394,7 +289,23 @@ export async function mountApp(root: HTMLElement): Promise<() => void> {
       link('Analytics', 'analytics.html'),
     );
     for (const anchor of shortcuts.querySelectorAll('a')) anchor.target = '_blank';
-    root.append(shortcuts, profileCards(normalizeProfile(settings.profile)));
+    let profileView = mountProfileView(normalizeProfile(settings.profile), resumeDownload);
+    root.append(shortcuts, el('h2', 'side-profile-title', 'Profile'), profileView.element);
+    const profileChanged: Parameters<typeof chrome.storage.onChanged.addListener>[0] = (
+      changes,
+      area,
+    ) => {
+      if (disposed || area !== 'local' || !changes.profile) return;
+      const next = mountProfileView(normalizeProfile(changes.profile.newValue), resumeDownload);
+      profileView.element.replaceWith(next.element);
+      profileView.dispose();
+      profileView = next;
+    };
+    chrome.storage.onChanged.addListener(profileChanged);
+    cleanup.push(() => {
+      profileView.dispose();
+      chrome.storage.onChanged.removeListener(profileChanged);
+    });
   } else {
     document.body.classList.add('options-page');
     const header = el('header', 'app-header'),
@@ -597,7 +508,7 @@ async function renderApplications(main: HTMLElement, current: () => boolean): Pr
     if (!matches.length) {
       const empty = el('section', 'card empty-state');
       empty.append(
-        icon('applications'),
+        navigationIcon('applications'),
         el('h2', '', 'Your next opportunity starts here'),
         el(
           'p',

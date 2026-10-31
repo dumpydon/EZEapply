@@ -56,6 +56,7 @@ export async function mountAISettings(host: HTMLElement): Promise<void> {
     saving: Promise<void> = Promise.resolve();
   let closeMenu: (() => void) | undefined;
   let persistWriting: (() => Promise<void>) | undefined;
+  let persistKey: (() => Promise<void>) | undefined;
   let writingTimer: ReturnType<typeof setTimeout> | undefined;
   let saveFailed = false;
   function feedback(text: string, error = false) {
@@ -98,8 +99,10 @@ export async function mountAISettings(host: HTMLElement): Promise<void> {
     return el;
   }
   done.addEventListener('click', async () => {
+    done.disabled = true;
     try {
       clearTimeout(writingTimer);
+      await persistKey?.();
       await persistWriting?.();
       await saving;
       if (saveFailed) return;
@@ -108,20 +111,27 @@ export async function mountAISettings(host: HTMLElement): Promise<void> {
       if (!window.closed) feedback('Settings saved. You can return to your application.');
     } catch {
       /* The save error remains visible. */
+    } finally {
+      done.disabled = false;
     }
   });
   for (const [tab, panel] of [
     [keysTab, keys],
     [styleTab, writing],
   ] as const)
-    tab.addEventListener('click', () => {
-      closeMenu?.();
-      keys.hidden = panel !== keys;
-      writing.hidden = panel !== writing;
-      keysTab.classList.toggle('on', panel === keys);
-      styleTab.classList.toggle('on', panel === writing);
-      keysTab.setAttribute('aria-selected', String(panel === keys));
-      styleTab.setAttribute('aria-selected', String(panel === writing));
+    tab.addEventListener('click', async () => {
+      try {
+        await persistKey?.();
+        closeMenu?.();
+        keys.hidden = panel !== keys;
+        writing.hidden = panel !== writing;
+        keysTab.classList.toggle('on', panel === keys);
+        styleTab.classList.toggle('on', panel === writing);
+        keysTab.setAttribute('aria-selected', String(panel === keys));
+        styleTab.setAttribute('aria-selected', String(panel === writing));
+      } catch {
+        /* Keep the key field available so a failed save can be retried. */
+      }
     });
   async function refresh(force = false) {
     const requested = provider,
@@ -345,6 +355,7 @@ export async function mountAISettings(host: HTMLElement): Promise<void> {
       item.setAttribute('aria-pressed', String(id === provider));
       item.addEventListener('click', async () => {
         try {
+          await persistKey?.();
           await change({ kind: 'general', selectedProvider: id });
           provider = id;
           renderProvider();
@@ -364,25 +375,78 @@ export async function mountAISettings(host: HTMLElement): Promise<void> {
         : `Paste your ${LABELS[provider]} API key`;
     const keyRow = field(keys, LABELS[provider], key),
       save = button('Save', 'small-action'),
-      forget = button('Remove', 'small-action');
+      forget = button('Remove', 'small-action'),
+      keyState = node('p', 'key-state');
+    keyState.id = `${key.id}-state`;
+    keyState.setAttribute('role', 'status');
+    key.setAttribute('aria-describedby', keyState.id);
+    key.title = 'Saved keys stay hidden. Paste here only to add or replace a key.';
+    keys.append(keyState);
     forget.hidden = !config.hasKey;
     keyRow.append(save, forget);
+    let keySaving: Promise<void> | undefined;
+    function keyStatus() {
+      const saved = settings.providers[chosenProvider].hasKey;
+      const pending = !!key.value.trim();
+      keyState.dataset.state = keySaving
+        ? 'saving'
+        : pending
+          ? 'pending'
+          : saved
+            ? 'saved'
+            : 'missing';
+      keyState.textContent = keySaving
+        ? 'Saving key on this device…'
+        : pending
+          ? 'New key entered · saved when you leave this field or choose Done.'
+          : saved
+            ? 'Key saved on this device · kept across extension reloads and updates.'
+            : 'No key saved for this provider.';
+      forget.hidden = !saved;
+    }
+    async function saveKey(): Promise<void> {
+      if (keySaving) {
+        await keySaving;
+        if (key.value.trim()) await saveKey();
+        return;
+      }
+      const value = key.value;
+      if (!value.trim()) return;
+      save.disabled = true;
+      const task = change({ kind: 'provider', provider: chosenProvider, apiKey: value }).then(
+        () => {
+          // A later edit made while saving must not be erased by the older reply.
+          if (key.value === value) key.value = '';
+          key.placeholder = '••••••••  Saved — paste to replace';
+        },
+      );
+      keySaving = task;
+      keyStatus();
+      try {
+        await task;
+      } finally {
+        keySaving = undefined;
+        save.disabled = false;
+        keyStatus();
+      }
+      if (key.value.trim()) await saveKey();
+    }
+    persistKey = saveKey;
+    key.addEventListener('input', keyStatus);
+    key.addEventListener('blur', (event) => {
+      if (event.relatedTarget !== save && event.relatedTarget !== forget)
+        void saveKey().catch(() => {});
+    });
+    keyStatus();
     save.addEventListener('click', async () => {
       if (!key.value.trim()) {
         feedback('Paste a key first. Use Remove to delete a saved key.', true);
         return;
       }
-      save.disabled = true;
       try {
-        await change({ kind: 'provider', provider: chosenProvider, apiKey: key.value });
-        key.value = '';
-        key.placeholder = '••••••••  Saved — paste to replace';
-        forget.hidden = false;
+        await saveKey();
         void refresh(true);
-      } catch {
-      } finally {
-        save.disabled = false;
-      }
+      } catch {}
     });
     key.addEventListener('keydown', (event) => {
       if (event.key === 'Enter') {
@@ -394,10 +458,11 @@ export async function mountAISettings(host: HTMLElement): Promise<void> {
       if (!window.confirm(`Remove the saved ${LABELS[chosenProvider]} API key from this device?`))
         return;
       try {
+        await keySaving;
         await change({ kind: 'provider', provider: chosenProvider, apiKey: '' });
         key.value = '';
         key.placeholder = `Paste your ${LABELS[chosenProvider]} API key`;
-        forget.hidden = true;
+        keyStatus();
       } catch {}
     });
     if (['custom', 'ollama', 'azure'].includes(provider)) {

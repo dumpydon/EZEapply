@@ -1,32 +1,6 @@
+import { navigationIcon } from './navigation-icon';
+
 /** Compact entry points; detailed analytics stay on their own extension page. */
-export function analyticsIcon(): SVGSVGElement {
-  const ns = 'http://www.w3.org/2000/svg',
-    svg = document.createElementNS(ns, 'svg');
-  svg.setAttribute('viewBox', '0 0 24 24');
-  svg.setAttribute('fill', 'none');
-  svg.setAttribute('stroke', 'currentColor');
-  svg.setAttribute('stroke-width', '1.8');
-  svg.setAttribute('stroke-linecap', 'round');
-  svg.setAttribute('stroke-linejoin', 'round');
-  svg.setAttribute('aria-hidden', 'true');
-  const path = document.createElementNS(ns, 'path');
-  path.setAttribute('d', 'M3 3v18h18M6 15l4-5 4 3 6-8');
-  svg.append(path);
-  for (const [cx, cy] of [
-    [6, 15],
-    [10, 10],
-    [14, 13],
-    [20, 5],
-  ]) {
-    const circle = document.createElementNS(ns, 'circle');
-    circle.setAttribute('cx', String(cx));
-    circle.setAttribute('cy', String(cy));
-    circle.setAttribute('r', '1.4');
-    circle.setAttribute('fill', 'currentColor');
-    svg.append(circle);
-  }
-  return svg;
-}
 export function mountActivityControls(): { decorate(): void; dispose(): void } {
   let disposed = false,
     editor: HTMLDialogElement | undefined;
@@ -37,7 +11,7 @@ export function mountActivityControls(): { decorate(): void; dispose(): void } {
   shortcut.rel = 'noopener';
   shortcut.title = 'Analytics';
   shortcut.setAttribute('aria-label', 'Open application analytics');
-  shortcut.append(analyticsIcon());
+  shortcut.append(navigationIcon('analytics'));
   const nav = document.createElement('a');
   nav.href = href;
   nav.textContent = 'Analytics';

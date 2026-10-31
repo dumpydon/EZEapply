@@ -223,6 +223,62 @@ describe('form interaction', () => {
     expect(report.filled).toBe(0);
     expect(report.questions[0].reason).toMatch('unique');
   });
+  it.each(['— Make a Selection —', 'PLEASE SELECT', 'Choose an option…', '— Select a value —'])(
+    'fills a native dropdown whose placeholder has a nonempty value: %s',
+    (placeholder) => {
+      document.body.innerHTML = `<label for="prefix">Prefix</label><select id="prefix"><option value="-1">${placeholder}</option><option value="20">Ms. / Miss / Mrs.</option><option value="21">Mr.</option><option value="22">Other</option></select>`;
+      const saved = [field('prefix', 'prefix*', 'mR')];
+      expect(scanForm(document, saved).questions[0]).toMatchObject({
+        filled: false,
+        matchedField: 'prefix',
+      });
+      const events = vi.fn();
+      input('prefix').addEventListener('change', events);
+      expect(fillForm(document, saved).filled).toBe(1);
+      expect(input('prefix').value).toBe('21');
+      expect(events).toHaveBeenCalledOnce();
+      expect(fillForm(document, saved).filled).toBe(0);
+      undoFill();
+      expect(input('prefix').value).toBe('-1');
+    },
+  );
+  it.each(['None', 'Other', 'Prefer not to disclose', 'No', '0'])(
+    'preserves a real native choice labelled %s',
+    (label) => {
+      document.body.innerHTML = `<select id="choice" aria-label="Custom question"><option value="existing">${label}</option><option value="new">Saved answer</option></select>`;
+      expect(fillForm(document, [field('choice', 'Custom question', 'Saved answer')]).filled).toBe(
+        0,
+      );
+      expect(input('choice').value).toBe('existing');
+    },
+  );
+  it.each([
+    '<option value="21" disabled>Mr.</option>',
+    '<optgroup disabled><option value="21">Mr.</option></optgroup>',
+    '<option value="21">Mr.</option><option value="22">MR</option>',
+  ])('leaves unavailable or ambiguous native choices unchanged: %s', (options) => {
+    document.body.innerHTML = `<select aria-label="Prefix" id="prefix"><option value="-1">— Make a Selection —</option>${options}</select>`;
+    const report = fillForm(document, [field('prefix', 'prefix*', 'mr.')]);
+    expect(report.filled).toBe(0);
+    expect(report.questions[0].reason).toContain('unique dropdown');
+    expect(input('prefix').value).toBe('-1');
+  });
+  it('does not erase meaningful option words when comparing answers', () => {
+    document.body.innerHTML =
+      '<select aria-label="Working arrangement" id="choice"><option value="-1">Choose an option</option><option value="1">Travel required</option><option value="2">Travel optional</option></select>';
+    expect(
+      fillForm(document, [field('choice', 'Working arrangement', 'Travel required')]).filled,
+    ).toBe(1);
+    expect(input('choice').value).toBe('1');
+  });
+  it('uses native selection for a select with an explicit combobox role', () => {
+    document.body.innerHTML =
+      '<select role="combobox" aria-label="Prefix" id="prefix"><option value="-1">— Make a Selection —</option><option value="1">Mr.</option></select>';
+    const saved = [field('prefix', 'prefix*', 'MR')];
+    expect(scanForm(document, saved).questions[0].kind).toBe('select');
+    expect(fillForm(document, saved).filled).toBe(1);
+    expect(input('prefix').value).toBe('1');
+  });
   it('treats a radio group as one question, matches option label, preserves existing choice', () => {
     document.body.innerHTML =
       '<fieldset><legend>Willing to relocate?</legend><label>Yes<input id="yes" type="radio" name="relocation" value="1"></label><label>No<input id="no" type="radio" name="relocation" value="0"></label></fieldset>';

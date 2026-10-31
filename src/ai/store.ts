@@ -38,7 +38,9 @@ export async function updateAISettings(
     const db = await database();
     try {
       await new Promise<void>((resolve, reject) => {
-        const tx = db.transaction('settings', 'readwrite');
+        // A successful Save means the private record has committed durably,
+        // including when the extension worker is immediately reloaded.
+        const tx = db.transaction('settings', 'readwrite', { durability: 'strict' });
         tx.objectStore('settings').put(result, 'current');
         tx.oncomplete = () => resolve();
         tx.onerror = tx.onabort = () => reject(new Error('Could not save local AI settings.'));

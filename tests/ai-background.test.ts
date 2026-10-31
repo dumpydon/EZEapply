@@ -68,6 +68,21 @@ describe('AI background trust and persistence', () => {
     expect(status.issue).toContain('API key');
     expect(JSON.stringify(status)).not.toContain(background);
   });
+  it('keeps a saved key when a provider rejects a model refresh', async () => {
+    await send({
+      type: 'eze-ai:edit',
+      action: { kind: 'provider', provider: 'openai', apiKey: 'synthetic-rejected-key' },
+    });
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response('{}', { status: 401 })),
+    );
+    const result = await send({ type: 'eze-ai:models', provider: 'openai', force: true });
+    expect(result.live).toBe(false);
+    expect(result.settings.providers.openai.hasKey).toBe(true);
+    expect((await readAISettings()).providers.openai.apiKey).toBe('synthetic-rejected-key');
+    expect(JSON.stringify(result)).not.toContain('synthetic-rejected-key');
+  });
   it('rejects settings access and mutations from content scripts and external senders', async () => {
     for (const sender of [
       pageSender,

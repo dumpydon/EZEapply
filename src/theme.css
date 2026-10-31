@@ -1,4 +1,5 @@
 @import url('./app-controls.css');
+@import url('./profile-view.css');
 :root {
   color-scheme: dark;
   --background: #202b32;
@@ -414,14 +415,15 @@ textarea::placeholder {
   border: 0;
   border-radius: 0;
 }
-.empty-state > svg {
-  width: 40px;
-  height: 40px;
-  color: #69c7aa;
-  margin-bottom: 20px;
-}
 .empty-state h2 {
   margin-bottom: 10px;
+}
+.empty-state > .navigation-icon {
+  display: block;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 12px;
+  object-fit: contain;
 }
 .empty-state p {
   max-width: 480px;
@@ -430,10 +432,37 @@ textarea::placeholder {
 .popup-page {
   width: 340px;
   min-width: 300px;
-  background: radial-gradient(ellipse at 30% 0%, #319b8023, transparent 65%), #202d35;
 }
 .popup-page #root {
+  position: relative;
   padding: 22px 24px 24px;
+}
+.popup-extensions {
+  position: absolute;
+  top: 27px;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 2px;
+  border: 1px solid #76b8a82e;
+  border-radius: 7px;
+  background: #233d3b99;
+  box-shadow: inset 0 1px 0 #d8ffef0d;
+}
+.popup-extensions:hover {
+  background: #36534d;
+  border-color: #8bceba8a;
+}
+.popup-extensions:active {
+  background: #1a312d;
+}
+.popup-extensions .navigation-icon {
+  display: block;
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
 }
 .popup-page .wordmark {
   width: 225px;
@@ -492,44 +521,98 @@ textarea::placeholder {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 17px;
+  gap: 14px;
   margin: 14px 0 20px;
 }
-.round-shortcut {
+.popup-shortcut {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid #64c7ab45;
-  background: linear-gradient(130deg, #167f70, #2a9e80);
+  border: 1px solid #67c8af6b;
+  background: linear-gradient(155deg, #278e7b, #1a6e61);
   color: #fff;
-  border-radius: 50%;
-  width: 43px;
-  height: 43px;
-  padding: 9px;
+  border-radius: 12px;
+  width: 48px;
+  height: 48px;
+  padding: 6px;
+  box-shadow:
+    inset 0 1px 0 #d8ffef2e,
+    0 3px 0 #102e29,
+    0 6px 13px #00000030;
+  transition:
+    transform 140ms ease,
+    box-shadow 140ms ease,
+    border-color 140ms ease;
 }
-.round-shortcut:hover {
-  filter: brightness(1.15);
+.popup-shortcut:hover {
+  transform: translateY(-2px);
+  border-color: #9be2cda8;
+  box-shadow:
+    inset 0 1px 0 #e9fff445,
+    0 5px 0 #102e29,
+    0 9px 18px #00000038;
 }
-.round-shortcut svg {
-  width: 25px;
-  height: 25px;
+.popup-shortcut:active {
+  transform: translateY(2px);
+  box-shadow:
+    inset 0 1px 3px #052d2740,
+    0 1px 0 #102e29,
+    0 2px 5px #00000025;
+}
+.popup-shortcut .navigation-icon {
+  display: block;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  object-fit: contain;
 }
 .quick-access {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 9px;
-  border: 0;
-  background: transparent;
+  width: fit-content;
+  max-width: 100%;
+  min-height: 42px;
+  border: 1px solid #5d9b8c85;
+  border-radius: 11px;
+  background: linear-gradient(150deg, #344c50, #273d41);
   color: #e5edf3;
   font-size: 18px;
   font-weight: 650;
   margin: 0 auto 16px;
-  padding: 0;
+  padding: 4px 10px;
+  box-shadow:
+    inset 0 1px 0 #d8ffef17,
+    0 3px 0 #142a2b,
+    0 6px 14px #00000028;
+  transition:
+    transform 140ms ease,
+    box-shadow 140ms ease,
+    border-color 140ms ease;
 }
-.quick-access svg {
-  width: 20px;
-  height: 20px;
+.quick-access:hover {
+  transform: translateY(-1px);
+  border-color: #8bcebaa8;
+  box-shadow:
+    inset 0 1px 0 #d8ffef2e,
+    0 4px 0 #142a2b,
+    0 8px 16px #00000035;
+}
+.quick-access:active {
+  transform: translateY(2px);
+  box-shadow:
+    inset 0 1px 3px #132e3240,
+    0 1px 0 #142a2b,
+    0 2px 5px #00000025;
+}
+.quick-access .navigation-icon {
+  display: block;
+  width: 32px;
+  height: 32px;
+  flex: none;
+  object-fit: contain;
+  transform: scale(1.3);
 }
 .popup-switches .master-switch {
   justify-content: center;
@@ -551,8 +634,13 @@ textarea::placeholder {
   margin-top: 10px;
   max-width: 290px;
 }
-.sidepanel-page {
-  background: #202e36;
+.popup-page,
+.sidepanel-page,
+.options-page {
+  background-color: #202b32;
+  background-image: url('./career-pattern.svg');
+  background-size: 400px 400px;
+  background-repeat: repeat;
 }
 .sidepanel-page #root {
   padding: 18px 12px 26px;
@@ -593,56 +681,6 @@ textarea::placeholder {
 }
 .side-links a {
   text-decoration: none;
-}
-.profile-cards {
-  display: grid;
-  gap: 14px;
-}
-.profile-cards .card {
-  padding: 18px;
-  border-radius: 13px;
-}
-.profile-cards h2 {
-  font-size: 15px;
-  color: #b9d5cc;
-  margin-bottom: 16px;
-}
-.profile-value {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-  font-size: 12px;
-  margin: 7px 0;
-}
-.profile-value > span {
-  flex: 0 0 32%;
-  color: #bccbd3;
-}
-.copy-value {
-  padding: 2px 4px;
-  border: 0;
-  border-radius: 4px;
-  background: transparent;
-  color: #dfe9ee;
-  font: inherit;
-  cursor: pointer;
-  text-align: right;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  min-width: 0;
-  max-width: 68%;
-}
-.copy-value:hover {
-  background: #bcd5cc16;
-}
-.copy-value:disabled {
-  opacity: 0.45;
-}
-.history-summary + .history-summary {
-  border-top: 1px solid #40535e;
-  margin-top: 12px;
-  padding-top: 8px;
 }
 @media (max-width: 760px) {
   .app-header {

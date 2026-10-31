@@ -27,6 +27,7 @@ jobs:
       - run: npm ci
       - run: npm run format:check
       - run: npm run verify
+      - run: npm run check:release
 
   release:
     name: Publish versioned download
@@ -52,14 +53,22 @@ jobs:
           version=$(node -p "require('./package.json').version")
           tag="v${version}"
           if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            echo "Release $tag already exists; published assets stay unchanged."
+            previous=$(mktemp -d)
+            gh release download "$tag" --repo "$GITHUB_REPOSITORY" --pattern SHA256SUMS.txt --dir "$previous"
+            if ! cmp "$previous/SHA256SUMS.txt" downloads/SHA256SUMS.txt; then
+              echo "::error::Release $tag has different ZIP contents. Bump package.json version before publishing."
+              exit 1
+            fi
+            echo "Release $tag already contains the reviewed ZIP."
             exit 0
           fi
           gh release create "$tag" \
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \
             --title "EZEapply ${version}" \
+            --latest \
             --notes-file docs/RELEASE-NOTES.md \
             downloads/EZEapply.zip \
             downloads/SHA256SUMS.txt \
+            downloads/release-inventory.json \
             docs/media/install-ezeapply.mp4

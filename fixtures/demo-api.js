@@ -84,6 +84,17 @@
     );
   for (const item of [
     {
+      id: 'demo-prefix',
+      label: 'prefix*',
+      value: 'mR.',
+      category: 'Personal questions',
+      aliases: [],
+      exclude: [],
+      enabled: true,
+      matchMode: 'phrase',
+      scope: '',
+    },
+    {
       id: 'demo-gender',
       label: 'Gender *',
       value: 'Male',

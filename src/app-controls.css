@@ -366,10 +366,6 @@
   justify-content: center;
   text-decoration: none;
 }
-.eze-analytics-shortcut svg {
-  width: 24px;
-  height: 24px;
-}
 .eze-goal-dialog {
   width: min(340px, calc(100vw - 24px));
   margin: auto;

@@ -58,6 +58,24 @@ describe('independent application host', () => {
     document.querySelector<HTMLButtonElement>('.quick-access')!.click();
     expect(chrome.sidePanel.open).toHaveBeenCalledWith({ windowId: 7 });
   });
+  it('refreshes the profile cards after edits without disturbing the saved-answer panel', async () => {
+    history.replaceState({}, '', '/sidepanel.html');
+    const answers = document.createElement('div');
+    answers.id = 'eze-custom-root';
+    answers.textContent = 'Saved answers stay here';
+    document.body.prepend(answers);
+    cleanup = await mountApp(document.getElementById('root')!);
+    expect(document.querySelector('[aria-label="Copy Legal Name"]')?.textContent).toBe(
+      'Alex Sharma',
+    );
+    const callbacks = vi.mocked(chrome.storage.onChanged.addListener).mock.calls.map(([fn]) => fn);
+    for (const fn of callbacks)
+      fn({ profile: { newValue: { nameData: { firstName: 'Sam' } } } }, 'local');
+    expect(document.querySelector('[aria-label="Copy Legal Name"]')?.textContent).toBe('Sam');
+    expect(document.querySelectorAll('.profile-cards')).toHaveLength(1);
+    expect(answers.textContent).toBe('Saved answers stay here');
+    expect(document.querySelectorAll('.profile-section-heading h2 svg')).toHaveLength(5);
+  });
   it('saves edited profile fields while preserving untouched structured dates and booleans', async () => {
     history.replaceState({}, '', '/options.html#/profile');
     cleanup = await mountApp(document.getElementById('root')!);

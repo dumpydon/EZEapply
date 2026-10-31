@@ -1,0 +1,241 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400" fill="none">
+  <!-- Original EZEapply micro-doodles: 64 small motifs, with quiet details between them. -->
+  <defs>
+    <g id="case"><rect x="3" y="7" width="18" height="14" rx="3"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 11c5 4 13 4 18 0M12 11v4"/></g>
+    <g id="bulb"><path d="M8 16c0-3-3-4-3-8a7 7 0 0 1 14 0c0 4-3 5-3 8M8 17h8m-7 4h6M9 9l3 3 3-3m-3 3v5"/></g>
+    <g id="rocket"><path d="M9 16c2-8 6-12 13-13 0 8-4 13-11 15l-2-2ZM9 9l-5 1-2 5 6-1m8 3-1 5-5 1 1-5M3 22l3-3"/><circle cx="16" cy="9" r="2.5"/></g>
+    <g id="mail"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="m3 6 9 7 9-7M3 19l6-6m12 6-6-6"/></g>
+    <g id="profile"><circle cx="12" cy="7" r="4"/><path d="M4 22v-3a8 8 0 0 1 16 0v3M2 22h20"/></g>
+    <g id="spark"><path d="M12 2c1 7 3 9 10 10-7 1-9 3-10 10-1-7-3-9-10-10 7-1 9-3 10-10ZM21 2v4m-2-2h4"/></g>
+    <g id="chip"><rect x="5" y="5" width="14" height="14" rx="3"/><rect x="9" y="9" width="6" height="6" rx="1"/><path d="M8 1v4m8-4v4M8 19v4m8-4v4M1 8h4m-4 8h4m14-8h4m-4 8h4"/></g>
+    <g id="globe"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2c6 6 6 14 0 20-6-6-6-14 0-20Z"/></g>
+    <g id="bell"><path d="M5 16V9a7 7 0 0 1 14 0v7l3 4H2l3-4Zm5 7h4M10 2h4"/></g>
+    <g id="document"><path d="M5 2h10l5 5v15H5V2Zm10 0v6h5M9 12h7m-7 4h7m-7 4h3"/></g>
+    <g id="target"><circle cx="11" cy="13" r="9"/><circle cx="11" cy="13" r="4"/><path d="M11 13 21 3m-5 0h5v5"/></g>
+    <g id="cap"><path d="m1 8 11-5 11 5-11 5L1 8Zm4 3v7c5 3 9 3 14 0v-7m4-3v9"/></g>
+    <g id="cursor"><path d="m4 2 16 12-8 1-4 7L4 2Z"/></g>
+    <g id="flask"><path d="M8 2h8m-6 0v7L3 20a1.5 1.5 0 0 0 1 2h16a1.5 1.5 0 0 0 1-2L14 9V2M7 15h10m-8 4h1m5-1h1"/></g>
+    <g id="orbit"><ellipse cx="12" cy="12" rx="12" ry="5" transform="rotate(-35 12 12)"/><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="1"/></g>
+    <g id="code"><path d="m7 6-6 6 6 6m10-12 6 6-6 6M14 3l-4 18"/></g>
+    <g id="laptop"><rect x="3" y="3" width="18" height="14" rx="2"/><path d="m3 17-2 4h22l-2-4M9 7l-3 3 3 3m6-6 3 3-3 3"/></g>
+    <g id="calendar"><rect x="2" y="4" width="20" height="18" rx="3"/><path d="M7 1v6m10-6v6M2 10h20M7 14h2m6 0h2m-10 4h2m6 0h2"/></g>
+    <g id="pin"><path d="M20 9c0 6-8 13-8 13S4 15 4 9a8 8 0 1 1 16 0Z"/><circle cx="12" cy="9" r="3"/></g>
+    <g id="graph"><path d="M2 2v20h20M6 16l5-7 5 3 6-9"/><circle cx="11" cy="9" r="1.5"/><circle cx="16" cy="12" r="1.5"/></g>
+    <g id="chat"><path d="M2 3h20v14h-8l-7 6v-6H2V3ZM6 8h12m-12 4h8"/></g>
+    <g id="medal"><circle cx="12" cy="9" r="7"/><path d="m6 14-2 9 8-4 8 4-2-9M9 9l2 2 4-5"/></g>
+    <g id="plane"><path d="m1 3 22 8-10 4-4 8L1 3Zm0 0 12 12"/></g>
+    <g id="headphones"><path d="M3 16V11a9 9 0 0 1 18 0v5M3 11H1v8h5v-8H3Zm18 0h2v8h-5v-8h3Zm0 8c0 3-3 4-6 4"/></g>
+    <g id="tag"><path d="M3 2h10l10 10-11 11L2 13V3l1-1Z"/><circle cx="8" cy="8" r="2"/></g>
+    <g id="book"><path d="M12 4C8 1 5 1 1 2v17c4-1 7-1 11 2 4-3 7-3 11-2V2c-4-1-7-1-11 2Zm0 0v17M5 6h3m-3 4h3m8-4h3m-3 4h3"/></g>
+    <g id="trophy"><path d="M6 2h12v7a6 6 0 0 1-12 0V2Zm0 2H1v4a5 5 0 0 0 5 5m12-9h5v4a5 5 0 0 1-5 5M12 15v6m-6 1h12"/></g>
+    <g id="flow"><rect x="8" y="1" width="8" height="6" rx="1.5"/><rect x="1" y="17" width="8" height="6" rx="1.5"/><rect x="15" y="17" width="8" height="6" rx="1.5"/><path d="M12 7v5M5 17v-5h14v5"/></g>
+    <g id="clock"><circle cx="12" cy="13" r="9"/><path d="M12 8v5l4 2M9 1h6m-3 0v3m7 0 2-2"/></g>
+    <g id="cloud"><path d="M6 19a5 5 0 0 1-1-10 7 7 0 0 1 14-1 5.5 5.5 0 0 1-1 11M12 22V11m-4 4 4-4 4 4"/></g>
+    <g id="pencil"><path d="m15 3 6 6M3 21l2-8L17 1l6 6-12 12-8 2Zm2-8 6 6M3 21l4-1-3-3-1 4Z"/></g>
+    <g id="search"><circle cx="10" cy="10" r="8"/><path d="m16 16 7 7M6 10h8m-4-4v8"/></g>
+    <g id="terminal"><rect x="1" y="3" width="22" height="18" rx="3"/><path d="m5 8 4 4-4 4m8 0h6"/></g>
+    <g id="links"><path d="m10 7 3-3a5 5 0 0 1 7 7l-3 3M7 10l-3 3a5 5 0 0 0 7 7l3-3M8 16l8-8"/></g>
+    <g id="compass"><circle cx="12" cy="12" r="10"/><path d="m17 7-3 7-7 3 3-7 7-3Z"/></g>
+    <g id="leaf"><path d="M3 21 17 7M3 16C1 8 8 3 22 2c-1 14-6 21-14 19M7 17v-6m0 6h6"/></g>
+    <g id="mug"><path d="M3 7h14v13H3V7Zm14 1h3a4 4 0 0 1 0 8h-3M1 23h19M6 1v2m5-2v2"/></g>
+    <g id="idea"><path d="M3 12h3m12 0h3M5 4l2 2m12-2-2 2M12 1v3M8 20h8m-7 3h6M8 17c0-2-2-3-2-6a6 6 0 0 1 12 0c0 3-2 4-2 6Z"/></g>
+    <g id="nodes"><circle cx="12" cy="12" r="4"/><circle cx="3" cy="3" r="2"/><circle cx="21" cy="5" r="2"/><circle cx="20" cy="21" r="2"/><circle cx="3" cy="20" r="2"/><path d="m5 5 4 4m6-1 4-2m-4 9 4 4m-14 0 4-4"/></g>
+    <g id="flag"><path d="M4 23V2c6-3 10 3 16 0v12c-6 3-10-3-16 0"/></g>
+  </defs>
+  <g stroke="#a6c5d0" stroke-opacity=".06" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round">
+    <use href="#case" transform="translate(10 10) rotate(-12 12 12)"/>
+    <use href="#spark" transform="translate(65 13) rotate(17 12 12)"/>
+    <use href="#mail" transform="translate(113 16) rotate(-22 12 12)"/>
+    <use href="#chip" transform="translate(161 12) rotate(13 12 12)"/>
+    <use href="#bulb" transform="translate(216 15) rotate(-18 12 12)"/>
+    <use href="#plane" transform="translate(264 11) rotate(23 12 12)"/>
+    <use href="#profile" transform="translate(312 14) rotate(-14 12 12)"/>
+    <use href="#globe" transform="translate(360 10) rotate(19 12 12)"/>
+    <use href="#rocket" transform="translate(13 65) rotate(19 12 12)"/>
+    <use href="#book" transform="translate(61 61) rotate(-24 12 12)"/>
+    <use href="#target" transform="translate(116 64) rotate(15 12 12)"/>
+    <use href="#bell" transform="translate(164 60) rotate(-20 12 12)"/>
+    <use href="#flow" transform="translate(212 63) rotate(25 12 12)"/>
+    <use href="#tag" transform="translate(260 66) rotate(-16 12 12)"/>
+    <use href="#cap" transform="translate(315 62) rotate(21 12 12)"/>
+    <use href="#code" transform="translate(363 65) rotate(-12 12 12)"/>
+    <use href="#laptop" transform="translate(16 113) rotate(-12 12 12)"/>
+    <use href="#calendar" transform="translate(64 116) rotate(17 12 12)"/>
+    <use href="#orbit" transform="translate(112 112) rotate(-22 12 12)"/>
+    <use href="#document" transform="translate(160 115) rotate(13 12 12)"/>
+    <use href="#nodes" transform="translate(215 111) rotate(-18 12 12)"/>
+    <use href="#pin" transform="translate(263 114) rotate(23 12 12)"/>
+    <use href="#graph" transform="translate(311 110) rotate(-14 12 12)"/>
+    <use href="#mug" transform="translate(366 113) rotate(19 12 12)"/>
+    <use href="#chat" transform="translate(12 161) rotate(19 12 12)"/>
+    <use href="#medal" transform="translate(60 164) rotate(-24 12 12)"/>
+    <use href="#headphones" transform="translate(115 160) rotate(15 12 12)"/>
+    <use href="#flask" transform="translate(163 163) rotate(-20 12 12)"/>
+    <use href="#cursor" transform="translate(211 166) rotate(25 12 12)"/>
+    <use href="#compass" transform="translate(266 162) rotate(-16 12 12)"/>
+    <use href="#idea" transform="translate(314 165) rotate(21 12 12)"/>
+    <use href="#terminal" transform="translate(362 161) rotate(-12 12 12)"/>
+    <use href="#leaf" transform="translate(15 216) rotate(-12 12 12)"/>
+    <use href="#case" transform="translate(63 212) rotate(17 12 12)"/>
+    <use href="#cloud" transform="translate(111 215) rotate(-22 12 12)"/>
+    <use href="#links" transform="translate(166 211) rotate(13 12 12)"/>
+    <use href="#trophy" transform="translate(214 214) rotate(-18 12 12)"/>
+    <use href="#clock" transform="translate(262 210) rotate(23 12 12)"/>
+    <use href="#pencil" transform="translate(310 213) rotate(-14 12 12)"/>
+    <use href="#flag" transform="translate(365 216) rotate(19 12 12)"/>
+    <use href="#globe" transform="translate(11 264) rotate(19 12 12)"/>
+    <use href="#chip" transform="translate(66 260) rotate(-24 12 12)"/>
+    <use href="#search" transform="translate(114 263) rotate(15 12 12)"/>
+    <use href="#cap" transform="translate(162 266) rotate(-20 12 12)"/>
+    <use href="#mail" transform="translate(210 262) rotate(25 12 12)"/>
+    <use href="#rocket" transform="translate(265 265) rotate(-16 12 12)"/>
+    <use href="#spark" transform="translate(313 261) rotate(21 12 12)"/>
+    <use href="#calendar" transform="translate(361 264) rotate(-12 12 12)"/>
+    <use href="#profile" transform="translate(14 312) rotate(-12 12 12)"/>
+    <use href="#document" transform="translate(62 315) rotate(17 12 12)"/>
+    <use href="#flow" transform="translate(110 311) rotate(-22 12 12)"/>
+    <use href="#bulb" transform="translate(165 314) rotate(13 12 12)"/>
+    <use href="#laptop" transform="translate(213 310) rotate(-18 12 12)"/>
+    <use href="#orbit" transform="translate(261 313) rotate(23 12 12)"/>
+    <use href="#tag" transform="translate(316 316) rotate(-14 12 12)"/>
+    <use href="#headphones" transform="translate(364 312) rotate(19 12 12)"/>
+    <use href="#graph" transform="translate(10 360) rotate(19 12 12)"/>
+    <use href="#plane" transform="translate(65 363) rotate(-24 12 12)"/>
+    <use href="#compass" transform="translate(113 366) rotate(15 12 12)"/>
+    <use href="#chat" transform="translate(161 362) rotate(-20 12 12)"/>
+    <use href="#medal" transform="translate(216 365) rotate(25 12 12)"/>
+    <use href="#code" transform="translate(264 361) rotate(-16 12 12)"/>
+    <use href="#leaf" transform="translate(312 364) rotate(21 12 12)"/>
+    <use href="#nodes" transform="translate(360 360) rotate(-12 12 12)"/>
+  </g>
+  <g stroke="#a6c5d0" stroke-opacity=".042" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m47 25 3 3-3 3"/>
+    <circle cx="97" cy="29" r="1.4"/>
+    <circle cx="147" cy="25" r="1.4"/>
+    <path d="m197 29 3 3-3 3"/>
+    <circle cx="247" cy="25" r="1.4"/>
+    <circle cx="297" cy="29" r="1.4"/>
+    <path d="m347 25 3 3-3 3"/>
+    <circle cx="397" cy="29" r="1.4"/>
+    <circle cx="47" cy="75" r="1.4"/>
+    <circle cx="97" cy="79" r="1.4"/>
+    <path d="m147 75 3 3-3 3"/>
+    <circle cx="197" cy="79" r="1.4"/>
+    <circle cx="247" cy="75" r="1.4"/>
+    <path d="m297 79 3 3-3 3"/>
+    <circle cx="347" cy="75" r="1.4"/>
+    <circle cx="397" cy="79" r="1.4"/>
+    <circle cx="47" cy="125" r="1.4"/>
+    <path d="m97 129 3 3-3 3"/>
+    <circle cx="147" cy="125" r="1.4"/>
+    <circle cx="197" cy="129" r="1.4"/>
+    <path d="m247 125 3 3-3 3"/>
+    <circle cx="297" cy="129" r="1.4"/>
+    <circle cx="347" cy="125" r="1.4"/>
+    <path d="m397 129 3 3-3 3"/>
+    <path d="m47 175 3 3-3 3"/>
+    <circle cx="97" cy="179" r="1.4"/>
+    <circle cx="147" cy="175" r="1.4"/>
+    <path d="m197 179 3 3-3 3"/>
+    <circle cx="247" cy="175" r="1.4"/>
+    <circle cx="297" cy="179" r="1.4"/>
+    <path d="m347 175 3 3-3 3"/>
+    <circle cx="397" cy="179" r="1.4"/>
+    <circle cx="47" cy="225" r="1.4"/>
+    <circle cx="97" cy="229" r="1.4"/>
+    <path d="m147 225 3 3-3 3"/>
+    <circle cx="197" cy="229" r="1.4"/>
+    <circle cx="247" cy="225" r="1.4"/>
+    <path d="m297 229 3 3-3 3"/>
+    <circle cx="347" cy="225" r="1.4"/>
+    <circle cx="397" cy="229" r="1.4"/>
+    <circle cx="47" cy="275" r="1.4"/>
+    <path d="m97 279 3 3-3 3"/>
+    <circle cx="147" cy="275" r="1.4"/>
+    <circle cx="197" cy="279" r="1.4"/>
+    <path d="m247 275 3 3-3 3"/>
+    <circle cx="297" cy="279" r="1.4"/>
+    <circle cx="347" cy="275" r="1.4"/>
+    <path d="m397 279 3 3-3 3"/>
+    <path d="m47 325 3 3-3 3"/>
+    <circle cx="97" cy="329" r="1.4"/>
+    <circle cx="147" cy="325" r="1.4"/>
+    <path d="m197 329 3 3-3 3"/>
+    <circle cx="247" cy="325" r="1.4"/>
+    <circle cx="297" cy="329" r="1.4"/>
+    <path d="m347 325 3 3-3 3"/>
+    <circle cx="397" cy="329" r="1.4"/>
+    <circle cx="47" cy="375" r="1.4"/>
+    <circle cx="97" cy="379" r="1.4"/>
+    <path d="m147 375 3 3-3 3"/>
+    <circle cx="197" cy="379" r="1.4"/>
+    <circle cx="247" cy="375" r="1.4"/>
+    <path d="m297 379 3 3-3 3"/>
+    <circle cx="347" cy="375" r="1.4"/>
+    <circle cx="397" cy="379" r="1.4"/>
+    <path d="M19 47h4m-2-2v4"/>
+    <path d="m74 47 3 2"/>
+    <path d="m127 47 3 2"/>
+    <path d="M169 47h4m-2-2v4"/>
+    <path d="m224 47 3 2"/>
+    <path d="m277 47 3 2"/>
+    <path d="M319 47h4m-2-2v4"/>
+    <path d="m374 47 3 2"/>
+    <path d="m24 97 3 2"/>
+    <path d="m77 97 3 2"/>
+    <path d="M119 97h4m-2-2v4"/>
+    <path d="m174 97 3 2"/>
+    <path d="m227 97 3 2"/>
+    <path d="M269 97h4m-2-2v4"/>
+    <path d="m324 97 3 2"/>
+    <path d="m377 97 3 2"/>
+    <path d="m27 147 3 2"/>
+    <path d="M69 147h4m-2-2v4"/>
+    <path d="m124 147 3 2"/>
+    <path d="m177 147 3 2"/>
+    <path d="M219 147h4m-2-2v4"/>
+    <path d="m274 147 3 2"/>
+    <path d="m327 147 3 2"/>
+    <path d="M369 147h4m-2-2v4"/>
+    <path d="M19 197h4m-2-2v4"/>
+    <path d="m74 197 3 2"/>
+    <path d="m127 197 3 2"/>
+    <path d="M169 197h4m-2-2v4"/>
+    <path d="m224 197 3 2"/>
+    <path d="m277 197 3 2"/>
+    <path d="M319 197h4m-2-2v4"/>
+    <path d="m374 197 3 2"/>
+    <path d="m24 247 3 2"/>
+    <path d="m77 247 3 2"/>
+    <path d="M119 247h4m-2-2v4"/>
+    <path d="m174 247 3 2"/>
+    <path d="m227 247 3 2"/>
+    <path d="M269 247h4m-2-2v4"/>
+    <path d="m324 247 3 2"/>
+    <path d="m377 247 3 2"/>
+    <path d="m27 297 3 2"/>
+    <path d="M69 297h4m-2-2v4"/>
+    <path d="m124 297 3 2"/>
+    <path d="m177 297 3 2"/>
+    <path d="M219 297h4m-2-2v4"/>
+    <path d="m274 297 3 2"/>
+    <path d="m327 297 3 2"/>
+    <path d="M369 297h4m-2-2v4"/>
+    <path d="M19 347h4m-2-2v4"/>
+    <path d="m74 347 3 2"/>
+    <path d="m127 347 3 2"/>
+    <path d="M169 347h4m-2-2v4"/>
+    <path d="m224 347 3 2"/>
+    <path d="m277 347 3 2"/>
+    <path d="M319 347h4m-2-2v4"/>
+    <path d="m374 347 3 2"/>
+    <path d="m24 397 3 2"/>
+    <path d="m77 397 3 2"/>
+    <path d="M119 397h4m-2-2v4"/>
+    <path d="m174 397 3 2"/>
+    <path d="m227 397 3 2"/>
+    <path d="M269 397h4m-2-2v4"/>
+    <path d="m324 397 3 2"/>
+    <path d="m377 397 3 2"/>
+  </g>
+</svg>

@@ -1,0 +1,24 @@
+# EZEapply navigation artwork
+
+## Chrome extensions shortcut prompt
+
+`extensions.png` was generated with the built-in image generation tool on 2026-10-31, with a transparent background, then resized to 192 × 192 PNG for local packaging.
+
+> Use case: logo-brand. Asset type: a single tiny toolbar button icon for the EZEapply Chrome extension popup, displayed at about 22 pixels. Primary request: a clean extension puzzle-piece icon with the recognizable Google Chrome logo centered inside the puzzle. Subject: one upright jigsaw puzzle piece, crisp rounded square body with a top tab and a left-side notch, mint-white outer silhouette. In the center place a compact, accurate Chrome browser roundel, red yellow green three-part ring around a blue center with white separators. The Chrome roundel must be contained completely inside the puzzle body. Style: polished professional app icon, clean geometric shapes, subtle chamfered frosted mint finish matching EZEapply, mostly flat and extremely legible at small size. Composition: a single centered icon, square image, the artwork fills around 85 percent of the canvas, no surrounding button, no other objects, no text. Backdrop: genuinely transparent alpha background. Avoid: text, letters, labels, background rectangle, extra circles outside the Chrome roundel, busy details, glow, large shadows, checkerboard rendering.
+
+Generated with the built-in image generation tool on 2026-10-30. Five separate generations with transparent backgrounds. Selected assets were resized to 192 × 192 PNG for local packaging.
+
+## Navigation icon prompts
+
+Shared prompt:
+
+> Use case: logo-brand. Asset type: one production UI navigation icon for EZEapply, a polished teal Chrome extension for job applications. Create a single exquisitely clean, professional, vector-inspired pictogram on a genuinely transparent background. It must read instantly when reduced to 28 by 28 pixels inside an existing teal circular button. Style: bold simple geometric silhouette, optical balance, precise smooth edges, subtly chamfered frosted-white surface with a restrained pale-mint secondary plane. Near-white #F1FFFA primary, pale mint #B7F4DF secondary. Front-on orthographic, no perspective, no background plate or enclosing tile, no text, no letters, no numerals, no watermark, no glow, no floating particles, no ornate decoration, no hairline strokes, no busy interior detail, no heavy shadow. Center the mark, occupying about 76% of the square canvas, with even transparent padding. Keep the styling suitable for a coordinated four-icon navigation family.
+
+- `applications.png`: Subject: APPLICATIONS. A tidy stack of two application document sheets, the front document bearing one bold checkmark. Rounded page corners, three simple shapes at most. Purpose: view submitted job applications.
+- `profile.png`: Subject: PROFILE. A compact professional profile badge: a rounded rectangular ID card containing one unmistakable circular head and smooth shoulder silhouette. Strong legibility, no tiny text lines. Purpose: manage applicant profile.
+- `settings.png`: Subject: SETTINGS. A perfectly symmetrical precision six-tooth cog with evenly spaced teeth and one clean circular center opening. Elegant, mathematically balanced, clear silhouette, no internal nested squiggles, no sparkle. Purpose: application settings.
+- `analytics.png`: Subject: ANALYTICS. Three bold ascending rounded bars with a simple rising diagonal arrow above them. Balanced chart silhouette without dots or a jagged line, no enclosing box, no axis labels. Purpose: application analytics.
+
+## Quick Access Sidepane prompt
+
+> Use case: logo-brand. Asset type: one production UI navigation icon for EZEapply, a polished teal Chrome extension for job applications. Subject: QUICK ACCESS SIDEPANE. One instantly recognizable compact browser-window outline with a distinct narrow right-hand side panel, combined with a bold lightning bolt projecting in front of the lower-left of the window. The window and panel should be obvious, the lightning bolt should communicate speed; keep to two simple components. Create a single exquisitely clean, professional, vector-inspired pictogram on a genuinely transparent background. It must read instantly when reduced to 28 by 28 pixels. Style: bold simple geometric silhouette, optical balance, precise smooth edges, subtly chamfered frosted-white surface with a restrained pale-mint secondary plane. Near-white #F1FFFA primary, pale mint #B7F4DF secondary. Front-on orthographic, no perspective, no background plate or enclosing tile, no text, no letters, no numerals, no watermark, no glow, no floating particles, no ornate decoration, no hairline strokes, no busy interior detail, no heavy shadow. Center the mark, occupying about 76% of the square canvas, with even transparent padding. Match a coordinated four-icon white-and-mint navigation family. Clean transparent empty spaces without stray speckles or halos.

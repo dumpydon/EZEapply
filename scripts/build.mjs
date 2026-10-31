@@ -116,11 +116,17 @@ try {
     ['panel.css', 'panel.css'],
     ['theme.css', 'theme.css'],
     ['app-controls.css', 'app-controls.css'],
+    ['profile-view.css', 'profile-view.css'],
     ['ai/settings.css', 'ai-settings.css'],
     ['analytics.css', 'analytics.css'],
     ['assets/wordmark.svg', 'wordmark.svg'],
+    ['assets/career-pattern.svg', 'career-pattern.svg'],
   ])
     await cp(join(root, 'src', from), join(out, 'custom', to));
+  await cp(join(root, 'src/assets/navigation'), join(out, 'custom/navigation'), {
+    recursive: true,
+    filter: (path) => !path.endsWith('.md'),
+  });
   await sharp(join(root, 'src/assets/ai-logo.png'))
     .resize(192, 192, { fit: 'inside' })
     .png()

@@ -1,0 +1,264 @@
+.side-profile-title {
+  margin: 20px 4px 10px;
+  font-size: 20px;
+  color: #d9e3e9;
+}
+.profile-cards {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+.profile-cards .card {
+  min-width: 0;
+  padding: 16px;
+  border-radius: 14px;
+  background: #293740;
+}
+.profile-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.profile-section-heading h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 650;
+  color: #d8e1e8;
+}
+.profile-section-heading h2 svg {
+  width: 21px;
+  height: 21px;
+  flex: none;
+  color: #64c7ab;
+}
+.profile-edit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  color: #a3b5bf;
+}
+.profile-edit svg {
+  width: 17px;
+  height: 17px;
+}
+.profile-edit:hover {
+  color: #e3edf0;
+  background: #ffffff0a;
+}
+.profile-value {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 13px;
+  margin: 6px 0;
+}
+.profile-value > span {
+  flex: 0 0 auto;
+  max-width: 42%;
+  color: #b9c6ce;
+}
+.profile-cards .copy-value {
+  min-width: 0;
+  padding: 1px 3px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #dfe7ec;
+  font: inherit;
+  text-align: left;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.profile-value > .copy-value {
+  max-width: 70%;
+  text-align: right;
+}
+.profile-cards .copy-value:hover,
+.profile-cards .copy-value[data-copied] {
+  background: #bcd5cc16;
+}
+.profile-cards .copy-value:disabled {
+  opacity: 0.45;
+}
+.history-summary + .history-summary {
+  border-top: 1px solid #40535e;
+  margin-top: 14px;
+  padding-top: 14px;
+}
+.history-title {
+  margin: 0 0 2px;
+  font-size: 14px;
+  line-height: 1.4;
+  font-weight: 650;
+}
+.profile-cards .history-title-value {
+  max-width: 100%;
+}
+.history-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  column-gap: 10px;
+  row-gap: 1px;
+  margin: 0 0 6px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.profile-cards .history-meta-value {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  color: #aab9c4;
+}
+.history-meta svg {
+  width: 13px;
+  height: 13px;
+  flex: none;
+  align-self: center;
+}
+.history-description {
+  min-width: 0;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.profile-cards .history-preview {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  width: 100%;
+  white-space: pre-line;
+  color: #bac5cf;
+}
+.profile-cards .history-preview.is-expanded {
+  display: block;
+  -webkit-line-clamp: unset;
+}
+.history-expand {
+  display: block;
+  border: 0;
+  border-radius: 4px;
+  padding: 3px;
+  margin-top: 3px;
+  background: transparent;
+  color: #92cebb;
+  font-size: 11px;
+  font-weight: 600;
+}
+.history-expand:hover {
+  text-decoration: underline;
+}
+.profile-empty {
+  margin: 0;
+  font-size: 12px;
+}
+.profile-resume-name {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 13px;
+}
+.profile-resume-meta {
+  font-size: 11px;
+  margin: 3px 0 8px;
+}
+.profile-resume-meta:empty {
+  display: none;
+}
+.profile-resume-actions {
+  display: flex;
+  gap: 7px;
+}
+.profile-resume-actions .quiet-button {
+  flex: 1;
+  min-width: 0;
+  min-height: 28px;
+  padding: 3px 8px;
+  font-size: 11px;
+  background: #ffffff04;
+}
+.profile-resume-actions svg {
+  width: 14px;
+  height: 14px;
+}
+.profile-subheading {
+  margin: 14px 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #c4d0d7;
+}
+.portfolio-links,
+.profile-skills {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px 7px;
+}
+.portfolio-link {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  min-width: 0;
+  border-radius: 5px;
+  background: #ffffff04;
+}
+.profile-cards .portfolio-link-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  padding: 3px 4px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.portfolio-link-copy > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.portfolio-link-copy svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  color: #a8b8c2;
+}
+.portfolio-link-open {
+  display: inline-flex;
+  flex: none;
+  padding: 5px;
+  color: #9aafb8;
+  border-radius: 4px;
+}
+.portfolio-link-open:hover {
+  background: #bcd5cc16;
+  color: #74cfb1;
+}
+.portfolio-link-open svg {
+  width: 11px;
+  height: 11px;
+}
+.profile-cards .profile-skill {
+  max-width: 100%;
+  padding: 1px 7px;
+  border-radius: 20px;
+  background: #ffffff08;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.profile-copy-status {
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

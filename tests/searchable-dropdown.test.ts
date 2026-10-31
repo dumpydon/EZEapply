@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { searchableWidget } from '../fixtures/searchable-widget';
+import { siblingDropdown } from '../fixtures/sibling-dropdown';
 import { comboboxValue, fillCombobox } from '../src/widgets';
 import { fieldQuestion } from '../src/form-labels';
 import { fillFormWithWidgets, scanForm, undoFill } from '../src/content';
@@ -32,6 +33,39 @@ const gender: CustomField = {
 };
 
 describe('searchable web-component dropdowns', () => {
+  it.each([false, true])(
+    'selects a sibling-owned popup (active descendant: %s)',
+    async (activeDescendant) => {
+      const widget = siblingDropdown(document.body, { activeDescendant });
+      if (activeDescendant) widget.popup.removeAttribute('aria-owns');
+      const saved = { ...gender, id: 'prefix', label: 'prefix*', value: 'mr' };
+      expect(comboboxValue(widget.control)).toBe('');
+      expect((await finish(fillFormWithWidgets(document, [saved]))).filled).toBe(1);
+      expect(widget.select.value).toBe('101');
+      expect(widget.selections).toBe(1);
+      expect(comboboxValue(widget.control)).toBe('Mr.');
+      expect((await finish(fillFormWithWidgets(document, [saved]))).filled).toBe(0);
+      expect(widget.selections).toBe(1);
+    },
+  );
+  it('requires a sibling backing select to confirm the choice', async () => {
+    const widget = siblingDropdown(document.body, { rejectSelection: true });
+    widget.list.children[1].addEventListener('click', () => {
+      widget.control.querySelector('span')!.textContent = 'Mr.';
+      widget.control.setAttribute('aria-expanded', 'false');
+    });
+    expect((await finish(fillCombobox(widget.control, 'MR.'))).filled).toBe(false);
+    expect(widget.select.value).toBe('-1');
+  });
+  it('does not borrow a listbox owned by an adjacent, separately labelled question', async () => {
+    const widget = siblingDropdown(document.body);
+    const label = document.createElement('label');
+    label.textContent = 'A different question';
+    widget.popup.prepend(label);
+    expect((await finish(fillCombobox(widget.control, 'Mr.'))).filled).toBe(false);
+    expect(widget.select.value).toBe('-1');
+    expect(widget.selections).toBe(0);
+  });
   it('discovers the outer question and treats the component as one logical field', () => {
     const widget = searchableWidget(document.body);
     expect(fieldQuestion(widget.control)).toBe('Gender *');

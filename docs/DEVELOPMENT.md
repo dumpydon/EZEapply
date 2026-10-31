@@ -6,6 +6,7 @@ Use Node.js 22 or newer and npm. Install from the lockfile with `npm ci`.
 npm run verify        # strict TypeScript, regression suite, complete extension build
 npm run format:check  # reproducible formatting
 npm run package       # fresh build, reviewed ZIP, SHA-256 and file inventory
+npm run check:release # reject a stale source snapshot or damaged download
 npm run preview       # synthetic browser lab at http://127.0.0.1:4317
 ```
 
@@ -40,4 +41,4 @@ Only source, tests, synthetic fixtures, documentation, original media and the re
 
 ## Publishing
 
-The GitHub workflow checks formatting, TypeScript, tests and a clean build before publishing a new `package.json` version. Its release job verifies the reviewed ZIP checksum and archive integrity, then creates a versioned GitHub Release with the ZIP, checksum and installation MP4. Existing version assets are left unchanged. Write access is limited to that release job on pushes to `main`; pull requests receive read-only checks.
+The GitHub workflow checks formatting, TypeScript, tests and a clean build before publishing a new `package.json` version. It verifies the committed ZIP against its checksum, every entry in the file inventory, the extension identity and hashes of the source/build inputs. Its release job creates a versioned GitHub Release with the ZIP, checksum, inventory and installation MP4, then marks it latest. Existing version assets are left unchanged; a changed ZIP requires a new package version. Write access is limited to that release job on pushes to `main`; pull requests receive read-only checks.

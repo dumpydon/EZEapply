@@ -36,6 +36,33 @@
         font-weight: 600;
         margin: 8px 0;
       }
+      select,
+      a[role='combobox'] {
+        display: block;
+        width: 100%;
+        border: 1px solid #9faeb8;
+        background: white;
+        border-radius: 6px;
+        padding: 10px;
+        font: inherit;
+        cursor: pointer;
+      }
+      [hidden] {
+        display: none !important;
+      }
+      ul[role='listbox'] {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        border: 1px solid #9faeb8;
+      }
+      li[role='option'] {
+        padding: 10px;
+        cursor: pointer;
+      }
+      li[role='option']:hover {
+        background: #e3f2ed;
+      }
       p {
         color: #5a7366;
       }
@@ -70,7 +97,8 @@
     <h1>Example Engineer · Job application</h1>
     <p>
       Enable <b>Auto-fill saved answers</b> in the toolbar popup, or use <b>Fill this page</b>.
-      These controls use open shadow roots, keyup search and mouse-down selection.
+      Prefix exercises native and sibling-owned dropdowns with a nonempty placeholder. Gender and
+      country use open shadow roots, keyup search and mouse-down selection.
     </p>
     <form id="job-application" onsubmit="return false"></form>
     <output id="committed" aria-live="polite"></output

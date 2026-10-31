@@ -1,6 +1,6 @@
 {
   "name": "ezeapply",
-  "version": "3.0.0",
+  "version": "3.0.2",
   "private": true,
   "type": "module",
   "scripts": {
@@ -15,8 +15,9 @@
     "verify:source": "npm run typecheck && npm test && npm run check:bundles",
     "media:stills": "node media-src/install-film.mjs --stills",
     "media:render": "node media-src/install-film.mjs",
-    "package:local": "npm run build && node scripts/package-local.mjs",
-    "package": "npm run build && node scripts/package-local.mjs"
+    "check:release": "node scripts/check-release.mjs",
+    "package:local": "npm run package",
+    "package": "npm run build && node scripts/package-local.mjs && npm run check:release"
   },
   "devDependencies": {
     "@types/chrome": "^0.1.24",

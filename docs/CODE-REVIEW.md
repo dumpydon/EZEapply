@@ -1,8 +1,11 @@
 # Public-release code review
 
-Reviewed 29 October 2026 for the independent EZEapply 3.0.0 release.
+Reviewed 31 October 2026 for the EZEapply 3.0.2 release, extending the independent-source review of 29 October.
 
 ## Changes made
+
+- Reviewed the subsequent dropdown, profile presentation, navigation artwork and API-key persistence changes. Keys remain in private extension-origin IndexedDB; settings never receive the saved secret back.
+- Added source hashes to release inventories and verification of every ZIP entry. CI checks the committed install package against the current source inputs, preserves the extension identity and rejects a reused version with different ZIP contents.
 
 - Replaced the inherited app shell, worker entry point, UI patching adapters and cached runtime assets with original repository-owned code. The build no longer reads another extension or a private source cache.
 - Preserved the installed extension ID, profile keys, custom-library schema, AI settings database and application ledger. Import normalization retains structured history dates and untouched values.

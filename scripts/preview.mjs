@@ -101,6 +101,7 @@ const analyticsHtml = (await readFile(root + 'dist/extension/analytics.html', 'u
   '<head><script src="/native-api.js"></script><script src="/tracking-api.js"></script>',
 );
 const routes = {
+  '/profile-layout.html': ['fixtures/profile-layout.html', 'text/html'],
   '/install.html': ['fixtures/install-film.html', 'text/html'],
   '/downloads/EZEapply.zip': ['downloads/EZEapply.zip', 'application/zip'],
   '/media/install-ezeapply.mp4': ['docs/media/install-ezeapply.mp4', 'video/mp4'],
@@ -148,6 +149,23 @@ const routes = {
   '/custom/content.js': ['.local/preview-content.js', 'text/javascript'],
   '/custom/panel.css': ['dist/extension/custom/panel.css', 'text/css'],
   '/custom/theme.css': ['dist/extension/custom/theme.css', 'text/css'],
+  '/custom/profile-view.css': ['dist/extension/custom/profile-view.css', 'text/css'],
+  '/custom/career-pattern.svg': ['dist/extension/custom/career-pattern.svg', 'image/svg+xml'],
+  '/custom/navigation/applications.png': [
+    'dist/extension/custom/navigation/applications.png',
+    'image/png',
+  ],
+  '/custom/navigation/extensions.png': [
+    'dist/extension/custom/navigation/extensions.png',
+    'image/png',
+  ],
+  '/custom/navigation/profile.png': ['dist/extension/custom/navigation/profile.png', 'image/png'],
+  '/custom/navigation/settings.png': ['dist/extension/custom/navigation/settings.png', 'image/png'],
+  '/custom/navigation/analytics.png': [
+    'dist/extension/custom/navigation/analytics.png',
+    'image/png',
+  ],
+  '/custom/navigation/sidepane.png': ['dist/extension/custom/navigation/sidepane.png', 'image/png'],
   '/custom/app-controls.css': ['dist/extension/custom/app-controls.css', 'text/css'],
   '/custom/app-ui.js': ['dist/extension/custom/app-ui.js', 'text/javascript'],
   '/custom/icon/128.png': ['dist/extension/custom/icon/128.png', 'image/png'],
