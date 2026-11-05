@@ -363,10 +363,13 @@ export interface MatchCompatibility {
   reason?: 'units' | 'notice-units' | 'meaning';
 }
 
-/** Explicit units outrank the requested lakh fallback; values never convert. */
+/** Explicit units outrank the requested lakh fallback; values never convert.
+ * A deliberate alias can supply omitted monetary units, but never contradict
+ * units, pay periods or components actually specified by the question. */
 export function matchCompatibility(
   answer: MatchingTerms,
   question: MatchingTerms,
+  { explicitAlias = false }: { explicitAlias?: boolean } = {},
 ): MatchCompatibility {
   if (answer.topic && question.topic && answer.topic !== question.topic)
     return { priority: 0, reason: 'meaning' };
@@ -405,6 +408,7 @@ export function matchCompatibility(
   )
     return { priority: 0, reason: 'meaning' };
   if (answer.compensation && question.compensation) {
+    if (explicitAlias && !question.amountUnit && !question.currency) return { priority: 3 };
     if (
       !question.amountUnit &&
       !question.currency &&

@@ -3,15 +3,15 @@ import {
   analyticsSummary,
   applicationURLKey,
   dailyTotals,
-  localDayKey,
   mergeRecords,
   sameApplication,
   sanitizedURL,
   validDay,
 } from '../src/tracking-model';
+import { utcDayKey } from '../src/application-day';
 import type { ApplicationRecord, TrackingSnapshot } from '../src/tracking-types';
-const now = new Date(2026, 9, 29, 12),
-  date = (offset: number) => new Date(2026, 9, 29 + offset, 10).toISOString();
+const now = new Date('2026-10-29T12:00:00Z'),
+  date = (offset: number) => new Date(Date.UTC(2026, 9, 29 + offset, 10)).toISOString();
 const record = (
   id: string,
   offset = 0,
@@ -90,7 +90,7 @@ describe('application identities and analytics', () => {
     expect(sameApplication(a, { ...b, submittedAt: date(-1) })).toBe(false);
   });
   it.each([7, 15, 30])(
-    'produces %i zero-filled local-calendar bins and an equal previous period',
+    'produces %i zero-filled UTC-calendar bins and an equal previous period',
     (days) => {
       const data = snapshot([
         record('today'),
@@ -143,9 +143,27 @@ describe('application identities and analytics', () => {
     expect(validDay('2026-02-29')).toBe(false);
     expect(validDay('2024-02-29')).toBe(true);
     expect(validDay('__proto__')).toBe(false);
-    expect(localDayKey(new Date(2026, 0, 1))).toBe('2026-01-01');
-    expect(analyticsSummary(snapshot(), 7, new Date(2026, 0, 1, 12)).bins[0].day).toBe(
+    expect(utcDayKey(new Date('2026-01-01T00:00:00Z'))).toBe('2026-01-01');
+    expect(analyticsSummary(snapshot(), 7, new Date('2026-01-01T12:00:00Z')).bins[0].day).toBe(
       '2025-12-26',
     );
+  });
+  it('bins both submission sources and corrections by UTC, across the IST midnight boundary', () => {
+    const data = snapshot(
+      [
+        record('linkedin-before', 0, 'linkedin', { submittedAt: '2026-11-01T23:59:59+05:30' }),
+        record('external-after', 0, 'external', { submittedAt: '2026-11-02T00:00:00+05:30' }),
+        record('utc-next', 0, 'linkedin', { submittedAt: '2026-11-02T05:30:00+05:30' }),
+      ],
+      { adjustments: { '2026-11-01': 1 }, goalHistory: { '2026-11-01': 3 } },
+    );
+    expect(dailyTotals(data)['2026-11-01']).toMatchObject({ total: 3, linkedin: 1, external: 1 });
+    const before = analyticsSummary(data, 7, new Date('2026-11-02T05:29:59+05:30'));
+    const after = analyticsSummary(data, 7, new Date('2026-11-02T05:30:00+05:30'));
+    expect(before.bins.at(-1)).toMatchObject({ day: '2026-11-01', total: 3 });
+    expect(after.bins.at(-1)).toMatchObject({ day: '2026-11-02', total: 1 });
+    expect(after.bins.at(-2)?.total).toBe(3);
+    expect(after.streak).toBe(2);
+    expect(after.goalDays).toBe(1);
   });
 });

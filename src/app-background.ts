@@ -1,4 +1,6 @@
 import { normalizeProfile } from './app-profile';
+import { APPEARANCE_KEY, isColorThemeId } from './appearance-config';
+import { DEFAULT_YES_KEY } from './types';
 
 function trusted(sender: chrome.runtime.MessageSender): boolean {
   return !!sender.url && sender.url.startsWith(chrome.runtime.getURL(''));
@@ -10,6 +12,18 @@ export function installAppBackground(): void {
       return;
     const work = async () => {
       if (!trusted(sender)) throw new Error('Open EZEapply to change its profile or preferences.');
+      if (message.type === 'eze-app:default-yes') {
+        if (typeof message.enabled !== 'boolean')
+          throw new Error('Choose whether to default Yes/No questions to Yes.');
+        await chrome.storage.local.set({ [DEFAULT_YES_KEY]: message.enabled });
+        return { ok: true };
+      }
+      if (message.type === 'eze-app:appearance') {
+        if (!isColorThemeId(message.theme))
+          throw new Error('Choose one of the available color themes.');
+        await chrome.storage.local.set({ [APPEARANCE_KEY]: message.theme });
+        return { ok: true };
+      }
       if (message.type === 'eze-app:save-profile') {
         const profile = normalizeProfile(message.profile);
         await chrome.storage.local.set({ profile });

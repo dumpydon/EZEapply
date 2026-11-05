@@ -79,14 +79,14 @@
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  border: 1px solid #55b99b70;
+  border: 1px solid var(--ui-edge);
   border-radius: 18px;
   padding: 25px 28px;
   background:
-    radial-gradient(ellipse at 4% 0%, #57dab52c, transparent 60%),
-    linear-gradient(115deg, #123c37, #1f3037 78%);
+    radial-gradient(ellipse at 4% 0%, var(--ui-soft), transparent 60%),
+    linear-gradient(115deg, var(--ui-raised), var(--ui-panel) 78%);
   box-shadow: 0 8px 30px #08241d18;
-  color: #eefbf6;
+  color: var(--ui-text);
 }
 .eze-ai-power-icon {
   display: grid;
@@ -95,11 +95,11 @@
   width: 72px;
   height: 78px;
   border-radius: 22px;
-  color: #8af0cb;
-  border: 1px solid #78d9b54d;
+  color: var(--ui-accent);
+  border: 1px solid var(--ui-border);
   background:
-    radial-gradient(circle at 50% 40%, #3ea98940, transparent 75%),
-    linear-gradient(145deg, #19493e, #153c38);
+    radial-gradient(circle at 50% 40%, var(--ui-soft), transparent 75%),
+    linear-gradient(145deg, var(--ui-raised), var(--ui-panel));
   box-shadow:
     inset 0 1px 0 #b6ffe62b,
     0 7px 24px #061e2033;
@@ -119,7 +119,7 @@
   line-height: 1.3;
   letter-spacing: 0.15em;
   font-weight: 750;
-  color: #85dfbd;
+  color: var(--ui-accent);
   margin-bottom: 7px;
 }
 #root .eze-ai-hero h2 {
@@ -128,12 +128,12 @@
   font-weight: 700;
   letter-spacing: -0.035em;
   margin: 0 0 9px;
-  color: #f0fff8;
+  color: var(--ui-text);
 }
 #root .eze-ai-hero p {
   font-size: 12px;
   line-height: 1.65;
-  color: #bdcfc9;
+  color: var(--ui-muted);
   margin: 0;
 }
 .eze-ai-provider-list {
@@ -146,15 +146,15 @@
   font-size: 10px;
   line-height: 1.4;
   padding: 3px 8px;
-  border: 1px solid #80bca62b;
+  border: 1px solid var(--ui-border);
   border-radius: 5px;
-  color: #c7ded4;
-  background: #8cd8bc0b;
+  color: var(--ui-text);
+  background: var(--ui-soft);
 }
 .eze-ai-provider-list span:last-child {
   border-color: transparent;
   background: transparent;
-  color: #8cb6a5;
+  color: var(--ui-muted);
   padding-left: 3px;
 }
 .eze-ai-hero-actions {
@@ -169,14 +169,14 @@
   align-items: center;
   justify-content: center;
   gap: 16px;
-  border: 1px solid #9ce4c26b;
+  border: 1px solid var(--ui-edge);
   border-radius: 9px;
   padding: 12px 18px;
   font-size: 13px;
   line-height: 1.4;
   font-weight: 650;
-  color: #062d23;
-  background: linear-gradient(110deg, #95edc4, #60ccaa);
+  color: #fff;
+  background: linear-gradient(115deg, var(--ui-fill), var(--ui-hover));
   box-shadow: 0 3px 12px #041d2130;
   text-decoration: none;
   transition:
@@ -194,11 +194,11 @@
 .eze-ai-hero-hint {
   font-size: 10px;
   line-height: 1.4;
-  color: #a0bdb1;
+  color: var(--ui-muted);
 }
 .eze-native-ai-link:focus-visible,
 .eze-ai-configure:focus-visible {
-  outline: 3px solid #78d8b3;
+  outline: 3px solid var(--ui-accent);
   outline-offset: 4px;
 }
 @media (max-width: 760px) {
@@ -261,8 +261,8 @@
   width: 24px;
   height: 14px;
   border-radius: 10px;
-  border: 1px solid #71808b;
-  background: #42515b;
+  border: 1px solid var(--ui-border);
+  background: var(--ui-raised);
   margin: 0;
   cursor: pointer;
 }
@@ -278,14 +278,14 @@
   transition: transform 0.15s;
 }
 .eze-popup-option input:checked {
-  background: #269b83;
-  border-color: #65c7a8;
+  background: var(--ui-fill);
+  border-color: var(--ui-edge);
 }
 .eze-popup-option input:checked::after {
   transform: translateX(10px);
 }
 .eze-popup-option input:focus-visible {
-  outline: 2px solid #78cbb2;
+  outline: 2px solid var(--ui-accent);
   outline-offset: 3px;
 }
 .eze-popup-option input:disabled {
@@ -316,9 +316,9 @@
   width: 23px;
   height: 23px;
   padding: 0;
-  border: 1px solid #72bba157;
+  border: 1px solid var(--ui-border);
   border-radius: 7px;
-  background: #1e9d7e17;
+  background: var(--ui-soft);
   color: var(--foreground);
   font-family: inherit;
   font-size: 16px;
@@ -328,14 +328,14 @@
   transition: background 0.15s;
 }
 #root .eze-count-step:hover {
-  background: #4cc5a336;
+  background: var(--ui-soft);
 }
 #root .eze-count-step:disabled {
   opacity: 0.35;
   cursor: default;
 }
 #root .eze-count-step:focus-visible {
-  outline: 2px solid #78cbb2;
+  outline: 2px solid var(--ui-accent);
   outline-offset: 2px;
 }
 .eze-count-status {
@@ -370,10 +370,10 @@
   width: min(340px, calc(100vw - 24px));
   margin: auto;
   padding: 22px;
-  border: 1px solid #527c70;
+  border: 1px solid var(--ui-border);
   border-radius: 16px;
-  background: #202e34;
-  color: #e7f5ef;
+  background: var(--ui-panel);
+  color: var(--ui-text);
   font:
     13px/1.5 -apple-system,
     BlinkMacSystemFont,
@@ -391,7 +391,7 @@
   margin: 0 0 6px;
 }
 .eze-goal-dialog p {
-  color: #acbfb6;
+  color: var(--ui-muted);
   margin: 0 0 18px;
 }
 .eze-goal-dialog label {
@@ -400,16 +400,16 @@
   font-weight: 600;
 }
 .eze-goal-dialog input {
-  border: 1px solid #4f6962;
+  border: 1px solid var(--ui-border);
   border-radius: 9px;
   padding: 11px 12px;
-  background: #17252b;
-  color: #edf8f2;
+  background: var(--ui-input);
+  color: var(--ui-text);
   font: inherit;
   width: 100%;
 }
 .eze-goal-dialog input:focus {
-  outline: 2px solid #57c9a7;
+  outline: 2px solid var(--ui-edge);
   outline-offset: 2px;
 }
 .eze-goal-actions {
@@ -420,7 +420,7 @@
 }
 .eze-goal-actions button {
   font: inherit;
-  border: 1px solid #4f6962;
+  border: 1px solid var(--ui-border);
   padding: 8px 13px;
   border-radius: 8px;
   cursor: pointer;
@@ -428,8 +428,8 @@
   color: inherit;
 }
 .eze-goal-actions .eze-goal-save {
-  background: #268f76;
-  border-color: #57c9a7;
+  background: var(--ui-fill);
+  border-color: var(--ui-edge);
   color: #fff;
   font-weight: 650;
 }

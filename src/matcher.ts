@@ -86,10 +86,11 @@ export function matchField(
     let best = autocomplete && field.autocomplete?.includes(autocomplete) ? 180 : 0;
     let bestPriority = best ? 3 : 0;
     const fieldTerms = savedMatchingTerms(field.label, field.value);
-    for (const rawAlias of [field.label, ...field.aliases]) {
+    for (const [aliasIndex, rawAlias] of [field.label, ...field.aliases].entries()) {
       const alias = normalize(rawAlias);
       if (!alias) continue;
-      const terms = aliasTerms(fieldTerms, matchingTerms(rawAlias));
+      const declaredTerms = matchingTerms(rawAlias);
+      const terms = aliasTerms(fieldTerms, declaredTerms);
       if (!terms) continue;
       questions.forEach((question, index) => {
         const exact = question === alias;
@@ -99,7 +100,16 @@ export function matchField(
         // Visible monetary labels govern format even when a lower-priority
         // machine name happens to match a broader alias.
         const units = questionTerms[0]?.topic ? questionTerms[0] : questionTerms[index];
-        const { priority, reason } = matchCompatibility(terms, units);
+        // A deliberately saved alternative may omit the answer's currency or
+        // scale. Only trust an exact/equivalent match to the primary question;
+        // a broad substring or a secondary machine name cannot grant this.
+        const explicitAlias =
+          aliasIndex > 0 &&
+          index === 0 &&
+          !declaredTerms.currency &&
+          !declaredTerms.amountUnit &&
+          (exact || keywords);
+        const { priority, reason } = matchCompatibility(terms, units, { explicitAlias });
         if (!priority) {
           if (reason === 'units') differentUnits = true;
           else if (reason === 'notice-units') differentNoticeUnits = true;

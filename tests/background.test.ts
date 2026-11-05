@@ -1,7 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { IDBFactory } from 'fake-indexeddb';
 import { APPLICATION_COUNTS_KEY, PANEL_RESTORE_KEY, STORAGE_KEY } from '../src/types';
-import { localDay } from '../src/application-count';
+import { utcDayKey } from '../src/application-day';
+import { APPEARANCE_KEY } from '../src/appearance-config';
+import { DEFAULT_YES_KEY } from '../src/types';
 
 type Listener = (...args: any[]) => any;
 let messages: Listener[];
@@ -93,6 +95,39 @@ beforeEach(async () => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe('background persistence and frame dispatch', () => {
+  it('persists the Yes/No opt-in separately and rejects untrusted or malformed writes', async () => {
+    data[STORAGE_KEY] = { version: 1, profiles: { local: profile } };
+    const original = structuredClone(data);
+    expect(
+      await send(
+        { type: 'eze-app:default-yes', enabled: true },
+        { url: 'https://employer.test/apply', tab: { id: 3 } },
+      ),
+    ).toHaveProperty('error');
+    expect(await send({ type: 'eze-app:default-yes', enabled: 'true' })).toHaveProperty('error');
+    expect(data).toEqual(original);
+    expect(await send({ type: 'eze-app:default-yes', enabled: true })).toEqual({ ok: true });
+    expect(data).toEqual({ ...original, [DEFAULT_YES_KEY]: true });
+    expect(await send({ type: 'eze-app:default-yes', enabled: false })).toEqual({ ok: true });
+    expect(data[DEFAULT_YES_KEY]).toBe(false);
+  });
+  it('saves only allowlisted themes from extension views without replacing profile or credentials', async () => {
+    data.profile = { nameData: { firstName: 'Alex' } };
+    data['unrelated-preference'] = 'keep';
+    const original = structuredClone(data);
+    expect(
+      await send(
+        { type: 'eze-app:appearance', theme: 'violet' },
+        { url: 'https://employer.test/apply' },
+      ),
+    ).toHaveProperty('error');
+    expect(
+      await send({ type: 'eze-app:appearance', theme: '<style>injected</style>' }),
+    ).toHaveProperty('error');
+    expect(data).toEqual(original);
+    expect(await send({ type: 'eze-app:appearance', theme: 'violet' })).toEqual({ ok: true });
+    expect(data).toEqual({ ...original, [APPEARANCE_KEY]: 'violet' });
+  });
   it('accepts profile changes only from extension views and keeps answer libraries intact', async () => {
     data[STORAGE_KEY] = { version: 1, profiles: { local: profile } };
     const request = {
@@ -134,7 +169,7 @@ describe('background persistence and frame dispatch', () => {
     expect(data.autofillEnabled).toBe(false);
   });
   it('serializes manual daily-count corrections without adding application records', async () => {
-    const today = localDay();
+    const today = utcDayKey();
     data.appliedList = [{ jobTitle: 'Example', date: new Date().toString() }];
     await Promise.all([
       send({ type: 'eze-custom:adjust-count', delta: 1, day: today }),
@@ -148,7 +183,7 @@ describe('background persistence and frame dispatch', () => {
     });
   });
   it('does not decrease the application count below zero or apply yesterday’s correction today', async () => {
-    const today = localDay();
+    const today = utcDayKey();
     expect(await send({ type: 'eze-custom:adjust-count', delta: -1, day: today })).toEqual({
       ok: true,
       count: 0,

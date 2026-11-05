@@ -73,7 +73,7 @@ describe('form interaction', () => {
   it('explains a missing unit variant instead of filling an INR amount into an unqualified CTC question', () => {
     document.body.innerHTML = `<label for="ctc">What's your expected CTC?</label><input id="ctc" name="expected_ctc_in_inr" type="number">`;
     const report = fillForm(document, [
-      field('inr', 'Please enter your expected CTC in INR', '800000', ['expected ctc']),
+      field('inr', 'Please enter your expected CTC in INR', '800000'),
     ]);
     expect(report.filled).toBe(0);
     expect(input('ctc').value).toBe('');

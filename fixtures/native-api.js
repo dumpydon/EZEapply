@@ -79,7 +79,8 @@
   const preferencesKey = 'eze-native-preview-preferences',
     preferenceNames = ['eze.showFloatingRestore', 'eze.linkedin.disableAutoFollow'];
   const demoKey = 'eze-preview-v1',
-    customKey = 'eze.customFields.v1';
+    customKey = 'eze.customFields.v1',
+    defaultYesKey = 'eze.defaultYes.v1';
   const countsKey = 'eze.applicationCountAdjustments.v1',
     countsPreviewKey = 'eze-native-preview-counts';
   data[countsKey] = JSON.parse(localStorage.getItem(countsPreviewKey) || '{}');
@@ -93,14 +94,17 @@
   });
   const shared = () => JSON.parse(localStorage.getItem(demoKey) || '{}');
   data[customKey] = shared()[customKey] || { version: 1, profiles: {} };
+  data[defaultYesKey] = shared()[defaultYesKey] === true;
   window.addEventListener('storage', (event) => {
     if (event.key !== demoKey) return;
     const before = JSON.parse(event.oldValue || '{}'),
       after = JSON.parse(event.newValue || '{}');
-    data[customKey] = after[customKey];
-    listeners.forEach((fn) =>
-      fn({ [customKey]: { oldValue: before[customKey], newValue: after[customKey] } }, 'local'),
-    );
+    const changes = {};
+    for (const key of [customKey, defaultYesKey]) {
+      data[key] = after[key];
+      changes[key] = { oldValue: before[key], newValue: after[key] };
+    }
+    listeners.forEach((fn) => fn(changes, 'local'));
   });
   const savedPreferences = JSON.parse(localStorage.getItem(preferencesKey) || '{}');
   for (const name of preferenceNames)
@@ -180,21 +184,30 @@
         if (message.type === 'eze-custom:adjust-count') {
           const now = new Date(),
             day = [
-              now.getFullYear(),
-              String(now.getMonth() + 1).padStart(2, '0'),
-              String(now.getDate()).padStart(2, '0'),
+              now.getUTCFullYear(),
+              String(now.getUTCMonth() + 1).padStart(2, '0'),
+              String(now.getUTCDate()).padStart(2, '0'),
             ].join('-');
           if (message.day !== day || ![1, -1].includes(message.delta))
             return { error: 'Reopen the popup and try again.' };
           const corrections = { ...data[countsKey] },
-            start = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime(),
-            end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).getTime();
+            start = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
+            end = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1);
           const detected = data.appliedList.filter(
             (item) => new Date(item.date).getTime() >= start && new Date(item.date).getTime() < end,
           ).length;
           corrections[day] = Math.max(-detected, (corrections[day] || 0) + message.delta);
           await storage.set({ [countsKey]: corrections });
           return { ok: true, count: Math.max(0, detected + corrections[day]) };
+        }
+        if (message.type === 'eze-app:default-yes') {
+          const demo = shared();
+          localStorage.setItem(
+            demoKey,
+            JSON.stringify({ ...demo, 'eze.defaultYes.v1': message.enabled }),
+          );
+          await storage.set({ 'eze.defaultYes.v1': message.enabled });
+          return { ok: true };
         }
         if (message.type === 'eze-custom:auto-fill') {
           if (message.profileId !== 'local') return { error: 'Your profile changed. Try again.' };

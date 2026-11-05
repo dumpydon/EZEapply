@@ -7,11 +7,13 @@ import {
 } from './app-profile';
 import { mountPopupControls } from './popup-controls';
 import { navigationIcon } from './navigation-icon';
+import { mountThemePicker } from './appearance';
 import { mountProfileView } from './profile-view';
+import { mountCVTray } from './cv-tray';
 import { mountApplicationCount, applicationCount } from './application-count';
 import { mountActivityControls } from './activity-controls';
 import { aiSettingsHero, aiSideEntry, aiPowerIcon } from './ai-entry';
-import { localDayKey } from './tracking-model';
+import { utcDayKey, watchUtcDay } from './application-day';
 import {
   TRACKING_CACHE_KEY,
   TRACKING_DAILY_TOTALS_KEY,
@@ -152,6 +154,7 @@ function masterSwitch(initial: boolean): HTMLElement {
 function ring(): HTMLElement {
   const chart = el('div', 'daily-ring');
   chart.dataset.chart = 'today';
+  chart.title = 'Today resets at 00:00 UTC (5:30 a.m. IST).';
   const ns = 'http://www.w3.org/2000/svg',
     svg = document.createElementNS(ns, 'svg');
   svg.setAttribute('viewBox', '0 0 240 240');
@@ -193,8 +196,10 @@ export async function mountApp(root: HTMLElement): Promise<() => void> {
     APPLICATION_COUNTS_KEY,
   ]);
   if (disposed) return () => {};
+  const appearance = side ? undefined : mountThemePicker(root.ownerDocument);
+  if (appearance) cleanup.push(() => appearance.dispose());
   function counts() {
-    const cached = record(record(settings[TRACKING_DAILY_TOTALS_KEY])[localDayKey()]).total;
+    const cached = record(record(settings[TRACKING_DAILY_TOTALS_KEY])[utcDayKey()]).total;
     return typeof cached === 'number' && Number.isSafeInteger(cached) && cached >= 0
       ? cached
       : applicationCount(settings.appliedList, settings[APPLICATION_COUNTS_KEY]);
@@ -216,6 +221,8 @@ export async function mountApp(root: HTMLElement): Promise<() => void> {
   if (popup) {
     const windowId = (await chrome.windows.getCurrent()).id;
     document.body.classList.add('popup-page');
+    appearance!.button.classList.add('popup-appearance');
+    root.append(appearance!.button);
     const extensions = button('', 'popup-extensions');
     extensions.title = 'Open Chrome extensions';
     extensions.setAttribute('aria-label', 'Open Chrome extensions');
@@ -278,6 +285,7 @@ export async function mountApp(root: HTMLElement): Promise<() => void> {
       document.createTextNode(' Applications '),
       el('small', '', 'today'),
     );
+    heading.title = 'Today resets at 00:00 UTC (5:30 a.m. IST).';
     const progress = el('div', 'daily-progress');
     progress.append(el('span', 'daily-progress-value'));
     summary.append(heading, el('p', 'daily-goal', 'Goal: 10'), progress);
@@ -290,7 +298,14 @@ export async function mountApp(root: HTMLElement): Promise<() => void> {
     );
     for (const anchor of shortcuts.querySelectorAll('a')) anchor.target = '_blank';
     let profileView = mountProfileView(normalizeProfile(settings.profile), resumeDownload);
-    root.append(shortcuts, el('h2', 'side-profile-title', 'Profile'), profileView.element);
+    const cvTray = mountCVTray();
+    cleanup.push(() => cvTray.dispose());
+    root.append(
+      shortcuts,
+      cvTray.element,
+      el('h2', 'side-profile-title', 'Profile'),
+      profileView.element,
+    );
     const profileChanged: Parameters<typeof chrome.storage.onChanged.addListener>[0] = (
       changes,
       area,
@@ -326,6 +341,7 @@ export async function mountApp(root: HTMLElement): Promise<() => void> {
     const ai = link('AI settings', 'ai-settings.html', 'nav-ai');
     ai.prepend(aiPowerIcon());
     nav.append(ai);
+    nav.append(appearance!.button);
     header.append(home, nav);
     const main = el('main', 'app-main'),
       footer = el(
@@ -420,11 +436,8 @@ export async function mountApp(root: HTMLElement): Promise<() => void> {
       paintCount();
     };
     chrome.storage.onChanged.addListener(changed);
-    const timer = setInterval(paintCount, 60000);
-    cleanup.push(
-      () => chrome.storage.onChanged.removeListener(changed),
-      () => clearInterval(timer),
-    );
+    const stopRollover = watchUtcDay(paintCount, root.ownerDocument);
+    cleanup.push(() => chrome.storage.onChanged.removeListener(changed), stopRollover);
   }
   return () => {
     disposed = true;
@@ -524,7 +537,7 @@ async function renderApplications(main: HTMLElement, current: () => boolean): Pr
     const table = el('table'),
       head = el('thead'),
       row = el('tr');
-    for (const title of ['Job & company', 'Source', 'Stage', 'Applied'])
+    for (const title of ['Job & company', 'Source', 'Stage', 'Applied (UTC)'])
       row.append(el('th', '', title));
     head.append(row);
     table.append(head);
@@ -586,6 +599,7 @@ async function renderApplications(main: HTMLElement, current: () => boolean): Pr
             day: 'numeric',
             month: 'short',
             year: 'numeric',
+            timeZone: 'UTC',
           }),
         ),
       );

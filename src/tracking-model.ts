@@ -4,15 +4,13 @@ import type {
   ApplicationRecord,
   TrackingSnapshot,
 } from './tracking-types';
+import { utcDayKey, utcDayOffset } from './application-day';
 
-export function localDayKey(date = new Date()): string {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-}
 export function validDay(day: string): boolean {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return false;
   const [year, month, date] = day.split('-').map(Number),
-    parsed = new Date(year, month - 1, date);
-  return year >= 1970 && localDayKey(parsed) === day;
+    parsed = new Date(Date.UTC(year, month - 1, date));
+  return year >= 1970 && utcDayKey(parsed) === day;
 }
 export function sanitizedURL(raw: unknown): string {
   if (typeof raw !== 'string' || raw.length > 8192) return '';
@@ -64,7 +62,7 @@ function label(value: string): string {
     .trim();
 }
 function dayOf(record: ApplicationRecord): string {
-  return localDayKey(new Date(record.submittedAt));
+  return utcDayKey(new Date(record.submittedAt));
 }
 function identifiedURL(key: string): boolean {
   return (
@@ -155,7 +153,7 @@ export function dailyTotals(
   for (const record of snapshot.records) {
     const parsed = new Date(record.submittedAt);
     if (Number.isNaN(parsed.getTime())) continue;
-    const item = bin(localDayKey(parsed));
+    const item = bin(utcDayKey(parsed));
     item[record.source]++;
     item.total++;
   }
@@ -167,9 +165,6 @@ export function dailyTotals(
     }
   return totals;
 }
-function dayOffset(now: Date, offset: number): Date {
-  return new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset, 12);
-}
 export function analyticsSummary(
   snapshot: TrackingSnapshot,
   days: number,
@@ -177,14 +172,14 @@ export function analyticsSummary(
 ): AnalyticsSummary {
   const period = Number.isInteger(days) && days >= 1 && days <= 366 ? days : 7;
   const totals = dailyTotals(snapshot),
-    today = localDayKey(now);
+    today = utcDayKey(now);
   const history = Object.entries(snapshot.goalHistory)
     .filter(([day, goal]) => validDay(day) && Number.isInteger(goal) && goal >= 1 && goal <= 10000)
     .sort(([a], [b]) => a.localeCompare(b));
   const goalFor = (day: string) =>
     history.filter(([key]) => key <= day).at(-1)?.[1] || (day === today ? snapshot.goal : 0);
   const bins: AnalyticsBin[] = Array.from({ length: period }, (_, index) => {
-    const day = localDayKey(dayOffset(now, index - period + 1));
+    const day = utcDayKey(utcDayOffset(now, index - period + 1));
     return {
       day,
       ...(totals[day] || { total: 0, linkedin: 0, external: 0, unknown: 0, adjustment: 0 }),
@@ -194,11 +189,11 @@ export function analyticsSummary(
   const total = bins.reduce((sum, bin) => sum + bin.total, 0);
   const previousTotal = Array.from(
     { length: period },
-    (_, index) => totals[localDayKey(dayOffset(now, index - period * 2 + 1))]?.total || 0,
+    (_, index) => totals[utcDayKey(utcDayOffset(now, index - period * 2 + 1))]?.total || 0,
   ).reduce((sum, count) => sum + count, 0);
   let streak = 0,
     offset = (totals[today]?.total || 0) > 0 ? 0 : -1;
-  while (streak < 3660 && (totals[localDayKey(dayOffset(now, offset))]?.total || 0) > 0) {
+  while (streak < 3660 && (totals[utcDayKey(utcDayOffset(now, offset))]?.total || 0) > 0) {
     streak++;
     offset--;
   }

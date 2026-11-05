@@ -65,5 +65,7 @@ export const MESSAGE_PREFIX = 'eze-custom:';
 export const PANEL_RESTORE_KEY = 'eze.showFloatingRestore';
 /** Explicit opt-in: uncheck company-follow choices inside LinkedIn applications. */
 export const LINKEDIN_NOFOLLOW_KEY = 'eze.linkedin.disableAutoFollow';
+/** Opt-in default for unanswered, exactly two-option Yes/No application questions. */
+export const DEFAULT_YES_KEY = 'eze.defaultYes.v1';
 /** Signed manual corrections to the daily counter; never fake tracker records. */
 export const APPLICATION_COUNTS_KEY = 'eze.applicationCountAdjustments.v1';

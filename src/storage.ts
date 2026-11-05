@@ -1,5 +1,6 @@
 import {
   STORAGE_KEY,
+  DEFAULT_YES_KEY,
   type CustomField,
   type CustomStore,
   type ProfileContext,
@@ -237,6 +238,17 @@ export async function setAutoFillPreference(
     throw new Error(result?.error || 'Automatic filling could not be saved. Please try again.');
 }
 
+export async function getDefaultYesPreference(): Promise<boolean> {
+  const values = await chrome.storage.local.get(DEFAULT_YES_KEY);
+  return values[DEFAULT_YES_KEY] === true;
+}
+
+export async function setDefaultYesPreference(enabled: boolean): Promise<void> {
+  const result = await chrome.runtime.sendMessage({ type: 'eze-app:default-yes', enabled });
+  if (!result?.ok)
+    throw new Error(result?.error || 'The Yes/No preference could not be saved. Try again.');
+}
+
 export function phoneVariants(personal: Record<string, unknown>): {
   national: string;
   international: string;
@@ -377,13 +389,19 @@ export async function getActiveFields(): Promise<ProfileFields> {
 
 /** Use one storage snapshot so a profile switch cannot mix identity and answers. */
 export async function getAutofillData(): Promise<
-  ProfileFields & { resume?: SavedResume; profileId?: string }
+  ProfileFields & {
+    resume?: SavedResume;
+    profileId?: string;
+    defaultYes?: boolean;
+    masterEnabled?: boolean;
+  }
 > {
   const data = await chrome.storage.local.get([
     'profile',
     'lastSyncProfile',
     STORAGE_KEY,
     'autofillEnabled',
+    DEFAULT_YES_KEY,
   ]);
   const context = contextFrom(data);
   const store = data[STORAGE_KEY] as CustomStore | undefined;
@@ -409,6 +427,8 @@ export async function getAutofillData(): Promise<
   return {
     ...saved,
     autoFill: saved.autoFill && data.autofillEnabled !== false,
+    defaultYes: data[DEFAULT_YES_KEY] === true,
+    masterEnabled: data.autofillEnabled !== false,
     profileId: context.id,
     fields: [...saved.fields, ...shortcuts, ...profileAutofillFields(profile)],
     ...(string(resume.fileName) && string(resume.resumeBase64)

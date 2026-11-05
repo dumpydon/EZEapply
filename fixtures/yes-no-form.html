@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Example Engineer job application</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 24px;
+        background: #1b2023;
+        color: #e4e9eb;
+        font:
+          14px/1.5 -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+      }
+      h1 {
+        font-size: 23px;
+        margin: 0 0 6px;
+      }
+      p {
+        color: #a8b4b9;
+        margin: 0 0 18px;
+      }
+      fieldset,
+      .question-block,
+      [role='radiogroup'],
+      .field {
+        border: 0;
+        padding: 0;
+        margin: 0 0 24px;
+      }
+      legend,
+      .question {
+        padding: 0;
+        font-weight: 600;
+        margin: 0 0 9px;
+      }
+      label,
+      .choice-text {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-right: 20px;
+        cursor: pointer;
+      }
+      input {
+        width: 18px;
+        height: 18px;
+        accent-color: #2cb193;
+      }
+      .styled-choice {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 5px 0;
+      }
+      .styled-choice p {
+        margin: 0;
+        color: inherit;
+      }
+      .styled-choice input {
+        display: none;
+      }
+      .styled-choice label::before {
+        content: '';
+        width: 22px;
+        height: 22px;
+        border: 1.5px solid #b5c1c6;
+        border-radius: 50%;
+      }
+      .styled-choice input:checked + label::before {
+        border: 7px solid #2cb193;
+        background: #152d27;
+      }
+      select {
+        margin-top: 8px;
+        display: block;
+        background: #252d32;
+        color: inherit;
+        border: 1px solid #58706f;
+        border-radius: 6px;
+        padding: 8px;
+        width: 100%;
+        font: inherit;
+      }
+      button {
+        background: #2b383c;
+        color: inherit;
+        border: 1px solid #52736b;
+        border-radius: 7px;
+        font: inherit;
+        padding: 7px 12px;
+        cursor: pointer;
+      }
+      [role='radio'][aria-checked='true'] {
+        background: #235e50;
+        border-color: #6dc6af;
+      }
+      [role='radio'] {
+        margin-right: 10px;
+      }
+      output {
+        display: block;
+        margin: 20px 0;
+        padding: 12px;
+        border: 1px solid #3c5b51;
+        border-radius: 8px;
+        color: #a9d9c7;
+      }
+    </style>
+    <script src="/demo-api.js"></script>
+    <script defer src="/yes-no-demo.js"></script>
+    <script defer src="/custom/content.js"></script>
+  </head>
+  <body>
+    <form id="job-application" aria-label="Job application">
+      <h1>Job application · AI Engineer</h1>
+      <p>Additional questions</p>
+      <div id="questions"></div>
+      <output id="committed" aria-live="polite"></output>
+      <button type="button" id="next-step">New form step</button>
+    </form>
+  </body>
+</html>

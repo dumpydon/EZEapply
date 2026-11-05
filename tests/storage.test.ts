@@ -10,7 +10,7 @@ import {
   validateProfile,
   phoneVariants,
 } from '../src/storage';
-import { STORAGE_KEY } from '../src/types';
+import { DEFAULT_YES_KEY, STORAGE_KEY } from '../src/types';
 import type { CustomField } from '../src/types';
 
 const field: CustomField = {
@@ -25,6 +25,31 @@ const field: CustomField = {
   scope: '',
 };
 describe('custom-field storage validation', () => {
+  it('defaults Yes/No opt-in off and keeps it independent of saved-answer autofill and the master switch', async () => {
+    const data: Record<string, unknown> = {
+      [STORAGE_KEY]: { version: 1, profiles: { local: { fields: [], autoFill: false } } },
+    };
+    vi.stubGlobal('chrome', { storage: { local: { get: async () => data } } });
+    try {
+      expect((await getAutofillData()).defaultYes).toBe(false);
+      data[DEFAULT_YES_KEY] = 'true';
+      expect((await getAutofillData()).defaultYes).toBe(false);
+      data[DEFAULT_YES_KEY] = true;
+      expect(await getAutofillData()).toMatchObject({
+        autoFill: false,
+        defaultYes: true,
+        masterEnabled: true,
+      });
+      data.autofillEnabled = false;
+      expect(await getAutofillData()).toMatchObject({
+        autoFill: false,
+        defaultYes: true,
+        masterEnabled: false,
+      });
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
   it('honors the master autofill switch without hiding answers from manual Fill', async () => {
     const data: Record<string, unknown> = {
       autofillEnabled: false,

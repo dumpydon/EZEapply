@@ -3,26 +3,44 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   applicationCount,
   countAdjustments,
-  localDay,
   mountApplicationCount,
 } from '../src/application-count';
+import { utcDayKey } from '../src/application-day';
 import { APPLICATION_COUNTS_KEY } from '../src/types';
 
 describe('daily application-count corrections', () => {
-  it('counts the local calendar day, excludes invalid/future dates, and adds only today’s correction', () => {
-    const now = new Date(2026, 9, 29, 10),
-      day = localDay(now);
+  it('counts the UTC calendar day, excludes dates outside it, and adds only today’s correction', () => {
+    const now = new Date('2026-10-29T10:00:00Z'),
+      day = utcDayKey(now);
     const applications = [
-      { date: new Date(2026, 9, 29, 0).toString() },
-      { date: new Date(2026, 9, 29, 23, 59).toString() },
-      { date: new Date(2026, 9, 28, 23, 59).toString() },
-      { date: new Date(2026, 9, 30, 0).toString() },
+      { date: '2026-10-29T00:00:00Z' },
+      { date: '2026-10-29T23:59:59.999Z' },
+      { date: '2026-10-28T23:59:59.999Z' },
+      { date: '2026-10-30T00:00:00Z' },
       { date: 'invalid' },
       {},
     ];
     expect(applicationCount(applications, { [day]: 3, '2026-10-28': 50 }, now)).toBe(5);
     expect(applicationCount(applications, { [day]: -50 }, now)).toBe(0);
-    expect(applicationCount(applications, { [day]: 3 }, new Date(2026, 9, 30, 1))).toBe(1);
+    expect(applicationCount(applications, { [day]: 3 }, new Date('2026-10-30T01:00:00Z'))).toBe(1);
+  });
+  it('keeps early-morning IST applications in the preceding UTC day until 5:30 a.m.', () => {
+    const applications = [
+      { date: '2026-11-01T23:59:59+05:30' },
+      { date: '2026-11-02T00:00:00+05:30' },
+      { date: '2026-11-02T05:29:59.999+05:30' },
+    ];
+    const corrections = { '2026-11-01': 2 };
+    expect(
+      applicationCount(applications, corrections, new Date('2026-11-02T05:29:59.999+05:30')),
+    ).toBe(5);
+    expect(applicationCount(applications, corrections, new Date('2026-11-02T05:30:00+05:30'))).toBe(
+      0,
+    );
+    applications.push({ date: '2026-11-02T05:30:00+05:30' });
+    expect(applicationCount(applications, corrections, new Date('2026-11-02T05:30:00+05:30'))).toBe(
+      1,
+    );
   });
   it('ignores malformed count storage rather than coercing strings or unsafe numbers', () => {
     expect(
@@ -61,7 +79,7 @@ beforeEach(() => {
     runtime: {
       sendMessage: vi.fn(async (message: { delta: number }) => {
         data[APPLICATION_COUNTS_KEY] = {
-          [localDay()]: Math.max(
+          [utcDayKey()]: Math.max(
             0,
             applicationCount(data.appliedList, data[APPLICATION_COUNTS_KEY]) + message.delta,
           ),
@@ -87,10 +105,28 @@ beforeEach(() => {
 afterEach(() => {
   cleanup?.();
   cleanup = undefined;
+  vi.useRealTimers();
   vi.unstubAllGlobals();
   document.body.replaceChildren();
 });
 describe('native count controls', () => {
+  it('resets the open controls at UTC midnight and sends new-day corrections with the UTC date', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-11-02T05:29:59.999+05:30'));
+    data[APPLICATION_COUNTS_KEY] = { '2026-11-01': 2 };
+    cleanup = mountApplicationCount().dispose;
+    await vi.advanceTimersByTimeAsync(0);
+    expect(minus().disabled).toBe(false);
+    await vi.advanceTimersByTimeAsync(1);
+    expect(minus().disabled).toBe(true);
+    plus().click();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
+      type: 'eze-custom:adjust-count',
+      delta: 1,
+      day: '2026-11-02',
+    });
+  });
   it('adds one pair of buttons beside the daily heading and saves corrections without changing the list', async () => {
     const view = mountApplicationCount();
     cleanup = view.dispose;
@@ -103,7 +139,7 @@ describe('native count controls', () => {
     expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
       type: 'eze-custom:adjust-count',
       delta: 1,
-      day: localDay(),
+      day: utcDayKey(),
     });
     expect(data.appliedList).toEqual([]);
     expect(minus().disabled).toBe(false);
@@ -118,7 +154,7 @@ describe('native count controls', () => {
     document.querySelector('#root')!.innerHTML =
       '<h1>2 Applications <span>out of 10 today</span></h1>';
     view.decorate();
-    data[APPLICATION_COUNTS_KEY] = { [localDay()]: 2 };
+    data[APPLICATION_COUNTS_KEY] = { [utcDayKey()]: 2 };
     listeners.forEach((fn) =>
       fn({ [APPLICATION_COUNTS_KEY]: { newValue: data[APPLICATION_COUNTS_KEY] } }, 'local'),
     );

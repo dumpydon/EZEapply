@@ -123,6 +123,35 @@ describe('application-only AI context', () => {
     );
     expect(isApplicationField(document.querySelector<HTMLElement>('#message')!, url)).toBe(false);
   });
+  it('recognizes a LinkedIn application title rendered as a plain paragraph', () => {
+    expect(
+      allowed(
+        `<div role="dialog"><p>Apply to Example</p><form><p>Additional Questions</p>${input}</form></div>`,
+        'https://www.linkedin.com/jobs/view/123',
+      ),
+    ).toBe(true);
+  });
+  it.each([
+    [
+      'a message that mentions applying',
+      '<p>New message</p><p>Apply to Example. Additional Questions about the role.</p>',
+      '/jobs/view/123',
+    ],
+    [
+      'an unrelated dialog',
+      '<p>Apply to Example</p><p>Some unrelated content</p>',
+      '/jobs/view/123',
+    ],
+    [
+      'a conversation route',
+      '<p>Apply to Example</p><p>Additional Questions</p>',
+      '/messaging/thread/123',
+    ],
+  ])('does not treat %s as a plain-title application', (_, intro, path) => {
+    expect(
+      allowed(`<div role="dialog">${intro}${input}</div>`, `https://www.linkedin.com${path}`),
+    ).toBe(false);
+  });
   it('supports an application control inside an open shadow root', () => {
     document.body.innerHTML = '<form id="job-application"><app-field></app-field></form>';
     const shadow = document.querySelector('app-field')!.attachShadow({ mode: 'open' });

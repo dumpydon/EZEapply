@@ -1,4 +1,5 @@
-import { analyticsSummary, localDayKey } from './tracking-model';
+import { analyticsSummary } from './tracking-model';
+import { utcDayKey, watchUtcDay } from './application-day';
 import {
   TRACKING_CACHE_KEY,
   type ApplicationRecord,
@@ -18,7 +19,10 @@ const decimal = new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 });
 const dateLabel = (
   day: string,
   options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' },
-) => new Intl.DateTimeFormat(undefined, options).format(new Date(`${day}T12:00:00`));
+) =>
+  new Intl.DateTimeFormat(undefined, { ...options, timeZone: 'UTC' }).format(
+    new Date(`${day}T00:00:00Z`),
+  );
 function element<K extends keyof HTMLElementTagNameMap>(
   tag: K,
   className = '',
@@ -81,7 +85,7 @@ function recordsInPeriod(
     .filter((record) => {
       const date = new Date(record.submittedAt);
       if (!Number.isFinite(date.getTime())) return false;
-      const day = localDayKey(date);
+      const day = utcDayKey(date);
       return day >= first && day <= last;
     })
     .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
@@ -118,7 +122,7 @@ export function exportAnalytics(
       {
         version: 1,
         exportedAt: now.toISOString(),
-        period: { days, from: summary.bins[0]?.day, to: summary.bins.at(-1)?.day },
+        period: { days, from: summary.bins[0]?.day, to: summary.bins.at(-1)?.day, timeZone: 'UTC' },
         records,
         daily: summary.bins,
       },
@@ -162,8 +166,7 @@ export function mountAnalytics(host: HTMLElement): () => void {
     revision = 0,
     visibleRecords = 12,
     source: 'all' | ApplicationSource = 'all';
-  let refreshTimer: ReturnType<typeof setTimeout> | undefined,
-    lastDay = localDayKey();
+  let refreshTimer: ReturnType<typeof setTimeout> | undefined;
   const top = element('header', 'topbar'),
     brand = element('a', 'brand');
   brand.href = chrome.runtime.getURL('options.html#/');
@@ -243,7 +246,11 @@ export function mountAnalytics(host: HTMLElement): () => void {
     footer = element('footer', 'page-footer');
   footer.append(
     element('span', '', 'Saved on this device. No account or analytics service.'),
-    element('span', '', 'Blue for LinkedIn. Teal for external forms.'),
+    element(
+      'span',
+      '',
+      'Blue for LinkedIn. Teal for external forms. Days reset at 00:00 UTC (5:30 a.m. IST).',
+    ),
   );
   main.append(intro, notice, tools, body, footer);
   host.replaceChildren(top, main);
@@ -269,7 +276,7 @@ export function mountAnalytics(host: HTMLElement): () => void {
       url = URL.createObjectURL(blob),
       link = element('a');
     link.href = url;
-    link.download = `EZEapply-applications-${days}-days-${localDayKey()}.${format}`;
+    link.download = `EZEapply-applications-${days}-days-${utcDayKey()}.${format}`;
     document.body.append(link);
     link.click();
     link.remove();
@@ -589,6 +596,8 @@ export function mountAnalytics(host: HTMLElement): () => void {
           day: 'numeric',
           hour: '2-digit',
           minute: '2-digit',
+          timeZone: 'UTC',
+          timeZoneName: 'short',
         }).format(new Date(record.submittedAt)),
       );
       date.dateTime = record.submittedAt;
@@ -743,19 +752,13 @@ export function mountAnalytics(host: HTMLElement): () => void {
     refreshTimer = setTimeout(() => void refresh(), 80);
   };
   chrome.storage.onChanged.addListener(changed);
-  const rollover = setInterval(() => {
-    const current = localDayKey();
-    if (current !== lastDay) {
-      lastDay = current;
-      void refresh();
-    }
-  }, 60000);
+  const stopRollover = watchUtcDay(() => void refresh(), host.ownerDocument);
   void refresh();
   return () => {
     disposed = true;
     revision++;
     clearTimeout(refreshTimer);
-    clearInterval(rollover);
+    stopRollover();
     chrome.storage.onChanged.removeListener(changed);
   };
 }

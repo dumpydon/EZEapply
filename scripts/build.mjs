@@ -65,7 +65,7 @@ try {
     content_security_policy: { extension_pages: "script-src 'self'; object-src 'self'" },
   };
   const page = (title, styles, scripts, body) =>
-    `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>EZEapply · ${title}</title><link rel="icon" href="custom/icon/32.png">${styles.map((name) => `<link rel="stylesheet" href="custom/${name}.css">`).join('')}${scripts.map((name) => `<script defer src="custom/${name}.js"></script>`).join('')}</head><body>${body}</body></html>\n`;
+    `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>EZEapply · ${title}</title><link rel="icon" href="custom/icon/32.png">${styles.map((name) => `<link rel="stylesheet" href="custom/${name}.css">`).join('')}${['appearance-page', ...scripts].map((name) => `<script defer src="custom/${name}.js"></script>`).join('')}</head><body>${body}</body></html>\n`;
   const pages = {
     'popup.html': page('Quick Access', ['theme'], ['app-ui'], '<div id="root"></div>'),
     'options.html': page('Applications & profile', ['theme'], ['app-ui'], '<div id="root"></div>'),
@@ -98,6 +98,7 @@ try {
   await writeFile(join(out, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
   await build({
     entryPoints: {
+      'appearance-page': join(root, 'src/appearance-page.ts'),
       panel: join(root, 'src/panel.ts'),
       content: join(root, 'src/content.ts'),
       background: join(root, 'src/background.ts'),
@@ -113,6 +114,7 @@ try {
     legalComments: 'none',
   });
   for (const [from, to] of [
+    ['appearance.css', 'appearance.css'],
     ['panel.css', 'panel.css'],
     ['theme.css', 'theme.css'],
     ['app-controls.css', 'app-controls.css'],
@@ -124,6 +126,10 @@ try {
   ])
     await cp(join(root, 'src', from), join(out, 'custom', to));
   await cp(join(root, 'src/assets/navigation'), join(out, 'custom/navigation'), {
+    recursive: true,
+    filter: (path) => !path.endsWith('.md'),
+  });
+  await cp(join(root, 'src/assets/cv-controls'), join(out, 'custom/cv-controls'), {
     recursive: true,
     filter: (path) => !path.endsWith('.md'),
   });

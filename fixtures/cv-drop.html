@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>PDF upload test</title>
+    <style>
+      body {
+        font: 16px system-ui;
+        padding: 30px;
+        background: #f4f7f6;
+        color: #23332b;
+      }
+      #drop {
+        padding: 70px 25px;
+        border: 2px dashed #39846a;
+        border-radius: 18px;
+        text-align: center;
+      }
+      input {
+        display: block;
+        margin: 30px 0;
+      }
+      output {
+        display: block;
+        white-space: pre-wrap;
+      }
+    </style>
+    <script src="/cv-transfer-demo.js"></script>
+  </head>
+  <body>
+    <h1>Job application · PDF upload</h1>
+    <div id="drop">Drop a CV here</div>
+    <section>
+      <button id="styled">Select PDF file</button
+      ><input id="hidden-pdf" type="file" accept=".pdf" hidden />
+    </section>
+    <label>Native file upload<input type="file" accept="application/pdf" /></label
+    ><output id="result">No file received.</output>
+    <script>
+      const drop = document.getElementById('drop');
+      document.getElementById('styled').onclick = () =>
+        document.getElementById('hidden-pdf').click();
+      for (const input of document.querySelectorAll('input[type=file]'))
+        input.addEventListener('change', async () => {
+          const file = input.files[0];
+          document.getElementById('result').textContent = file
+            ? `Received via file input: ${file.name} · ${file.size} bytes · ${(await file.text()).slice(0, 8)}`
+            : 'No file received';
+        });
+      drop.addEventListener('dragover', (e) => e.preventDefault());
+      drop.addEventListener('drop', async (e) => {
+        e.preventDefault();
+        const file = e.dataTransfer.files[0];
+        document.getElementById('result').textContent = file
+          ? `Received: ${file.name}\nType: ${file.type}\nBytes: ${file.size}\nPDF header: ${(await file.text()).slice(0, 8)}`
+          : 'No file data received';
+      });
+    </script>
+  </body>
+</html>

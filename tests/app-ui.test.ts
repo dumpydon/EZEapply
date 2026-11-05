@@ -2,7 +2,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { mountApp, safeWebsite, profileDate } from '../src/app-ui';
 import { TRACKING_DAILY_TOTALS_KEY } from '../src/tracking-types';
-import { localDayKey } from '../src/tracking-model';
+import { utcDayKey } from '../src/application-day';
 let data: Record<string, unknown>, cleanup: (() => void) | undefined;
 beforeEach(() => {
   data = {
@@ -13,7 +13,7 @@ beforeEach(() => {
       jobData: [{ company: 'Example', startDate: { month: 2, year: 2024 } }],
     },
     dailyGoal: 10,
-    [TRACKING_DAILY_TOTALS_KEY]: { [localDayKey()]: { total: 14 } },
+    [TRACKING_DAILY_TOTALS_KEY]: { [utcDayKey()]: { total: 14 } },
   };
   document.body.innerHTML = '<div id="root"></div>';
   vi.stubGlobal('chrome', {
@@ -38,10 +38,35 @@ beforeEach(() => {
 afterEach(() => {
   cleanup?.();
   cleanup = undefined;
+  vi.useRealTimers();
   document.body.replaceChildren();
   vi.unstubAllGlobals();
 });
 describe('independent application host', () => {
+  it.each(['/popup.html', '/sidepanel.html'])(
+    'refreshes an open %s at midnight UTC without changing the goal or yesterday’s history',
+    async (path) => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-11-01T23:59:59.999+05:30'));
+      data[TRACKING_DAILY_TOTALS_KEY] = { '2026-11-01': { total: 14 } };
+      history.replaceState({}, '', path);
+      cleanup = await mountApp(document.getElementById('root')!);
+      await vi.advanceTimersByTimeAsync(0);
+      expect(document.querySelector('.daily-total')?.textContent).toBe('14');
+      await vi.advanceTimersByTimeAsync(1);
+      expect(document.querySelector('.daily-total')?.textContent).toBe('14');
+      await vi.advanceTimersByTimeAsync(5.5 * 60 * 60 * 1000);
+      expect(document.querySelector('.daily-total')?.textContent).toBe('0');
+      expect(document.querySelector('.daily-goal')?.textContent).toBe('Goal: 10');
+      const ring = document.querySelector<SVGElement>('.ring-value');
+      if (path === '/popup.html') expect(ring?.style.opacity).toBe('0');
+      else
+        expect(document.querySelector<HTMLElement>('.daily-progress-value')?.style.width).toBe(
+          '0%',
+        );
+      expect(data[TRACKING_DAILY_TOTALS_KEY]).toEqual({ '2026-11-01': { total: 14 } });
+    },
+  );
   it('keeps the compact popup and exposes the same local switches, goal controls and analytics entry', async () => {
     history.replaceState({}, '', '/popup.html');
     cleanup = await mountApp(document.getElementById('root')!);

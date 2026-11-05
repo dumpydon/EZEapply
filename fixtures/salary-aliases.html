@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>EZEapply · Salary alias verification</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #19262d;
+        color: #e7f4ee;
+        font:
+          14px/1.5 -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+      }
+      header {
+        padding: 18px 24px;
+        border-bottom: 1px solid #456157;
+      }
+      header b {
+        font-size: 20px;
+      }
+      header p {
+        margin: 4px 0;
+        color: #aac7ba;
+      }
+      main {
+        display: grid;
+        grid-template-columns: minmax(340px, 400px) minmax(350px, 1fr);
+        height: calc(100dvh - 155px);
+        gap: 1px;
+        background: #456157;
+      }
+      iframe {
+        border: 0;
+        width: 100%;
+        height: 100%;
+      }
+      button {
+        font: inherit;
+        border: 1px solid #649b85;
+        border-radius: 6px;
+        background: #254f43;
+        color: #e7f4ee;
+        padding: 7px 12px;
+        margin-top: 8px;
+        cursor: pointer;
+      }
+      @media (max-width: 750px) {
+        main {
+          grid-template-columns: 1fr;
+          height: auto;
+        }
+        iframe {
+          height: 800px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <b>EZEapply · Saved salary aliases</b>
+      <p>Isolated synthetic data · no employer requests or submissions.</p>
+      <p>
+        Load sample answers, then use Fill this page. Turn Auto fill on and reveal a new step to
+        test automatic filling.
+      </p>
+      <button id="load-sample" type="button">Load sample answers</button>
+      <span id="ready" role="status"></span>
+    </header>
+    <main>
+      <iframe
+        id="panel"
+        title="EZEapply saved answers"
+        src="/panel.html?sandbox=salary-aliases"
+      ></iframe>
+      <iframe
+        id="application"
+        title="Salary application form"
+        src="/careers/apply/salary-alias-form?sandbox=salary-aliases"
+      ></iframe>
+    </main>
+    <script>
+      document.getElementById('load-sample').addEventListener('click', async () => {
+        const fields = [
+          ['current-generic', 'Current CTC', '9', []],
+          ['current-inr', 'Current CTC in INR', '900000', ['Current Salary']],
+          ['expected-generic', 'Expected CTC', '9', []],
+          ['expected-inr', 'Expected CTC in INR', '900000', ['Desired Salary', 'Expected Salary*']],
+        ].map(([id, label, value, aliases]) => ({
+          id,
+          label,
+          value,
+          aliases,
+          exclude: [],
+          scope: '',
+          enabled: true,
+          matchMode: 'phrase',
+          category: 'Personal questions',
+        }));
+        await document.getElementById('panel').contentWindow.chrome.storage.local.set({
+          'eze.customFields.v1': { version: 1, profiles: { local: { autoFill: false, fields } } },
+        });
+        document.getElementById('ready').textContent =
+          'Sample INR answers and matching phrases saved.';
+      });
+    </script>
+  </body>
+</html>

@@ -8,10 +8,17 @@ const state = vi.hoisted(() => ({
   builtIns: [] as CustomField[],
   save: vi.fn(),
   autoSave: vi.fn(),
+  defaultYes: false,
+  yesSave: vi.fn(),
   sendMessage: vi.fn(),
   copy: vi.fn(),
 }));
 vi.mock('../src/storage', () => ({
+  getDefaultYesPreference: async () => state.defaultYes,
+  setDefaultYesPreference: async (enabled: boolean) => {
+    await state.yesSave(enabled);
+    state.defaultYes = enabled;
+  },
   getProfileContext: async () => state.profile,
   getCustomProfile: async () => structuredClone(state.data),
   getActiveFields: async () => ({
@@ -78,6 +85,39 @@ async function mount(): Promise<void> {
   document.body.append(host);
   unmount = await mountPanel(host);
 }
+
+describe('side-pane Yes/No preference', () => {
+  it('saves independently of the answer library and reflects the stored value after remounting', async () => {
+    await mount();
+    const toggle = document.querySelector<HTMLInputElement>(
+      '[aria-label="Default Yes for Yes/No questions"]',
+    )!;
+    expect(toggle.checked).toBe(false);
+    toggle.click();
+    await settle();
+    expect(state.yesSave).toHaveBeenCalledWith(true);
+    expect(state.save).not.toHaveBeenCalled();
+    expect(state.autoSave).not.toHaveBeenCalled();
+    unmount!();
+    await mount();
+    expect(
+      document.querySelector<HTMLInputElement>('[aria-label="Default Yes for Yes/No questions"]')!
+        .checked,
+    ).toBe(true);
+  });
+  it('restores the toggle and shows an error if persistence fails', async () => {
+    state.yesSave.mockRejectedValueOnce(new Error('Could not save the preference'));
+    await mount();
+    const toggle = document.querySelector<HTMLInputElement>(
+      '[aria-label="Default Yes for Yes/No questions"]',
+    )!;
+    toggle.click();
+    await settle();
+    expect(toggle.checked).toBe(false);
+    expect(toggle.disabled).toBe(false);
+    expect(document.querySelector('[role="status"]')?.textContent).toContain('Could not save');
+  });
+});
 beforeEach(() => {
   localStorage.clear();
   document.body.replaceChildren();
@@ -96,6 +136,8 @@ beforeEach(() => {
   ];
   state.save.mockClear();
   state.autoSave.mockClear();
+  state.defaultYes = false;
+  state.yesSave.mockReset();
   state.sendMessage.mockReset();
   state.copy.mockReset();
   state.copy.mockResolvedValue(undefined);

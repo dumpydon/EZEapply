@@ -4,7 +4,7 @@
 
 <p align="center"><a href="https://github.com/dumpydon/EZEapply/releases/latest/download/EZEapply.zip"><strong>↓ Download EZEapply for Chrome</strong></a> · <a href="docs/media/install-ezeapply.mp4">Watch the 30-second install film</a></p>
 
-Current stable version: **3.0.2** · [Release notes](https://github.com/dumpydon/EZEapply/releases/tag/v3.0.2) · [Download checksum](https://github.com/dumpydon/EZEapply/releases/latest/download/SHA256SUMS.txt)
+Current stable version: **3.0.13** · [Release notes](https://github.com/dumpydon/EZEapply/releases/tag/v3.0.13) · [Download checksum](https://github.com/dumpydon/EZEapply/releases/latest/download/SHA256SUMS.txt)
 
 ## Install
 

@@ -1,14 +1,15 @@
+@import url('./appearance.css');
 @import url('./app-controls.css');
 @import url('./profile-view.css');
 :root {
   color-scheme: dark;
-  --background: #202b32;
-  --foreground: #e3edf0;
-  --card: #293740;
-  --primary: #64c7ab;
-  --muted-foreground: #a3b5bf;
-  --border: #40535e;
-  --eze-local-gradient: linear-gradient(115deg, #167f70, #269b83 64%, #359d72);
+  --background: var(--ui-bg);
+  --foreground: var(--ui-text);
+  --card: var(--ui-panel);
+  --primary: var(--ui-accent);
+  --muted-foreground: var(--ui-muted);
+  --border: var(--ui-border);
+  --eze-local-gradient: linear-gradient(115deg, var(--ui-fill), var(--ui-hover));
   font:
     14px/1.55 -apple-system,
     BlinkMacSystemFont,
@@ -55,7 +56,7 @@ a:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 2px solid #78d8b3;
+  outline: 2px solid var(--ui-accent);
   outline-offset: 3px;
 }
 [hidden] {
@@ -90,7 +91,7 @@ p {
 }
 .app-status {
   font-size: 13px;
-  color: #9ae4c9;
+  color: var(--ui-accent);
   margin: 12px 0;
 }
 .quiet-button,
@@ -107,17 +108,17 @@ p {
   padding: 8px 13px;
   color: inherit;
   text-decoration: none;
-  background: #31424b;
+  background: var(--ui-raised);
   font-weight: 600;
   font-size: 13px;
 }
 .quiet-button:hover {
-  background: #3b505a;
+  background: var(--ui-hover-surface);
 }
 .primary-button {
   color: #fff;
   background: var(--eze-local-gradient);
-  border-color: #58ac95;
+  border-color: var(--ui-edge);
 }
 .danger-button {
   color: #f4b0ba;
@@ -130,7 +131,7 @@ p {
 }
 .card {
   background: var(--card);
-  border: 1px solid #3b4b55;
+  border: 1px solid var(--ui-border);
   border-radius: 16px;
   padding: 24px;
 }
@@ -146,7 +147,7 @@ textarea {
   width: 100%;
   border: 1px solid var(--border);
   border-radius: 9px;
-  background: #1c2931;
+  background: var(--ui-input);
   color: var(--foreground);
   padding: 10px 12px;
   min-width: 0;
@@ -155,11 +156,11 @@ textarea {
   resize: vertical;
 }
 input[type='checkbox'] {
-  accent-color: #2da284;
+  accent-color: var(--ui-fill);
 }
 input::placeholder,
 textarea::placeholder {
-  color: #8da2ad;
+  color: var(--ui-muted);
 }
 .toolbar,
 .page-heading,
@@ -187,7 +188,7 @@ textarea::placeholder {
   justify-content: space-between;
   gap: 24px;
   padding: 22px max(24px, calc((100vw - 1200px) / 2));
-  background: #26363f;
+  background: var(--ui-panel);
   border-bottom: 1px solid var(--border);
 }
 .app-header > a {
@@ -200,7 +201,7 @@ textarea::placeholder {
   flex-wrap: wrap;
 }
 .app-nav > a {
-  color: #becdd4;
+  color: var(--ui-muted);
   text-decoration: none;
   font-size: 13px;
   font-weight: 600;
@@ -213,7 +214,7 @@ textarea::placeholder {
   display: flex;
   align-items: center;
   gap: 7px;
-  color: #7ed5b8;
+  color: var(--ui-accent);
 }
 .nav-ai img {
   width: 26px;
@@ -228,7 +229,7 @@ textarea::placeholder {
 }
 .app-footer {
   border-top: 1px solid var(--border);
-  color: #8ca2ae;
+  color: var(--ui-muted);
   text-align: center;
   padding: 24px;
   font-size: 12px;
@@ -254,8 +255,8 @@ textarea::placeholder {
   width: 32px;
   height: 19px;
   border-radius: 12px;
-  background: #40545f;
-  border: 1px solid #71838d;
+  background: var(--ui-raised);
+  border: 1px solid var(--ui-border);
   margin: 0;
   cursor: pointer;
 }
@@ -270,8 +271,8 @@ textarea::placeholder {
   background: #f4f9fa;
 }
 .master-switch input:checked {
-  background: #2c9f85;
-  border-color: #64c7ab;
+  background: var(--ui-fill);
+  border-color: var(--ui-accent);
 }
 .master-switch input:checked:after {
   transform: translateX(13px);
@@ -302,7 +303,7 @@ textarea::placeholder {
   font-size: 13px;
 }
 .form-field > span {
-  color: #c5d3db;
+  color: var(--ui-muted);
   font-weight: 600;
 }
 .form-field:has(textarea) {
@@ -319,7 +320,7 @@ textarea::placeholder {
 }
 .history-editor {
   padding: 18px;
-  border: 1px solid #48606b;
+  border: 1px solid var(--ui-border);
   border-radius: 12px;
   margin: 0;
   min-width: 0;
@@ -362,13 +363,13 @@ textarea::placeholder {
   white-space: nowrap;
 }
 .application-list th {
-  background: #2b3c45;
-  color: #9acdbc;
+  background: var(--ui-raised);
+  color: var(--ui-accent);
   font-size: 12px;
   padding: 14px 18px;
 }
 .application-list td {
-  border-top: 1px solid #364a55;
+  border-top: 1px solid var(--ui-border);
   padding: 17px 18px;
   font-size: 13px;
 }
@@ -379,7 +380,7 @@ textarea::placeholder {
 .job-title {
   display: block;
   font-weight: 600;
-  color: #e3edf0;
+  color: var(--ui-text);
   text-decoration: none;
   margin-bottom: 4px;
 }
@@ -437,6 +438,15 @@ textarea::placeholder {
   position: relative;
   padding: 22px 24px 24px;
 }
+.popup-page .popup-appearance {
+  position: absolute;
+  top: 27px;
+  left: 8px;
+  width: 28px;
+  height: 28px;
+  border-color: var(--ui-border);
+  background: var(--ui-panel);
+}
 .popup-extensions {
   position: absolute;
   top: 27px;
@@ -446,17 +456,17 @@ textarea::placeholder {
   width: 28px;
   height: 28px;
   padding: 2px;
-  border: 1px solid #76b8a82e;
+  border: 1px solid var(--ui-border);
   border-radius: 7px;
-  background: #233d3b99;
+  background: var(--ui-panel);
   box-shadow: inset 0 1px 0 #d8ffef0d;
 }
 .popup-extensions:hover {
-  background: #36534d;
-  border-color: #8bceba8a;
+  background: var(--ui-raised);
+  border-color: var(--ui-accent);
 }
 .popup-extensions:active {
-  background: #1a312d;
+  background: var(--ui-input);
 }
 .popup-extensions .navigation-icon {
   display: block;
@@ -480,11 +490,11 @@ textarea::placeholder {
   transform: rotate(-90deg);
 }
 .ring-track {
-  stroke: #4b626a55;
+  stroke: var(--ui-border);
   stroke-width: 14;
 }
 .ring-value {
-  stroke: #62c8ac;
+  stroke: var(--ui-accent);
   stroke-width: 14;
   stroke-linecap: round;
   stroke-dasharray: 0 660;
@@ -503,7 +513,7 @@ textarea::placeholder {
   font-weight: 500;
   line-height: 1.1;
   letter-spacing: -0.05em;
-  color: #69caae;
+  color: var(--ui-accent);
 }
 .ring-text > span {
   font-size: 19px;
@@ -513,7 +523,7 @@ textarea::placeholder {
 }
 .ring-text > small {
   font-size: 18px;
-  color: #b7c8d2;
+  color: var(--ui-muted);
   margin-top: 22px;
   font-weight: 600;
 }
@@ -528,8 +538,8 @@ textarea::placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid #67c8af6b;
-  background: linear-gradient(155deg, #278e7b, #1a6e61);
+  border: 1px solid var(--ui-edge);
+  background: linear-gradient(155deg, var(--ui-hover), var(--ui-fill));
   color: #fff;
   border-radius: 12px;
   width: 48px;
@@ -537,7 +547,7 @@ textarea::placeholder {
   padding: 6px;
   box-shadow:
     inset 0 1px 0 #d8ffef2e,
-    0 3px 0 #102e29,
+    0 3px 0 var(--ui-input),
     0 6px 13px #00000030;
   transition:
     transform 140ms ease,
@@ -546,17 +556,17 @@ textarea::placeholder {
 }
 .popup-shortcut:hover {
   transform: translateY(-2px);
-  border-color: #9be2cda8;
+  border-color: var(--ui-accent);
   box-shadow:
     inset 0 1px 0 #e9fff445,
-    0 5px 0 #102e29,
+    0 5px 0 var(--ui-input),
     0 9px 18px #00000038;
 }
 .popup-shortcut:active {
   transform: translateY(2px);
   box-shadow:
     inset 0 1px 3px #052d2740,
-    0 1px 0 #102e29,
+    0 1px 0 var(--ui-input),
     0 2px 5px #00000025;
 }
 .popup-shortcut .navigation-icon {
@@ -574,17 +584,17 @@ textarea::placeholder {
   width: fit-content;
   max-width: 100%;
   min-height: 42px;
-  border: 1px solid #5d9b8c85;
+  border: 1px solid var(--ui-edge);
   border-radius: 11px;
-  background: linear-gradient(150deg, #344c50, #273d41);
-  color: #e5edf3;
+  background: linear-gradient(150deg, var(--ui-raised), var(--ui-panel));
+  color: var(--ui-text);
   font-size: 18px;
   font-weight: 650;
   margin: 0 auto 16px;
   padding: 4px 10px;
   box-shadow:
     inset 0 1px 0 #d8ffef17,
-    0 3px 0 #142a2b,
+    0 3px 0 var(--ui-input),
     0 6px 14px #00000028;
   transition:
     transform 140ms ease,
@@ -593,17 +603,17 @@ textarea::placeholder {
 }
 .quick-access:hover {
   transform: translateY(-1px);
-  border-color: #8bcebaa8;
+  border-color: var(--ui-accent);
   box-shadow:
     inset 0 1px 0 #d8ffef2e,
-    0 4px 0 #142a2b,
+    0 4px 0 var(--ui-input),
     0 8px 16px #00000035;
 }
 .quick-access:active {
   transform: translateY(2px);
   box-shadow:
     inset 0 1px 3px #132e3240,
-    0 1px 0 #142a2b,
+    0 1px 0 var(--ui-input),
     0 2px 5px #00000025;
 }
 .quick-access .navigation-icon {
@@ -637,8 +647,13 @@ textarea::placeholder {
 .popup-page,
 .sidepanel-page,
 .options-page {
-  background-color: #202b32;
-  background-image: url('./career-pattern.svg');
+  background-color: var(--ui-bg);
+  background-image:
+    linear-gradient(
+      color-mix(in srgb, var(--ui-bg) 55%, transparent),
+      color-mix(in srgb, var(--ui-bg) 55%, transparent)
+    ),
+    url('./career-pattern.svg');
   background-size: 400px 400px;
   background-repeat: repeat;
 }
@@ -656,24 +671,24 @@ textarea::placeholder {
 .side-summary h1 small {
   font-size: 12px;
   font-weight: 500;
-  color: #acbcc5;
+  color: var(--ui-muted);
 }
 .side-summary .daily-goal {
   font-size: 12px;
-  color: #a3b8c1;
+  color: var(--ui-muted);
   margin: 0 0 12px;
 }
 .daily-progress {
   height: 6px;
   border-radius: 6px;
-  background: #3f596366;
+  background: var(--ui-border);
   overflow: hidden;
 }
 .daily-progress-value {
   display: block;
   width: 0;
   height: 100%;
-  background: #5ac6a5;
+  background: var(--ui-fill);
 }
 .side-links {
   font-size: 12px;
@@ -735,7 +750,7 @@ textarea::placeholder {
   margin-right: auto;
 }
 .eze-ai-configure {
-  background: linear-gradient(110deg, #95edc4, #60ccaa);
-  color: #062d23;
-  border-color: #9ce4c26b;
+  background: var(--eze-local-gradient);
+  color: #fff;
+  border-color: var(--ui-edge);
 }

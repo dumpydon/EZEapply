@@ -1,7 +1,6 @@
 // Synthetic browser verification only. Never packaged into EZEapply.
 import { installTrackingBackground } from '../src/tracking-background';
 import { adjustTrackingCount, trackingSnapshot, updateTracking } from '../src/tracking-store';
-import { localDayKey } from '../src/tracking-model';
 import { APPLICATION_COUNTS_KEY } from '../src/types';
 import { TRACKING_CACHE_KEY, TRACKING_DAILY_TOTALS_KEY } from '../src/tracking-types';
 type EventListener = (...args: any[]) => void;
@@ -119,8 +118,8 @@ if (!bridge) {
         for (let day = 0; day < 60; day++)
           for (let n = 0; n < (day < 30 ? 3 + ((day * 7) % 8) : 1 + (day % 4)); n++) {
             const when = new Date();
-            when.setDate(when.getDate() - day);
-            when.setHours(9 + n, 15, 0, 0);
+            when.setUTCDate(when.getUTCDate() - day);
+            when.setUTCHours(9 + n, 15, 0, 0);
             state.records.push({
               id: `sample-${day}-${n}`,
               source: n % 3 === 0 ? 'linkedin' : 'external',

@@ -154,7 +154,15 @@ function applicationScope(scope: Element, url: URL): boolean {
     return (
       scope.matches('.jobs-easy-apply-modal') ||
       (scope.matches('dialog,[role="dialog"]') &&
-        /\b(?:apply to|easy apply|review your application)\b/i.test(title))
+        (/\b(?:apply to|easy apply|review your application)\b/i.test(title) ||
+          // Some application dialogs render their title as ordinary text.
+          // Require the opening title, a job route and an application step;
+          // a conversation merely mentioning an application is insufficient.
+          (/^\/jobs(?:\/|$)/i.test(url.pathname) &&
+            /^\s*(?:apply to\b|review your application\b)/i.test(body.slice(0, 300)) &&
+            /\b(?:additional questions|contact info(?:rmation)?|resume|résumé|review your application)\b/i.test(
+              body,
+            ))))
     );
   if (OTHER_FORM.test(title)) return false;
   if (
@@ -222,8 +230,12 @@ export function isApplicationField(
   const soleForm =
     !form || [...root.querySelectorAll(FORM_SCOPE)].every((candidate) => candidate === form);
   const jobApplicationRoute =
-    APPLICATION_ROUTE.test(url.pathname) &&
-    (ATS_HOST.test(url.hostname) || CAREER_ROUTE.test(`${url.hostname}${url.pathname}`));
+    (APPLICATION_ROUTE.test(url.pathname) &&
+      (ATS_HOST.test(url.hostname) || CAREER_ROUTE.test(`${url.hostname}${url.pathname}`))) ||
+    (hostIs(url.hostname, 'smartrecruiters.com') &&
+      /^\/oneclick-ui\/company\/[^/]+\/publication\/[^/]+\/(?:screening|application|personal-information|experience)(?:\/|$)/i.test(
+        url.pathname,
+      ));
   return (
     soleForm &&
     (jobApplicationRoute ||

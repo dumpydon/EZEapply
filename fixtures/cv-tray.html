@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>CV tray verification</title>
+    <style>
+      body {
+        margin: 0;
+        background: #18252b;
+        color: white;
+        font: 16px system-ui;
+      }
+      header {
+        padding: 16px;
+      }
+      main {
+        display: grid;
+        grid-template-columns: 400px 1fr;
+        height: 85vh;
+      }
+      iframe {
+        width: 100%;
+        height: 100%;
+        border: 0;
+      }
+    </style>
+    <script defer src="/cv-tray-demo.js"></script>
+    <script src="/cv-transfer-demo.js"></script>
+  </head>
+  <body>
+    <header>
+      CV tray · isolated PDF drag-and-drop verification<button id="sample">
+        Load four synthetic PDFs
+      </button>
+    </header>
+    <main>
+      <iframe src="/sidepanel.html" title="EZEapply side pane"></iframe
+      ><iframe src="http://localhost:4317/cv-drop.html" title="Cross-origin PDF upload"></iframe>
+    </main>
+  </body>
+</html>

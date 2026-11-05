@@ -17,7 +17,19 @@ export function isGenericPrompt(value: string): boolean {
   );
 }
 function parentOf(element: Element): Element | null {
-  return element.parentElement || (element.getRootNode() as ShadowRoot).host || null;
+  return (
+    element.assignedSlot ||
+    element.parentElement ||
+    (element.getRootNode() as ShadowRoot).host ||
+    null
+  );
+}
+/** Follow rendered ownership, including light-DOM controls assigned to a
+ * fieldset's slot inside a custom element's shadow root. */
+export function composedClosest(element: Element, selector: string): Element | null {
+  for (let node: Element | null = element; node; node = parentOf(node))
+    if (node.matches(selector)) return node;
+  return null;
 }
 function reference(element: Element, id: string): Element | null {
   let scope = element.getRootNode() as Document | ShadowRoot;

@@ -6,7 +6,7 @@ import {
   TRACKING_DAILY_TOTALS_KEY,
   TRACKING_INTENTS_KEY,
 } from '../src/tracking-types';
-import { localDayKey } from '../src/tracking-model';
+import { utcDayKey } from '../src/application-day';
 type Listener = (...args: any[]) => any;
 let data: Record<string, any>,
   session: Record<string, any>,
@@ -95,10 +95,47 @@ beforeEach(async () => {
   });
   await restart();
 });
-afterEach(() => {
+afterEach(async () => {
+  // Drain cache recomputations before replacing this worker's clock and storage.
+  await snapshot();
+  vi.useRealTimers();
   vi.unstubAllGlobals();
 });
 describe('durable submission ledger and worker boundary', () => {
+  it('rebuilds stale local-day caches in UTC and keeps history, goals and corrections through midnight and restart', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-11-02T00:00:00+05:30'));
+    data.appliedList = [
+      {
+        jobTitle: 'Imported application',
+        companyName: 'Example',
+        jobLink: 'https://jobs.example.test/posting/900000',
+        date: '2026-11-02T00:00:00+05:30',
+      },
+    ];
+    data[TRACKING_DAILY_TOTALS_KEY] = { '2026-11-02': { total: 99 } };
+    await restart();
+    expect(data[TRACKING_DAILY_TOTALS_KEY]['2026-11-02']).toBeUndefined();
+    expect(data[TRACKING_DAILY_TOTALS_KEY]['2026-11-01'].total).toBe(1);
+    const { adjustTrackingCount } = await import('../src/tracking-store');
+    await confirm();
+    await adjustTrackingCount(1, '2026-11-01');
+    await send({ type: 'eze-tracking:set-goal', goal: 25 });
+    vi.setSystemTime(new Date('2026-11-02T05:29:59.999+05:30'));
+    const before = await snapshot();
+    expect(data[TRACKING_DAILY_TOTALS_KEY]['2026-11-01'].total).toBe(3);
+    vi.setSystemTime(new Date('2026-11-02T05:30:00+05:30'));
+    await restart();
+    const after = await snapshot();
+    expect(after.records).toEqual(before.records);
+    expect(after.adjustments).toEqual({ '2026-11-01': 1 });
+    expect(after.goal).toBe(25);
+    expect(after.goalHistory['2026-11-02']).toBe(25);
+    await expect(adjustTrackingCount(1, '2026-11-01')).rejects.toThrow('The day changed');
+    expect(await adjustTrackingCount(1, '2026-11-02')).toEqual({ ok: true, count: 1 });
+    expect(data[TRACKING_DAILY_TOTALS_KEY]['2026-11-01'].total).toBe(3);
+    expect(data[TRACKING_DAILY_TOTALS_KEY]['2026-11-02'].total).toBe(1);
+  });
   it('records both submission channels and publishes their combined count without adding native tracker records', async () => {
     expect((await confirm()).ok).toBe(true);
     expect(
@@ -111,7 +148,7 @@ describe('durable submission ledger and worker boundary', () => {
     ).toBe(true);
     const result = await snapshot();
     expect(result.records.map((r: any) => r.source).sort()).toEqual(['external', 'linkedin']);
-    expect(data[TRACKING_DAILY_TOTALS_KEY][localDayKey()]).toMatchObject({
+    expect(data[TRACKING_DAILY_TOTALS_KEY][utcDayKey()]).toMatchObject({
       total: 2,
       linkedin: 1,
       external: 1,
@@ -228,7 +265,7 @@ describe('durable submission ledger and worker boundary', () => {
     expect(result.records).toHaveLength(1);
     expect(result.records[0].source).toBe('linkedin');
     expect(data.appliedList).toHaveLength(1);
-    expect(data[TRACKING_DAILY_TOTALS_KEY][localDayKey()].total).toBe(1);
+    expect(data[TRACKING_DAILY_TOTALS_KEY][utcDayKey()].total).toBe(1);
   });
   it('restores the history and derived caches after local cache removal', async () => {
     await confirm();
@@ -237,7 +274,7 @@ describe('durable submission ledger and worker boundary', () => {
     await restart();
     expect((await snapshot()).records).toHaveLength(1);
     expect(data.dailyGoal).toBe(25);
-    expect(data[TRACKING_CACHE_KEY].goalHistory[localDayKey()]).toBe(25);
+    expect(data[TRACKING_CACHE_KEY].goalHistory[utcDayKey()]).toBe(25);
   });
   it('validates goals, shares the native goal and preserves history across restart', async () => {
     for (const goal of [0, -1, 1.5, 10001, '20'])
@@ -251,16 +288,16 @@ describe('durable submission ledger and worker boundary', () => {
     const { adjustTrackingCount } = await import('../src/tracking-store');
     await Promise.all([
       confirm(),
-      adjustTrackingCount(1, localDayKey()),
-      adjustTrackingCount(1, localDayKey()),
+      adjustTrackingCount(1, utcDayKey()),
+      adjustTrackingCount(1, utcDayKey()),
     ]);
     let result = await snapshot();
-    expect(result.adjustments[localDayKey()]).toBe(2);
-    expect(data[TRACKING_DAILY_TOTALS_KEY][localDayKey()].total).toBe(3);
-    await Promise.all(Array.from({ length: 6 }, () => adjustTrackingCount(-1, localDayKey())));
+    expect(result.adjustments[utcDayKey()]).toBe(2);
+    expect(data[TRACKING_DAILY_TOTALS_KEY][utcDayKey()].total).toBe(3);
+    await Promise.all(Array.from({ length: 6 }, () => adjustTrackingCount(-1, utcDayKey())));
     result = await snapshot();
-    expect(result.adjustments[localDayKey()]).toBe(-1);
-    expect(data[TRACKING_DAILY_TOTALS_KEY][localDayKey()].total).toBe(0);
-    expect(data[APPLICATION_COUNTS_KEY][localDayKey()]).toBe(-1);
+    expect(result.adjustments[utcDayKey()]).toBe(-1);
+    expect(data[TRACKING_DAILY_TOTALS_KEY][utcDayKey()].total).toBe(0);
+    expect(data[APPLICATION_COUNTS_KEY][utcDayKey()]).toBe(-1);
   });
 });

@@ -1,3 +1,4 @@
+@import url('./appearance.css');
 :root {
   color-scheme: dark;
   font:
@@ -5,10 +6,10 @@
     BlinkMacSystemFont,
     'Segoe UI',
     sans-serif;
-  color: #edf5f1;
-  background: #17231f;
-  --accent: #2ca588;
-  --muted: #a8b9b1;
+  color: var(--ui-text);
+  background: var(--ui-bg);
+  --accent: var(--ui-accent);
+  --muted: var(--ui-muted);
 }
 * {
   box-sizing: border-box;
@@ -19,7 +20,7 @@ body {
   display: grid;
   place-items: start center;
   align-content: start;
-  background: radial-gradient(ellipse at 50% 5%, #34645266, transparent 60%), #17231f;
+  background: radial-gradient(ellipse at 50% 5%, var(--ui-soft), transparent 60%), var(--ui-bg);
   padding: 32px 16px;
 }
 button,
@@ -39,7 +40,7 @@ button:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
-  outline: 2px solid #6dd7bd;
+  outline: 2px solid var(--ui-accent);
   outline-offset: 2px;
 }
 [hidden] {
@@ -49,8 +50,8 @@ select:focus-visible {
   width: min(680px, 100%);
   padding: 25px 28px;
   border-radius: 28px;
-  border: 1px solid #8ba99a66;
-  background: #34433bdc;
+  border: 1px solid var(--ui-border);
+  background: var(--ui-panel);
   box-shadow: 0 24px 100px #0005;
   backdrop-filter: blur(20px);
 }
@@ -71,15 +72,15 @@ select:focus-visible {
   flex: 1;
 }
 .done {
-  border: 1px solid #4cc3a4;
+  border: 1px solid var(--ui-edge);
   border-radius: 24px;
   padding: 7px 18px;
-  background: #249b7e;
+  background: var(--ui-fill);
   color: #fff;
   font-weight: 650;
 }
 .done:hover {
-  background: #2cad8d;
+  background: var(--ui-hover);
 }
 .tabs {
   display: flex;
@@ -95,9 +96,9 @@ select:focus-visible {
   border: 1px solid #ffffff19;
 }
 .tab.on {
-  color: #8ae2cb;
-  border-color: #4eb89b;
-  background: #35a68820;
+  color: var(--ui-accent);
+  border-color: var(--ui-edge);
+  background: var(--ui-soft);
 }
 .body {
   display: flex;
@@ -130,15 +131,15 @@ select:focus-visible {
   border-radius: 10px;
   border: 1px solid #ffffff26;
   background: #ffffff05;
-  color: #edf5f1;
+  color: var(--ui-text);
   font-size: 13px;
 }
 .provider:nth-child(n + 7) {
   flex-basis: calc((100% - 21px) / 4);
 }
 .provider.on {
-  border-color: #48c5a4;
-  background: #31a58629;
+  border-color: var(--ui-edge);
+  background: var(--ui-soft);
 }
 .provider:hover {
   background: #ffffff10;
@@ -161,7 +162,7 @@ select:focus-visible {
   color: var(--muted);
 }
 .key-state[data-state='saved'] {
-  color: #8ae2cb;
+  color: var(--ui-accent);
 }
 .key-state[data-state='pending'] {
   color: #e6ce9c;
@@ -172,15 +173,15 @@ select {
   min-width: 0;
   flex: 1;
   padding: 10px 12px;
-  color: #edf5f1;
+  color: var(--ui-text);
   border: 1px solid #ffffff26;
   border-radius: 10px;
-  background: #14251e70;
+  background: var(--ui-input);
   outline: none;
 }
 input::placeholder,
 textarea::placeholder {
-  color: #90a59a;
+  color: var(--ui-muted);
 }
 input:not([type='checkbox']):focus,
 textarea:focus,
@@ -198,7 +199,7 @@ input[type='checkbox'] {
   border: 1px solid #ffffff26;
   border-radius: 10px;
   background: #ffffff07;
-  color: #edf5f1;
+  color: var(--ui-text);
   padding: 7px 12px;
 }
 .action:hover,
@@ -240,7 +241,7 @@ input[type='checkbox'] {
 }
 .status {
   font-size: 12px;
-  color: #b2decf;
+  color: var(--ui-accent);
   margin: 15px 0 0;
   min-height: 18px;
 }
@@ -266,7 +267,7 @@ input[type='checkbox'] {
   padding: 0;
   border: 0;
   border-radius: 5px;
-  color: #e7f4ee;
+  color: var(--ui-text);
   background: transparent;
   font-size: 20px;
 }
@@ -280,16 +281,16 @@ input[type='checkbox'] {
   padding: 6px;
   border: 1px solid #ffffff2e;
   border-radius: 12px;
-  background: #25352d;
+  background: var(--ui-raised);
   box-shadow: 0 12px 34px #0007;
   scrollbar-width: thin;
-  color: #edf5f1;
+  color: var(--ui-text);
 }
 .model-group {
   padding: 8px 10px 4px;
   font-size: 11px;
   font-weight: 600;
-  color: #afc1b7;
+  color: var(--ui-muted);
 }
 .model-row {
   display: flex;
@@ -329,19 +330,19 @@ input[type='checkbox'] {
 }
 .model-id {
   font-size: 11px;
-  color: #9caf9f;
+  color: var(--ui-muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .selected {
-  color: #85d7be;
+  color: var(--ui-accent);
 }
 .model-delete {
   border: 0;
   border-radius: 5px;
   background: transparent;
-  color: #a9bcb1;
+  color: var(--ui-muted);
   width: 30px;
   margin: 4px 2px;
   font-size: 17px;
@@ -355,7 +356,7 @@ input[type='checkbox'] {
   border: 0;
   border-radius: 6px;
   padding: 9px 10px;
-  color: #9ae2cc;
+  color: var(--ui-accent);
   text-align: left;
   font-size: 12px;
   width: 100%;
@@ -384,10 +385,10 @@ textarea {
 .context-state {
   margin: 0;
   padding: 10px 12px;
-  border: 1px solid #54bf9d66;
+  border: 1px solid var(--ui-edge);
   border-radius: 10px;
-  background: #258b7122;
-  color: #b9e9d9;
+  background: var(--ui-soft);
+  color: var(--ui-accent);
   font-size: 12px;
 }
 .context-state.error {
@@ -401,7 +402,7 @@ textarea {
 }
 .background-editor summary {
   cursor: pointer;
-  color: #b5ddcd;
+  color: var(--ui-accent);
   font-size: 13px;
 }
 .background-editor textarea {

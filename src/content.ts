@@ -1,3 +1,4 @@
+import { mountCVFileDrop } from './cv-transfer';
 import { mountAIFieldUI, type AIField, type AIFieldUI } from './ai/field-ui';
 import { matchingTerms } from './matching-terms';
 import { fillNotice } from './fill-notice';
@@ -11,9 +12,12 @@ import {
   fieldInstructions,
   ariaLabel,
   CONTROL_SELECTOR,
+  composedClosest,
+  composedParent,
 } from './form-labels';
 import { comboboxValue, fillCombobox } from './widgets';
 import { isDropdownPlaceholder, normalizeOption } from './dropdown';
+import { radioOptionContext, radioQuestionContext } from './radio-context';
 import { attachResume, scanResumeInputs } from './resume';
 import { mountPanelDock } from './panel-dock';
 import { mountLinkedInFollow } from './linkedin-follow';
@@ -22,6 +26,7 @@ import { isApplicationField } from './application-context';
 import { mountSubmissionCapture } from './submission-capture';
 import {
   MESSAGE_PREFIX,
+  DEFAULT_YES_KEY,
   STORAGE_KEY,
   type CustomField,
   type CustomStore,
@@ -44,7 +49,10 @@ interface Change {
   before: string | boolean;
   after: string | boolean;
 }
-const SELECTOR = CONTROL_SELECTOR;
+const SELECTOR = `${CONTROL_SELECTOR},[role="radio"]`;
+export interface FillOptions {
+  defaultYes?: boolean;
+}
 const UNSAFE_TYPES = new Set([
   'hidden',
   'password',
@@ -87,7 +95,7 @@ function roots(root: Document | ShadowRoot): (Document | ShadowRoot)[] {
 }
 
 function parentElement(element: Element): Element | null {
-  return element.parentElement || (element.getRootNode() as ShadowRoot).host || null;
+  return composedParent(element);
 }
 function activeControl(root: Document): Element | null {
   let active = root.activeElement;
@@ -133,28 +141,87 @@ function editable(element: FormControl): boolean {
     element.hasAttribute('contenteditable') && element.getAttribute('contenteditable') !== 'false'
   );
 }
-function groupLabels(control: HTMLInputElement): string[] {
-  const group = control.closest('fieldset,[role="radiogroup"]');
+function isRadio(control: FormControl): boolean {
+  return (
+    (control.tagName === 'INPUT' && (control as HTMLInputElement).type === 'radio') ||
+    control.getAttribute('role') === 'radio'
+  );
+}
+/** Styled radios may hide only the input and render its associated label.
+ * Require that visible proxy and a visible parent; never revive a hidden step. */
+function radioPresentation(control: FormControl): HTMLElement | undefined {
+  if (
+    !control.isConnected ||
+    composedClosest(control, '[aria-disabled="true"]') ||
+    (native(control) && (control.disabled || control.matches(':disabled')))
+  )
+    return;
+  const visible = isVisible(control);
+  if (control.tagName !== 'INPUT' || (control as HTMLInputElement).type !== 'radio')
+    return visible ? control : undefined;
+  const parent = parentElement(control);
+  if (control.matches('[hidden],[inert],[aria-hidden="true"]') || !parent || !isVisible(parent))
+    return;
+  return (
+    [...((control as HTMLInputElement).labels || [])].find(isVisible) ||
+    (visible ? control : radioOptionContext(control, isVisible)?.element)
+  );
+}
+
+/** Visible choice text takes precedence over accessibility metadata: some
+ * forms put the same question in every radio's aria-label and render Yes/No
+ * outside empty HTML labels. ARIA remains a fallback for icon-only choices. */
+function radioOptionLabel(control: FormControl): string {
+  const associated = native(control)
+    ? [...((control as HTMLInputElement).labels || [])].map(text).filter(Boolean).join(' ')
+    : '';
+  return (
+    associated ||
+    (!native(control) ? text(control) : '') ||
+    (!native(control) ? control.getAttribute('label')?.trim() : '') ||
+    radioOptionContext(control, isVisible)?.label ||
+    control.getAttribute('aria-label') ||
+    ariaLabel(control) ||
+    (native(control) ? control.value : '')
+  );
+}
+function radioGroup(control: FormControl): Element | null {
+  return (
+    composedClosest(control, 'fieldset,[role="radiogroup"]') ||
+    control.closest(
+      '.form-group,.form-field,.field,.application-question,.fb-dash-form-element,.jobs-easy-apply-form-element,[role="listitem"]',
+    )
+  );
+}
+function groupLabels(control: FormControl): string[] {
+  const name = control.getAttribute('name') || '';
+  const group = composedClosest(control, 'fieldset,[role="radiogroup"]');
   if (group) {
     const legend = group.querySelector(':scope > legend');
     const values = [labelledBy(group), group.getAttribute('aria-label') || '', text(legend)];
-    if (values.some(Boolean)) return [...values.filter(Boolean), control.name];
+    if (values.some(Boolean)) return [...values.filter(Boolean), name].filter(Boolean);
   }
   // Common ATS markup: question label and a group of individual option labels.
   const questionId = control.getAttribute('data-question-id');
-  const wrapper = control.closest(
-    '.form-group,.form-field,.field,.application-question,.fb-dash-form-element',
-  );
+  const wrapper = radioGroup(control);
   const questionLabel = wrapper?.querySelector(
     ':scope > label,:scope > legend,:scope > [class*=label]',
   );
-  return [text(questionLabel || null), questionId || '', control.name].filter(Boolean);
+  return [
+    questionLabel?.querySelector('input[type="radio"],[role="radio"]') ||
+    /^(?:yes|no)[\s.*:]*$/i.test(text(questionLabel || null))
+      ? ''
+      : text(questionLabel || null),
+    radioQuestionContext(control, isVisible),
+    questionId || '',
+    name,
+  ].filter(Boolean);
 }
 
 function editKey(control: FormControl): string {
-  const radio = control.tagName === 'INPUT' && (control as HTMLInputElement).type === 'radio';
+  const radio = isRadio(control);
   return JSON.stringify([
-    normalize((radio ? groupLabels(control as HTMLInputElement) : ownLabels(control))[0] || ''),
+    normalize((radio ? groupLabels(control) : ownLabels(control))[0] || ''),
     autocompleteToken(control),
     control.getAttribute('role'),
     control.getAttribute('type'),
@@ -173,7 +240,16 @@ function editingBlocks(target: Target, automatic: boolean): boolean {
 function collect(root: Document): Target[] {
   const result: Target[] = [];
   for (const scope of roots(root)) {
-    const controls = [...scope.querySelectorAll<FormControl>(SELECTOR)].filter((control) => {
+    const allControls = [...scope.querySelectorAll<FormControl>(SELECTOR)].filter((control) => {
+      // A visual ARIA shell and its backing input represent one choice. Keep
+      // the native input as the state owner, including when it is CSS-hidden.
+      if (control.tagName === 'INPUT' && (control as HTMLInputElement).type === 'radio')
+        return true;
+      if (control.getAttribute('role') === 'radio' && control.querySelector('input[type="radio"]'))
+        return false;
+      return !control.parentElement?.closest('[role="radio"]');
+    });
+    const controls = allControls.filter((control) => {
       const type = control.tagName === 'INPUT' ? (control as HTMLInputElement).type : '';
       return (
         !control.closest('ezeapply-ai') &&
@@ -188,7 +264,7 @@ function collect(root: Document): Target[] {
           control.readOnly &&
           control.getAttribute('role') !== 'combobox'
         ) &&
-        isVisible(control)
+        (isRadio(control) ? !!radioPresentation(control) : isVisible(control))
       );
     });
     const consumed = new Set<FormControl>();
@@ -196,7 +272,7 @@ function collect(root: Document): Target[] {
       if (consumed.has(control)) continue;
       if (control.closest('[role="combobox"]') !== control && control.closest('[role="combobox"]'))
         continue;
-      const radio = control.tagName === 'INPUT' && (control as HTMLInputElement).type === 'radio';
+      const radio = isRadio(control);
       let members = [control];
       const presentation = fieldMatchingLabels(control, fieldLabels(control));
       let labels = presentation.labels;
@@ -207,17 +283,23 @@ function collect(root: Document): Target[] {
       )
         continue;
       if (radio) {
-        const form = (control as HTMLInputElement).form;
-        const group = control.closest('fieldset,[role="radiogroup"]');
-        members = controls.filter(
-          (other) =>
-            other.tagName === 'INPUT' &&
-            (other as HTMLInputElement).type === 'radio' &&
-            (other as HTMLInputElement).name === (control as HTMLInputElement).name &&
-            (other as HTMLInputElement).form === form &&
-            other.closest('fieldset,[role="radiogroup"]') === group,
-        );
-        labels = groupLabels(control as HTMLInputElement);
+        const form = native(control) ? (control as HTMLInputElement).form : control.closest('form');
+        const group = radioGroup(control);
+        const name = control.getAttribute('name') || '';
+        members = allControls.filter((other) => {
+          if (!isRadio(other) || native(other) !== native(control)) return false;
+          const otherForm = native(other)
+            ? (other as HTMLInputElement).form
+            : other.closest('form');
+          if (otherForm !== form) return false;
+          // Named HTML radios are one group even across separate wrappers.
+          // ARIA radios are owned by their group, not an option's name/id.
+          if (native(control) && name) return other.getAttribute('name') === name;
+          return group
+            ? radioGroup(other) === group && (!native(other) || !other.getAttribute('name'))
+            : other === control;
+        });
+        labels = groupLabels(control);
       }
       members.forEach((member) => consumed.add(member));
       if (labels.some((label) => PROTECTED.test(normalize(label)))) continue;
@@ -260,8 +342,7 @@ function placeholderOption(option: HTMLOptionElement | undefined): boolean {
 function hasValue(target: Target): boolean {
   if (target.kind === 'combobox') return !!comboboxValue(target.controls[0]);
   if (target.kind === 'contenteditable') return !!target.controls[0].textContent?.trim();
-  if (target.kind === 'radio')
-    return target.controls.some((control) => (control as HTMLInputElement).checked);
+  if (target.kind === 'radio') return target.controls.some((control) => valueOf(control) === true);
   const control = target.controls[0];
   if (control.tagName === 'SELECT') {
     const select = control as HTMLSelectElement;
@@ -302,6 +383,7 @@ function setNative(control: FormControl, value: string | boolean): void {
 }
 
 function valueOf(control: FormControl): string | boolean {
+  if (isRadio(control) && !native(control)) return control.getAttribute('aria-checked') === 'true';
   if (editable(control)) return control.textContent || '';
   if (!native(control)) return control.textContent || '';
   return control.tagName === 'INPUT' && (control as HTMLInputElement).type === 'radio'
@@ -321,7 +403,11 @@ function fillTarget(
   let value: string | boolean = answer;
   if (target.kind === 'radio') {
     const matches = target.controls.filter((option) =>
-      [...ownLabels(option), (option as HTMLInputElement).value].some((label) =>
+      [
+        radioOptionLabel(option),
+        ...ownLabels(option),
+        native(option) ? (option as HTMLInputElement).value : text(option),
+      ].some((label) =>
         [answer, ...valueAliases].some(
           (value) => normalizeOption(label) === normalizeOption(value),
         ),
@@ -329,6 +415,7 @@ function fillTarget(
     );
     if (matches.length !== 1) return 'No unique radio option matches the saved answer';
     selected = matches[0];
+    if (!radioPresentation(selected)) return 'This option is unavailable';
     value = true;
   } else if (control.tagName === 'SELECT') {
     const select = control as HTMLSelectElement;
@@ -356,12 +443,43 @@ function fillTarget(
       return 'Date answer must use YYYY-MM-DD';
   }
   const before = valueOf(selected);
-  if (target.kind === 'radio') selected.click();
-  else setNative(selected, value);
+  if (target.kind === 'radio') {
+    const presentation = radioPresentation(selected)!;
+    presentation.click();
+    // A visual wrapper without a label may not forward activation to its
+    // backing input. Use the input's click path, which also bubbles to handlers.
+    if (presentation !== selected && native(selected) && valueOf(selected) !== true)
+      selected.click();
+  } else setNative(selected, value);
   const after = valueOf(selected);
   if (after !== value) return 'The page did not accept the saved answer';
   changes.push({ element: selected, before, after });
   return undefined;
+}
+
+/** Inspect the complete option set, never infer a Yes/No question from its label. */
+function isYesNoQuestion(target: Target): boolean {
+  let labels: string[];
+  if (target.kind === 'radio') {
+    if (target.controls.some((control) => !radioPresentation(control))) return false;
+    labels = target.controls.map(radioOptionLabel);
+  } else if (target.kind === 'select') {
+    const select = target.controls[0] as HTMLSelectElement;
+    if (select.multiple) return false;
+    const options = [...select.options].filter((option) => !placeholderOption(option));
+    if (
+      options.some(
+        (option) => option.disabled || option.closest('optgroup[disabled]') || option.hidden,
+      )
+    )
+      return false;
+    labels = options.map((option) => option.textContent?.trim() || option.value);
+  } else return false;
+  return (
+    labels.length === 2 &&
+    new Set(labels.map(normalizeOption)).size === 2 &&
+    labels.every((label) => ['yes', 'no'].includes(normalizeOption(label)))
+  );
 }
 
 function question(target: Target, fields: CustomField[], hostname: string): Question {
@@ -413,6 +531,7 @@ function fillNativeForm(
   fields: CustomField[],
   hostname: string,
   automatic: boolean,
+  options: FillOptions,
 ): { report: FillReport; attempts: NativeAttempt[] } {
   const changes: Change[] = [];
   const attempts: NativeAttempt[] = [];
@@ -420,23 +539,52 @@ function fillNativeForm(
   for (const target of collect(root)) {
     const item = question(target, fields, hostname);
     const focused = automatic && target.controls.some((control) => control === activeControl(root));
-    const application =
-      !automatic || target.controls.some((control) => isApplicationField(control));
+    const applicationField =
+      (automatic || options.defaultYes === true) &&
+      target.controls.some((control) => {
+        const presentation = isRadio(control) ? radioPresentation(control) : control;
+        return !!presentation && isApplicationField(presentation);
+      });
+    const application = !automatic || applicationField;
+    const defaultYes = options.defaultYes === true && applicationField && isYesNoQuestion(target);
+    if (
+      options.defaultYes === true &&
+      target.kind === 'radio' &&
+      !item.filled &&
+      !item.matchedField &&
+      !defaultYes
+    ) {
+      const choices = target.controls.map(
+        (control) => radioOptionLabel(control).slice(0, 60) || 'unlabelled',
+      );
+      item.reason = !applicationField
+        ? 'Default Yes could not identify this as an application question'
+        : `Default Yes needs two available choices: Yes and No. Read: ${choices.join(' / ')}`;
+    }
+    let filledNow = false;
     if (
       application &&
       !focused &&
       !target.blocked &&
       !item.filled &&
-      item.matchedField &&
+      (item.matchedField || defaultYes) &&
       !editingBlocks(target, automatic)
     ) {
-      const field = fields.find((candidate) => candidate.id === item.matchedField)!;
+      const field = fields.find((candidate) => candidate.id === item.matchedField);
       try {
         const key = editKey(target.controls[0]);
-        const error = fillTarget(target, field.value, changes, field.valueAliases);
-        item.reason = error || 'Filled from saved field';
+        const error = fillTarget(
+          target,
+          defaultYes ? 'Yes' : field!.value,
+          changes,
+          defaultYes ? [] : field!.valueAliases,
+        );
+        item.reason =
+          error || (defaultYes ? 'Selected Yes by your default' : 'Filled from saved field');
         if (!error) {
           item.filled = true;
+          filledNow = true;
+          if (defaultYes) delete item.matchedField;
           report.filled++;
           target.controls.forEach((control) => userEdited.delete(control));
           const change = changes[changes.length - 1];
@@ -446,7 +594,7 @@ function fillNativeForm(
         item.reason = 'The page rejected this answer';
       }
     }
-    if (item.reason !== 'Filled from saved field') report.skipped++;
+    if (!filledNow) report.skipped++;
     report.questions.push(item);
   }
   // Preserve the previous useful undo batch when dynamic observation finds nothing new.
@@ -459,8 +607,9 @@ export function fillForm(
   fields: CustomField[],
   hostname = root.location?.hostname || '',
   automatic = false,
+  options: FillOptions = {},
 ): FillReport {
-  return fillNativeForm(root, fields, hostname, automatic).report;
+  return fillNativeForm(root, fields, hostname, automatic, options).report;
 }
 
 /** Runs option widgets sequentially so one open menu never steals another's
@@ -471,9 +620,10 @@ export async function fillFormWithWidgets(
   hostname = root.location?.hostname || '',
   automatic = false,
   signal?: AbortSignal,
+  options: FillOptions = {},
 ): Promise<FillReport> {
   if (signal?.aborted) return { filled: 0, skipped: 0, questions: [] };
-  const { report, attempts } = fillNativeForm(root, fields, hostname, automatic);
+  const { report, attempts } = fillNativeForm(root, fields, hostname, automatic, options);
   let attempted = 0;
   for (const target of collect(root).filter((target) => target.kind === 'combobox')) {
     if (signal?.aborted) break;
@@ -609,6 +759,11 @@ export function undoFill(): FillReport {
   let filled = 0;
   let skipped = 0;
   for (const change of previousChanges.reverse()) {
+    if (isRadio(change.element) && !native(change.element)) {
+      widgetChanges = true;
+      skipped++;
+      continue;
+    }
     if (change.element.isConnected && valueOf(change.element) === change.after) {
       setNative(change.element, change.before);
       filled++;
@@ -617,7 +772,7 @@ export function undoFill(): FillReport {
   previousChanges = [];
   const warnings = widgetChanges
     ? [
-        'Dropdown selections use the website’s own controls and must be changed there. Resume uploads are not removed by Undo.',
+        'Dropdown and custom radio selections use the website’s own controls and must be changed there. Resume uploads are not removed by Undo.',
       ]
     : undefined;
   widgetChanges = false;
@@ -728,7 +883,14 @@ export function startContent(aiUI?: Pick<AIFieldUI, 'open'>): () => void {
       autoPaused = false;
       notice.show('Autofill in progress…', true);
       try {
-        const report = await fillFormWithWidgets(document, settings.fields);
+        const report = await fillFormWithWidgets(
+          document,
+          settings.fields,
+          document.location.hostname,
+          false,
+          undefined,
+          { defaultYes: settings.defaultYes },
+        );
         notice.show(
           report.filled
             ? `Autofill complete · ${report.filled} ${report.filled === 1 ? 'field' : 'fields'}`
@@ -740,17 +902,19 @@ export function startContent(aiUI?: Pick<AIFieldUI, 'open'>): () => void {
         throw error;
       }
     }
-    if (!settings.autoFill || autoPaused || run?.signal.aborted)
+    const defaultYes = settings.defaultYes === true && settings.masterEnabled !== false;
+    if ((!settings.autoFill && !defaultYes) || autoPaused || run?.signal.aborted)
       return { filled: 0, skipped: 0, questions: [] };
     // The same per-field application policy used by AI also excludes chat,
     // search and unrelated forms beside an application. It covers application
     // steps on generic form hosts without relying on a careers URL alone.
     return fillFormWithWidgets(
       document,
-      settings.fields,
+      settings.autoFill ? settings.fields : [],
       document.location.hostname,
       true,
       run?.signal,
+      { defaultYes },
     );
   }
   function queued(type: string): Promise<FillReport> {
@@ -880,7 +1044,8 @@ export function startContent(aiUI?: Pick<AIFieldUI, 'open'>): () => void {
       changes[STORAGE_KEY] ||
       changes.profile ||
       changes.lastSyncProfile ||
-      changes.autofillEnabled
+      changes.autofillEnabled ||
+      changes[DEFAULT_YES_KEY]
     ) {
       automaticRun?.abort();
       const before = changes[STORAGE_KEY]?.oldValue as CustomStore | undefined;
@@ -890,6 +1055,7 @@ export function startContent(aiUI?: Pick<AIFieldUI, 'open'>): () => void {
       if (
         changes.lastSyncProfile ||
         changes.autofillEnabled?.newValue === true ||
+        changes[DEFAULT_YES_KEY]?.newValue === true ||
         (before?.profiles?.[activeProfileId]?.autoFill === false &&
           after?.profiles?.[activeProfileId]?.autoFill === true)
       )
@@ -947,6 +1113,7 @@ if (
   contentScope.__ezeContentStarted = true;
   // Remove the retired 1.4.0 overlay if this bundle reconnects an older tab.
   document.getElementById('ezeapply-overlay')?.remove();
+  mountCVFileDrop();
   mountPanelDock();
   mountLinkedInFollow();
   mountSubmissionCapture();

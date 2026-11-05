@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>EZEapply · Default Yes</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #141c21;
+        color: #e5edef;
+        font:
+          14px/1.5 -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+      }
+      header {
+        padding: 18px 24px;
+        border-bottom: 1px solid #35464d;
+      }
+      h1 {
+        font-size: 20px;
+        margin: 0;
+      }
+      p {
+        margin: 4px 0 0;
+        color: #aab6bf;
+      }
+      main {
+        display: grid;
+        grid-template-columns: minmax(430px, 1fr) 400px;
+        gap: 20px;
+        max-width: 1080px;
+        margin: 20px auto;
+        padding: 0 20px;
+      }
+      iframe {
+        width: 100%;
+        height: 930px;
+        border: 1px solid #35464d;
+        border-radius: 12px;
+        background: #1c272c;
+      }
+      @media (max-width: 820px) {
+        main {
+          grid-template-columns: 1fr;
+        }
+        iframe {
+          height: 900px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>EZEapply · Default Yes</h1>
+      <p>
+        Enable “Default Yes” in the side pane. New form steps fill automatically. Synthetic
+        demonstration; no submission.
+      </p>
+    </header>
+    <main>
+      <iframe
+        id="application"
+        title="Example job application"
+        src="/careers/apply/yes-no-form"
+      ></iframe>
+      <iframe title="EZEapply side pane" src="/sidepanel.html"></iframe>
+    </main>
+  </body>
+</html>

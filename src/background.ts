@@ -1,3 +1,4 @@
+import { installCVTransfer } from './cv-transfer';
 import { installAIBackground } from './ai/background';
 import { installAppBackground } from './app-background';
 import { installTrackingBackground } from './tracking-background';
@@ -5,6 +6,7 @@ import { PANEL_RESTORE_KEY, STORAGE_KEY, type CustomStore, type FillReport } fro
 import { emptyStore, getProfileContext, validateProfile } from './storage';
 import { adjustTrackingCount } from './tracking-store';
 
+installCVTransfer();
 installAIBackground();
 installAppBackground();
 installTrackingBackground();

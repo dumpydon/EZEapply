@@ -5,12 +5,15 @@ import {
   parseImport,
   saveCustomProfile,
   setAutoFillPreference,
+  getDefaultYesPreference,
+  setDefaultYesPreference,
 } from './storage';
 import type { CustomField, FillReport, ProfileFields, Question } from './types';
-import { STORAGE_KEY } from './types';
+import { DEFAULT_YES_KEY, STORAGE_KEY } from './types';
 import { moveField, orderFields } from './order';
 import { createFieldDragController } from './drag';
 import { mountZoom } from './zoom';
+import { mountThemePicker } from './appearance';
 
 const TEMPLATES: Record<string, Partial<CustomField>> = {
   'Expected compensation': {
@@ -144,6 +147,7 @@ function errorText(error: unknown): string {
 
 export async function mountPanel(host: HTMLElement): Promise<() => void> {
   host.classList.add('eze-panel');
+  const appearance = mountThemePicker(host.ownerDocument);
   let disposed = false;
   let generation = 0;
   let activeFields: ProfileFields = { fields: [], autoFill: false };
@@ -188,6 +192,21 @@ export async function mountPanel(host: HTMLElement): Promise<() => void> {
   const add = button('+ Add field', 'eze-button eze-primary');
   toolbar.append(searchInput, add);
 
+  const yesNoLabel = element('label', 'eze-auto-label eze-default-yes');
+  const yesNo = element('input');
+  yesNo.type = 'checkbox';
+  yesNo.disabled = true;
+  yesNo.setAttribute('role', 'switch');
+  yesNo.setAttribute('aria-label', 'Default Yes for Yes/No questions');
+  yesNo.setAttribute('aria-describedby', 'eze-default-yes-help');
+  const yesNoCopy = element('span');
+  const yesNoHelp = element('small', '', 'Unanswered Yes/No questions');
+  yesNoHelp.id = 'eze-default-yes-help';
+  yesNoCopy.append(element('strong', '', 'Default Yes'), yesNoHelp);
+  yesNoLabel.title =
+    'Automatically choose Yes when a job question offers only Yes and No. Existing choices are kept.';
+  yesNoLabel.append(yesNo, yesNoCopy);
+
   const list = element('div', 'eze-field-list');
   const drag = createFieldDragController(list, host, (sourceId, targetId, position, profileId) => {
     void reorder(sourceId, targetId, position, profileId);
@@ -224,7 +243,7 @@ export async function mountPanel(host: HTMLElement): Promise<() => void> {
   const zoomOut = button('−', 'eze-icon-button', 'Zoom out sidebar');
   const zoomReset = button('100%', 'eze-zoom-reset', 'Reset sidebar zoom');
   const zoomIn = button('+', 'eze-icon-button', 'Zoom in sidebar');
-  zoomControls.append(zoomOut, zoomReset, zoomIn);
+  zoomControls.append(appearance.button, zoomOut, zoomReset, zoomIn);
   const zoom = mountZoom(host, (percent) => {
     zoomReset.textContent = `${percent}%`;
     queueMicrotask(() => {
@@ -264,7 +283,17 @@ export async function mountPanel(host: HTMLElement): Promise<() => void> {
   status.setAttribute('aria-live', 'polite');
   status.setAttribute('aria-atomic', 'true');
   status.hidden = true;
-  body.append(subtitle, toolbar, reorderHelp, reportBox, list, restoreFields, footer, status);
+  body.append(
+    subtitle,
+    toolbar,
+    yesNoLabel,
+    reorderHelp,
+    reportBox,
+    list,
+    restoreFields,
+    footer,
+    status,
+  );
   card.append(barSpace, body);
   // Chrome owns the resize divider, so the hide button sits just inside the
   // extension page's edge, independently of the scrolling content.
@@ -427,11 +456,17 @@ export async function mountPanel(host: HTMLElement): Promise<() => void> {
   async function refresh(): Promise<void> {
     const token = ++generation;
     try {
-      const [profile, fields] = await Promise.all([getProfileContext(), getActiveFields()]);
+      const [profile, fields, defaultYes] = await Promise.all([
+        getProfileContext(),
+        getActiveFields(),
+        getDefaultYesPreference(),
+      ]);
       if (disposed || token !== generation) return;
       currentProfileId = profile.id;
       activeFields = fields;
       auto.checked = fields.autoFill;
+      yesNo.checked = defaultYes;
+      yesNo.disabled = false;
       profileName.textContent = profile.name || '';
       renderFields();
     } catch (error) {
@@ -786,7 +821,7 @@ export async function mountPanel(host: HTMLElement): Promise<() => void> {
     const aliasesInput = field(
       'Other ways the question is asked',
       element('textarea', 'eze-input'),
-      'Optional: one phrase per line. Equivalent wording in your field name is matched automatically.',
+      'Optional: one phrase per line. Matching phrases use this answer as saved; any units shown on the form must agree.',
     );
     aliasesInput.rows = 3;
     aliasesInput.maxLength = 10000;
@@ -1160,6 +1195,21 @@ export async function mountPanel(host: HTMLElement): Promise<() => void> {
       auto.disabled = false;
     }
   });
+  yesNo.addEventListener('change', async () => {
+    const desired = yesNo.checked;
+    yesNo.disabled = true;
+    try {
+      await setDefaultYesPreference(desired);
+      if (!disposed) yesNo.checked = await getDefaultYesPreference();
+    } catch (error) {
+      if (!disposed) {
+        yesNo.checked = !desired;
+        notify(errorText(error), true);
+      }
+    } finally {
+      if (!disposed) yesNo.disabled = false;
+    }
+  });
   const hideButtons = [hidePanel, headerHidePanel];
   const hideFullPanel = async (): Promise<void> => {
     hideButtons.forEach((control) => {
@@ -1259,7 +1309,11 @@ export async function mountPanel(host: HTMLElement): Promise<() => void> {
   ): void => {
     if (
       areaName === 'local' &&
-      (changes[STORAGE_KEY] || changes.profile || changes.lastSyncProfile || changes.profiles)
+      (changes[STORAGE_KEY] ||
+        changes.profile ||
+        changes.lastSyncProfile ||
+        changes.profiles ||
+        changes[DEFAULT_YES_KEY])
     )
       void refresh();
   };
@@ -1272,6 +1326,7 @@ export async function mountPanel(host: HTMLElement): Promise<() => void> {
     closeMenu();
     drag.destroy();
     zoom.dispose();
+    appearance.dispose();
     sizeObserver?.disconnect();
     window.removeEventListener('resize', positionBar);
     window.removeEventListener('focus', syncPanelSide);

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { exportAnalytics, mountAnalytics } from '../src/analytics';
-import { localDayKey } from '../src/tracking-model';
+import { utcDayKey } from '../src/application-day';
 import { TRACKING_CACHE_KEY, type TrackingSnapshot } from '../src/tracking-types';
 let data: TrackingSnapshot, cleanup: (() => void) | undefined;
 const listeners = new Set<Parameters<typeof chrome.storage.onChanged.addListener>[0]>();
@@ -17,8 +17,8 @@ beforeEach(() => {
   listeners.clear();
   data = {
     goal: 10,
-    goalHistory: { [localDayKey()]: 10 },
-    adjustments: { [localDayKey()]: 2 },
+    goalHistory: { [utcDayKey()]: 10 },
+    adjustments: { [utcDayKey()]: 2 },
     records: [
       {
         id: 'one',
@@ -62,6 +62,7 @@ beforeEach(() => {
 afterEach(() => {
   cleanup?.();
   cleanup = undefined;
+  vi.useRealTimers();
   vi.unstubAllGlobals();
   document.body.replaceChildren();
 });
@@ -70,6 +71,39 @@ async function mount() {
   await settle();
 }
 describe('separate application analytics page', () => {
+  it('advances an open chart and its exports to the next UTC day without losing earlier submissions', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-11-02T05:29:59.999+05:30'));
+    data.goalHistory = { '2026-11-01': 10 };
+    data.adjustments = { '2026-11-01': 2 };
+    data.records.forEach((record) => {
+      record.submittedAt = new Date().toISOString();
+    });
+    cleanup = mountAnalytics(document.getElementById('analytics')!);
+    await vi.advanceTimersByTimeAsync(0);
+    let exported = JSON.parse(exportAnalytics(data, 7, 'json'));
+    expect(exported.period).toMatchObject({
+      from: '2026-10-26',
+      to: '2026-11-01',
+      timeZone: 'UTC',
+    });
+    expect(exported.daily.at(-1).total).toBe(4);
+    expect(document.querySelector('.submission-date')?.textContent).toContain('UTC');
+    expect(document.querySelectorAll('.submission-row')).toHaveLength(2);
+    const before = vi.mocked(chrome.runtime.sendMessage).mock.calls.length;
+    await vi.advanceTimersByTimeAsync(1);
+    expect(vi.mocked(chrome.runtime.sendMessage).mock.calls.length).toBeGreaterThan(before);
+    exported = JSON.parse(exportAnalytics(data, 7, 'json'));
+    expect(exported.period).toMatchObject({
+      from: '2026-10-27',
+      to: '2026-11-02',
+      timeZone: 'UTC',
+    });
+    expect(exported.daily.at(-1).total).toBe(0);
+    expect(exported.daily.at(-2).total).toBe(4);
+    expect(document.querySelectorAll('.submission-row')).toHaveLength(2);
+    expect(document.querySelector('.page-footer')?.textContent).toContain('00:00 UTC');
+  });
   it('shows the source breakdown, daily period and manual corrections without fabricating source attribution', async () => {
     await mount();
     expect(document.querySelectorAll('.day-column')).toHaveLength(7);

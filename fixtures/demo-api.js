@@ -1,6 +1,7 @@
 // Local test fixture only. This file is never packaged into the extension.
 (() => {
-  const key = 'eze-preview-v1';
+  const sandbox = new URL(location.href).searchParams.get('sandbox') || '';
+  const key = /^[-\w]{1,60}$/.test(sandbox) ? `eze-preview-v1:${sandbox}` : 'eze-preview-v1';
   const defaultData = {
     profile: {
       nameData: { firstName: 'Alex', middleName: '', lastName: 'Sharma' },
@@ -288,6 +289,10 @@
         },
       },
       async sendMessage(message) {
+        if (message.type === 'eze-app:default-yes') {
+          await window.chrome.storage.local.set({ 'eze.defaultYes.v1': message.enabled });
+          return { ok: true };
+        }
         if (message.type === 'eze-custom:auto-fill') {
           const data = read(),
             id = data.lastSyncProfile?.id || 'local';

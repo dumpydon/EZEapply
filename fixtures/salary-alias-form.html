@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Salary alias application form</title>
+    <style>
+      body {
+        padding: 28px;
+        margin: 0;
+        background: #f4f6f5;
+        color: #23332b;
+        font:
+          15px/1.5 -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+      }
+      article {
+        background: white;
+        padding: 24px;
+        border: 1px solid #cedcd4;
+        border-radius: 14px;
+      }
+      h1 {
+        margin: 0 0 12px;
+        font-size: 25px;
+      }
+      label {
+        display: block;
+        font-weight: 600;
+        margin: 22px 0 8px;
+      }
+      input {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+        font: inherit;
+        border: 1px solid #c4d4ca;
+        padding: 12px;
+        border-radius: 7px;
+      }
+      button {
+        font: inherit;
+        padding: 9px 12px;
+        border: 1px solid #2e8a70;
+        border-radius: 7px;
+        background: #e3f5eb;
+        color: #206751;
+        cursor: pointer;
+        margin-top: 16px;
+      }
+      output {
+        display: block;
+        background: #edf5ef;
+        padding: 14px;
+        margin-top: 18px;
+        border: 1px solid #bbd5c5;
+        border-radius: 9px;
+        color: #20553b;
+      }
+    </style>
+    <script src="/demo-api.js"></script>
+    <script defer src="/custom/content.js"></script>
+  </head>
+  <body>
+    <article role="dialog" aria-labelledby="apply-title">
+      <h1 id="apply-title">Job Application · AI Engineer</h1>
+      <p>Additional Questions · synthetic form</p>
+      <form id="salary-form"></form>
+      <button id="next-step" type="button">Show next form step</button>
+      <output id="accepted" aria-live="polite"></output>
+    </article>
+    <script>
+      const form = document.getElementById('salary-form'),
+        output = document.getElementById('accepted');
+      let step = 0;
+      function render() {
+        step++;
+        const accepted = {};
+        form.innerHTML =
+          '<label for="current-salary">Current Salary*</label><input id="current-salary" type="text" inputmode="numeric" maxlength="20"><label for="expected-salary">Expected Salary*</label><input id="expected-salary" type="text" inputmode="numeric" maxlength="20"><label for="employer">Current Employer*</label><input id="employer">';
+        function show() {
+          output.textContent = `Step ${step} · Accepted form state: current ${accepted['current-salary'] || 'empty'}; expected ${accepted['expected-salary'] || 'empty'}; employer ${accepted.employer || 'empty'}.`;
+        }
+        for (const input of form.querySelectorAll('input'))
+          input.addEventListener('input', () => {
+            accepted[input.id] = input.value;
+            show();
+          });
+        show();
+      }
+      form.addEventListener('submit', (event) => event.preventDefault());
+      document.getElementById('next-step').addEventListener('click', render);
+      render();
+    </script>
+  </body>
+</html>

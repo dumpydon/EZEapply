@@ -1,9 +1,8 @@
 import { APPLICATION_COUNTS_KEY } from './types';
-import { localDayKey, validDay } from './tracking-model';
+import { validDay } from './tracking-model';
+import { utcDayKey, utcDayStart, utcDayOffset, watchUtcDay } from './application-day';
 import { TRACKING_DAILY_TOTALS_KEY } from './tracking-types';
 
-export { localDayKey as localDay } from './tracking-model';
-const localDay = localDayKey;
 export function countAdjustments(value: unknown): Record<string, number> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
   return Object.fromEntries(
@@ -18,8 +17,8 @@ export function applicationCount(
   adjustments: unknown,
   now = new Date(),
 ): number {
-  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-  const end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).getTime();
+  const start = utcDayStart(now);
+  const end = utcDayOffset(now, 1).getTime();
   const detected = Array.isArray(appliedList)
     ? appliedList.filter((item) => {
         if (!item || typeof item !== 'object' || typeof item.date !== 'string') return false;
@@ -27,7 +26,7 @@ export function applicationCount(
         return date >= start && date < end;
       }).length
     : 0;
-  return Math.max(0, detected + (countAdjustments(adjustments)[localDay(now)] || 0));
+  return Math.max(0, detected + (countAdjustments(adjustments)[utcDayKey(now)] || 0));
 }
 
 /** The host view owns the count/ring/progress. This module adds compact controls. */
@@ -61,7 +60,7 @@ export function mountApplicationCount(): { decorate(): void; dispose(): void } {
   function render() {
     minus.disabled = !ready || busy || total === 0;
     plus.disabled = !ready || busy;
-    controls.title = `Today: ${total}. Correct missed or extra counts manually.`;
+    controls.title = `Today: ${total}. Resets at 00:00 UTC (5:30 a.m. IST). Correct missed or extra counts manually.`;
   }
   async function refresh() {
     const request = ++revision;
@@ -74,7 +73,7 @@ export function mountApplicationCount(): { decorate(): void; dispose(): void } {
       if (disposed || request !== revision) return;
       const cached = (
         data[TRACKING_DAILY_TOTALS_KEY] as Record<string, { total: number }> | undefined
-      )?.[localDay()]?.total;
+      )?.[utcDayKey()]?.total;
       total =
         typeof cached === 'number' && Number.isSafeInteger(cached) && cached >= 0
           ? cached
@@ -98,7 +97,7 @@ export function mountApplicationCount(): { decorate(): void; dispose(): void } {
       const result = await chrome.runtime.sendMessage({
         type: 'eze-custom:adjust-count',
         delta,
-        day: localDay(),
+        day: utcDayKey(),
       });
       if (!result?.ok) throw new Error(result?.error || 'Could not update the count. Try again.');
       if (!disposed) {
@@ -127,7 +126,7 @@ export function mountApplicationCount(): { decorate(): void; dispose(): void } {
       void refresh();
   };
   chrome.storage.onChanged.addListener(changed);
-  const rollover = setInterval(() => void refresh(), 60000);
+  const stopRollover = watchUtcDay(() => void refresh());
   render();
   void refresh();
   function decorate() {
@@ -149,7 +148,7 @@ export function mountApplicationCount(): { decorate(): void; dispose(): void } {
     decorate,
     dispose() {
       disposed = true;
-      clearInterval(rollover);
+      stopRollover();
       chrome.storage.onChanged.removeListener(changed);
       controls.remove();
       status.remove();

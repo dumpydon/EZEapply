@@ -7,6 +7,7 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 await build({
   absWorkingDir: root,
   entryPoints: [
+    'src/appearance-page.ts',
     'src/panel.ts',
     'src/content.ts',
     'src/background.ts',

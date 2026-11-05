@@ -1,14 +1,15 @@
+@import url('./appearance.css');
 #eze-custom-root {
-  --eze-bg: #222e36;
-  --eze-surface: #2b3942;
-  --eze-border: #43555d;
-  --eze-muted: #adb7c6;
-  --eze-text: #edf1f7;
-  --eze-accent: #78cbb2;
-  --eze-ring: #7ed3b6;
+  --eze-bg: var(--ui-panel);
+  --eze-surface: var(--ui-raised);
+  --eze-border: var(--ui-border);
+  --eze-muted: var(--ui-muted);
+  --eze-text: var(--ui-text);
+  --eze-accent: var(--ui-accent);
+  --eze-ring: var(--ui-accent);
   --eze-gradient: var(
     --eze-local-gradient,
-    linear-gradient(115deg, #167f70 0%, #269b83 64%, #359d72 100%)
+    linear-gradient(115deg, var(--ui-fill), var(--ui-hover))
   );
   color-scheme: dark;
   color: var(--eze-text);
@@ -82,7 +83,7 @@
 }
 #eze-custom-root .eze-eyebrow {
   display: block;
-  color: #a1d9c6;
+  color: var(--ui-accent);
   font-size: 10px;
   line-height: 1.3;
   font-weight: 750;
@@ -99,8 +100,8 @@
   font-weight: 650;
 }
 #eze-custom-root .eze-count {
-  color: #b3e0cf;
-  background: #269b8324;
+  color: var(--ui-accent);
+  background: var(--ui-soft);
   font-size: 11px;
   letter-spacing: 0;
   border-radius: 8px;
@@ -120,7 +121,7 @@
   margin: 8px 0;
 }
 #eze-custom-root .eze-profile-name {
-  color: #8d98aa;
+  color: var(--ui-muted);
 }
 #eze-custom-root .eze-toolbar {
   display: flex;
@@ -131,7 +132,7 @@
 #eze-custom-root .eze-search {
   min-width: 0;
   flex: 1;
-  background: #1a212b;
+  background: var(--ui-input);
   border: 1px solid var(--eze-border);
   color: var(--eze-text);
   border-radius: 7px;
@@ -140,15 +141,15 @@
 }
 #eze-custom-root input::placeholder,
 #eze-custom-root textarea::placeholder {
-  color: #96a0b0;
+  color: var(--ui-muted);
   opacity: 1;
 }
 #eze-custom-root .eze-button {
   padding: 5px 8px;
   border-radius: 6px;
-  border: 1px solid #4d5666;
+  border: 1px solid var(--ui-border);
   color: var(--eze-text);
-  background: #343e4c;
+  background: var(--ui-raised);
   white-space: nowrap;
   font-weight: 550;
   font-size: 11px;
@@ -158,23 +159,23 @@
     border-color 0.15s;
 }
 #eze-custom-root .eze-button:hover:not(:disabled) {
-  background: #404b5c;
-  border-color: #7b879a;
+  background: var(--ui-hover-surface);
+  border-color: var(--ui-muted);
 }
 #eze-custom-root .eze-primary {
   background: var(--eze-gradient);
-  border-color: #61b99d;
+  border-color: var(--ui-edge);
   color: #fff;
 }
 #eze-custom-root .eze-primary:hover:not(:disabled) {
   background: var(--eze-gradient);
-  border-color: #adcfdb;
+  border-color: var(--ui-accent);
   filter: brightness(1.08);
 }
 #eze-custom-root .eze-quiet {
   background: transparent;
   border-color: transparent;
-  color: #c0c8d6;
+  color: var(--ui-muted);
 }
 #eze-custom-root .eze-icon-button {
   display: inline-flex;
@@ -186,7 +187,7 @@
   border-radius: 5px;
   border: 0;
   background: transparent;
-  color: #b8c0cf;
+  color: var(--ui-muted);
   font-size: 18px;
   line-height: 1;
   padding: 0;
@@ -203,13 +204,13 @@
   height: 38px;
   transform: translateY(-50%);
   border-radius: 0 7px 7px 0;
-  background: #30414bb8;
-  color: #a6b6c1;
+  background: var(--ui-raised);
+  color: var(--ui-muted);
   font-size: 17px;
 }
 #eze-custom-root .eze-hide-panel:hover,
 #eze-custom-root .eze-hide-panel:focus-visible {
-  background: #425661;
+  background: var(--ui-hover-surface);
   color: #fff;
 }
 #eze-custom-root .eze-hide-panel:focus-visible {
@@ -224,7 +225,7 @@
   margin-top: 11px;
 }
 #eze-custom-root .eze-group-heading {
-  color: #a5b0c2;
+  color: var(--ui-muted);
   text-transform: uppercase;
   letter-spacing: 0.07em;
   font-size: 10px;
@@ -256,13 +257,13 @@
 }
 #eze-custom-root .eze-copy:hover:not(:disabled),
 #eze-custom-root .eze-copy:focus-visible {
-  background: #3b4e59;
+  background: var(--ui-hover-surface);
 }
 #eze-custom-root .eze-copy:disabled {
   opacity: 0.6;
 }
 #eze-custom-root .eze-field-label {
-  color: #b7c3d0;
+  color: var(--ui-muted);
   min-width: 0;
   font-size: 12px;
   line-height: 1.4;
@@ -318,7 +319,7 @@
   border: 0;
   padding: 0;
   background: transparent;
-  color: #9aabba;
+  color: var(--ui-muted);
   font-size: 16px;
   line-height: 1;
   width: 14px;
@@ -331,7 +332,7 @@
 #eze-custom-root .eze-drag-handle:hover,
 #eze-custom-root .eze-drag-handle:focus-visible {
   opacity: 1;
-  color: #d3e5eb;
+  color: var(--ui-text);
 }
 #eze-custom-root .eze-drag-handle:active {
   cursor: grabbing;
@@ -345,7 +346,7 @@
   z-index: 2147483001;
   max-width: 220px;
   padding: 8px 12px;
-  border: 1px solid #7ed3b6;
+  border: 1px solid var(--ui-accent);
   border-radius: 7px;
   background: var(--eze-surface);
   color: var(--eze-text);
@@ -360,7 +361,7 @@
   right: 0;
   height: 2px;
   border-radius: 2px;
-  background: #7ed3b6;
+  background: var(--ui-accent);
   pointer-events: none;
 }
 #eze-custom-root .eze-drop-before::before {
@@ -387,7 +388,7 @@
   max-width: calc(100vw - 16px);
   background: var(--eze-surface);
   color: var(--eze-text);
-  border: 1px solid #61717e;
+  border: 1px solid var(--ui-border);
   border-radius: 9px;
   padding: 5px;
   box-shadow: 0 10px 32px #0006;
@@ -405,11 +406,11 @@
 }
 #eze-custom-root .eze-menu-item:hover:not(:disabled),
 #eze-custom-root .eze-menu-item:focus-visible {
-  background: #415561;
+  background: var(--ui-hover-surface);
 }
 #eze-custom-root .eze-menu-danger {
   color: #edbcc2;
-  border-top: 1px solid #50616b;
+  border-top: 1px solid var(--ui-border);
   margin-top: 4px;
 }
 #eze-custom-root .eze-restore-fields {
@@ -419,12 +420,12 @@
 }
 #eze-custom-root .eze-status-action {
   margin-left: 10px;
-  color: #e1eeff;
+  color: var(--ui-text);
   text-decoration: underline;
 }
 #eze-custom-root .eze-copy-only {
   display: inline-block;
-  color: #b6bfce;
+  color: var(--ui-muted);
   background: #ffffff0c;
   font-size: 9px;
   border-radius: 4px;
@@ -452,8 +453,8 @@
   flex: 0 0 32px;
   margin: 0;
   border-radius: 20px;
-  border: 1px solid #6f7a8e;
-  background: #424c5d;
+  border: 1px solid var(--ui-border);
+  background: var(--ui-raised);
   position: relative;
   transition: background 0.15s;
   cursor: pointer;
@@ -472,7 +473,7 @@
 }
 #eze-custom-root .eze-auto-label input:checked {
   background: var(--eze-gradient);
-  border-color: #70bfa7;
+  border-color: var(--ui-edge);
 }
 #eze-custom-root .eze-auto-label input:checked::after {
   transform: translateX(13px);
@@ -484,9 +485,15 @@
 }
 #eze-custom-root .eze-auto-label small {
   display: block;
-  color: #a5afbf;
+  color: var(--ui-muted);
   font-size: 10px;
   margin-top: 1px;
+}
+#eze-custom-root .eze-default-yes {
+  justify-content: flex-start;
+  gap: 8px;
+  margin: 4px 0 12px;
+  width: fit-content;
 }
 #eze-custom-root .eze-actions {
   display: flex;
@@ -506,7 +513,7 @@
   font-size: 15px;
 }
 #eze-custom-root .eze-zoom-reset {
-  color: #bacbd8;
+  color: var(--ui-muted);
   background: none;
   border: 0;
   padding: 2px;
@@ -517,7 +524,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #8e9aab;
+  color: var(--ui-muted);
   font-size: 10px;
   margin-top: 13px;
 }
@@ -527,32 +534,32 @@
 #eze-custom-root .eze-text-button {
   padding: 3px 0;
   background: transparent;
-  color: #9bdcc5;
+  color: var(--ui-accent);
   border: 0;
   font-size: 11px;
   font-weight: 600;
   white-space: nowrap;
 }
 #eze-custom-root .eze-text-button:hover {
-  color: #d5edee;
+  color: var(--ui-text);
   text-decoration: underline;
 }
 #eze-custom-root .eze-text-button.eze-ai-draft {
   padding: 4px 7px;
-  border: 1px solid #47bda36b;
+  border: 1px solid var(--ui-edge);
   border-radius: 6px;
-  background: #238e7622;
-  color: #83e0c4;
+  background: var(--ui-soft);
+  color: var(--ui-accent);
 }
 #eze-custom-root .eze-empty {
   padding: 18px 2px;
-  color: #c9d0dd;
+  color: var(--ui-text);
 }
 #eze-custom-root .eze-empty strong {
   font-size: 13px;
 }
 #eze-custom-root .eze-empty p {
-  color: #a7b0c0;
+  color: var(--ui-muted);
   font-size: 12px;
   margin: 5px 0;
 }
@@ -560,10 +567,10 @@
   font-size: 12px;
   margin-top: 10px;
   border-radius: 8px;
-  background: #233e39;
-  border: 1px solid #3b645a;
+  background: var(--ui-panel);
+  border: 1px solid var(--ui-edge);
   padding: 9px 10px;
-  color: #bdeadd;
+  color: var(--ui-accent);
   overflow-wrap: anywhere;
 }
 #eze-custom-root .eze-status.eze-error {
@@ -574,9 +581,9 @@
 #eze-custom-root .eze-report {
   margin-bottom: 10px;
   padding: 8px;
-  border: 1px solid #49536a;
+  border: 1px solid var(--ui-border);
   border-radius: 8px;
-  background: #1b232f;
+  background: var(--ui-input);
 }
 #eze-custom-root .eze-report-title {
   display: flex;
@@ -599,7 +606,7 @@
   align-items: center;
   padding-top: 10px;
   margin-top: 9px;
-  border-top: 1px solid #344053;
+  border-top: 1px solid var(--ui-border);
 }
 #eze-custom-root .eze-question > div:first-child {
   flex: 1;
@@ -618,7 +625,7 @@
   display: block;
 }
 #eze-custom-root .eze-help {
-  color: #a5b0c2;
+  color: var(--ui-muted);
   font-size: 11px;
   line-height: 1.55;
   margin-top: 4px;
@@ -627,8 +634,8 @@
 #eze-custom-root .eze-dialog {
   position: fixed;
   color: var(--eze-text);
-  background: #252e3b;
-  border: 1px solid #69728a;
+  background: var(--ui-panel);
+  border: 1px solid var(--ui-border);
   border-radius: 14px;
   padding: 0;
   width: min(460px, calc(100vw - 24px));
@@ -659,16 +666,16 @@
   flex-direction: column;
   gap: 6px;
   margin-top: 14px;
-  color: #d0d7e4;
+  color: var(--ui-text);
   font-size: 12px;
   font-weight: 600;
 }
 #eze-custom-root .eze-input {
   width: 100%;
   padding: 9px 10px;
-  background: #1a2330;
-  color: #f0f3f9;
-  border: 1px solid #535e72;
+  background: var(--ui-input);
+  color: var(--ui-text);
+  border: 1px solid var(--ui-border);
   border-radius: 7px;
   font-size: 13px;
   line-height: 1.45;
@@ -680,7 +687,7 @@
   min-height: 62px;
 }
 #eze-custom-root .eze-input:focus {
-  border-color: #7ed3b6;
+  border-color: var(--ui-accent);
 }
 #eze-custom-root .eze-checkbox-label {
   display: flex;
@@ -693,16 +700,16 @@
 #eze-custom-root .eze-checkbox-label input {
   width: 16px;
   height: 16px;
-  accent-color: #748fc9;
+  accent-color: var(--ui-fill);
   margin: 0;
 }
 #eze-custom-root .eze-advanced {
   margin-top: 16px;
-  border-top: 1px solid #414c5e;
+  border-top: 1px solid var(--ui-border);
   padding-top: 12px;
 }
 #eze-custom-root .eze-advanced summary {
-  color: #acc7e4;
+  color: var(--ui-accent);
   cursor: pointer;
   font-size: 12px;
   font-weight: 600;

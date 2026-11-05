@@ -84,23 +84,44 @@ await build({
     },
   ],
 });
+await build({
+  entryPoints: [root + 'fixtures/cv-transfer-demo.ts'],
+  outfile: root + '.local/cv-transfer-demo.js',
+  bundle: true,
+  format: 'iife',
+  target: 'chrome120',
+});
 const nativeHtml = (await readFile(root + 'dist/extension/options.html', 'utf8')).replace(
   '<head>',
-  '<head><script src="/native-api.js"></script><script src="/tracking-api.js"></script>',
+  '<head><script src="/native-api.js"></script><script src="/tracking-api.js"></script><script src="/appearance-api.js"></script><script src="/cv-transfer-demo.js"></script>',
 );
 const popupHtml = (await readFile(root + 'dist/extension/popup.html', 'utf8')).replace(
   '<head>',
-  '<head><script src="/native-api.js"></script><script src="/tracking-api.js"></script>',
+  '<head><script src="/native-api.js"></script><script src="/tracking-api.js"></script><script src="/appearance-api.js"></script><script src="/cv-transfer-demo.js"></script>',
 );
 const sidepanelHtml = (await readFile(root + 'dist/extension/sidepanel.html', 'utf8')).replace(
   '<head>',
-  '<head><script src="/native-api.js"></script><script src="/tracking-api.js"></script>',
+  '<head><script src="/native-api.js"></script><script src="/tracking-api.js"></script><script src="/appearance-api.js"></script><script src="/cv-transfer-demo.js"></script>',
 );
 const analyticsHtml = (await readFile(root + 'dist/extension/analytics.html', 'utf8')).replace(
   '<head>',
-  '<head><script src="/native-api.js"></script><script src="/tracking-api.js"></script>',
+  '<head><script src="/native-api.js"></script><script src="/tracking-api.js"></script><script src="/appearance-api.js"></script><script src="/cv-transfer-demo.js"></script>',
 );
+await build({
+  entryPoints: [root + 'fixtures/cv-tray-demo.ts'],
+  outfile: root + '.local/cv-tray-demo.js',
+  bundle: true,
+  format: 'iife',
+  target: 'chrome120',
+});
 const routes = {
+  '/cv-transfer-demo.js': ['.local/cv-transfer-demo.js', 'text/javascript'],
+  '/cv-tray-demo.js': ['.local/cv-tray-demo.js', 'text/javascript'],
+  '/cv-tray.html': ['fixtures/cv-tray.html', 'text/html'],
+  '/cv-drop.html': ['fixtures/cv-drop.html', 'text/html'],
+  '/yes-no.html': ['fixtures/yes-no.html', 'text/html'],
+  '/careers/apply/yes-no-form': ['fixtures/yes-no-form.html', 'text/html'],
+  '/yes-no-demo.js': ['fixtures/yes-no-demo.js', 'text/javascript'],
   '/profile-layout.html': ['fixtures/profile-layout.html', 'text/html'],
   '/install.html': ['fixtures/install-film.html', 'text/html'],
   '/downloads/EZEapply.zip': ['downloads/EZEapply.zip', 'application/zip'],
@@ -124,7 +145,10 @@ const routes = {
   '/careers/apply/ai-scope': ['fixtures/ai-scope-application.html', 'text/html'],
   '/scope/conversation': ['fixtures/ai-scope-unrelated.html', 'text/html'],
   '/native-api.js': ['fixtures/native-api.js', 'text/javascript'],
+  '/appearance-api.js': ['fixtures/appearance-api.js', 'text/javascript'],
   '/salary-format.html': ['fixtures/salary-format.html', 'text/html'],
+  '/salary-aliases.html': ['fixtures/salary-aliases.html', 'text/html'],
+  '/careers/apply/salary-alias-form': ['fixtures/salary-alias-form.html', 'text/html'],
   '/talent/all-opportunities': ['fixtures/salary-form.html', 'text/html'],
   '/linkedin-follow.html': ['fixtures/linkedin-follow.html', 'text/html'],
   '/linkedin-follow.js': ['.local/linkedin-follow.js', 'text/javascript'],
@@ -149,6 +173,8 @@ const routes = {
   '/custom/content.js': ['.local/preview-content.js', 'text/javascript'],
   '/custom/panel.css': ['dist/extension/custom/panel.css', 'text/css'],
   '/custom/theme.css': ['dist/extension/custom/theme.css', 'text/css'],
+  '/custom/appearance.css': ['dist/extension/custom/appearance.css', 'text/css'],
+  '/custom/appearance-page.js': ['dist/extension/custom/appearance-page.js', 'text/javascript'],
   '/custom/profile-view.css': ['dist/extension/custom/profile-view.css', 'text/css'],
   '/custom/career-pattern.svg': ['dist/extension/custom/career-pattern.svg', 'image/svg+xml'],
   '/custom/navigation/applications.png': [
@@ -166,6 +192,12 @@ const routes = {
     'image/png',
   ],
   '/custom/navigation/sidepane.png': ['dist/extension/custom/navigation/sidepane.png', 'image/png'],
+  '/custom/cv-controls/download.png': [
+    'dist/extension/custom/cv-controls/download.png',
+    'image/png',
+  ],
+  '/custom/cv-controls/delete.png': ['dist/extension/custom/cv-controls/delete.png', 'image/png'],
+  '/custom/cv-controls/reorder.png': ['dist/extension/custom/cv-controls/reorder.png', 'image/png'],
   '/custom/app-controls.css': ['dist/extension/custom/app-controls.css', 'text/css'],
   '/custom/app-ui.js': ['dist/extension/custom/app-ui.js', 'text/javascript'],
   '/custom/icon/128.png': ['dist/extension/custom/icon/128.png', 'image/png'],

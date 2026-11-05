@@ -1,5 +1,6 @@
 import { APPLICATION_COUNTS_KEY } from './types';
-import { dailyTotals, localDayKey, mergeRecords, sanitizedURL, validDay } from './tracking-model';
+import { dailyTotals, mergeRecords, sanitizedURL, validDay } from './tracking-model';
+import { utcDayKey } from './application-day';
 import {
   TRACKING_CACHE_KEY,
   TRACKING_DAILY_TOTALS_KEY,
@@ -183,7 +184,7 @@ export function updateTracking<T>(
         ? nativeGoal
         : state.goal);
     state.goal = goal;
-    const today = localDayKey();
+    const today = utcDayKey();
     if (state.goalHistory[today] !== goal) state.goalHistory[today] = goal;
     const result = await update(state);
     state.records = mergeRecords(state.records);
@@ -224,7 +225,7 @@ export async function adjustTrackingCount(
 ): Promise<{ ok: true; count: number }> {
   if (delta !== 1 && delta !== -1) throw new Error('Adjust the application count one at a time.');
   const { result } = await updateTracking((state) => {
-    const today = localDayKey();
+    const today = utcDayKey();
     if (day !== today) throw new Error('The day changed. Reopen EZEapply and try again.');
     const snapshot: TrackingSnapshot = { ...state };
     const before = dailyTotals(snapshot)[today]?.total || 0;

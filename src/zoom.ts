@@ -15,9 +15,11 @@ export function mountZoom(
   }
   const page = host.ownerDocument.body;
   const previous = page.style.zoom;
+  const previousScale = page.style.getPropertyValue('--eze-page-zoom');
   function apply(value: number): void {
     current = value;
     page.style.zoom = String(value);
+    page.style.setProperty('--eze-page-zoom', String(value));
     onChange(Math.round(value * 100));
     try {
       localStorage.setItem(KEY, String(value));
@@ -48,6 +50,8 @@ export function mountZoom(
     dispose() {
       host.ownerDocument.removeEventListener('keydown', keydown, true);
       page.style.zoom = previous;
+      if (previousScale) page.style.setProperty('--eze-page-zoom', previousScale);
+      else page.style.removeProperty('--eze-page-zoom');
     },
   };
 }

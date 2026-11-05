@@ -137,7 +137,7 @@ describe('custom answer matching', () => {
   it('selects generic, INR and lakh answers independently without converting their values', () => {
     const fields = [
       field('generic', 'Your expected CTC', '8'),
-      field('inr', 'Please enter your expected CTC in INR', '800000', ['expected ctc']),
+      field('inr', 'Please enter your expected CTC in INR', '800000', ['expected ctc in rupees']),
       field('lakh', 'Expected CTC in lakhs', '8.5'),
       field('current', 'Please enter your current CTC in INR', '600000'),
     ];
@@ -157,8 +157,8 @@ describe('custom answer matching', () => {
     expect(matchField(['Expected CTC in USD'], fields, '').field).toBeUndefined();
     expect(matchField(['Expected CTC in crores'], fields, '').field).toBeUndefined();
   });
-  it('does not guess a generic amount from an INR-only answer or a lower-priority machine name', () => {
-    const inr = field('inr', 'Please enter your expected CTC in INR', '800000', ['expected ctc']);
+  it('does not guess a generic amount from an INR-only answer without a saved alias or from a lower-priority machine name', () => {
+    const inr = field('inr', 'Please enter your expected CTC in INR', '800000');
     const result = matchField(["What's your expected CTC?", 'expected_ctc_in_inr'], [inr], '');
     expect(result.field).toBeUndefined();
     expect(result.reason).toContain('different units');
