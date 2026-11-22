@@ -1,5 +1,14 @@
 # EZEapply navigation artwork
 
+## Job Filters prompt
+
+`job-filters.png` was refined using built-in ImageGen on 2026-11-18, then resized to a 192 × 192 PNG with its alpha channel intact.
+
+> Use case: precise-object-edit.
+> Asset type: compact Job Filters glyph for the EZEapply Chrome toolbar popup. Make a polished, instantly recognizable 34-pixel icon. Reference: the attached blue-briefcase job card with a coral dismissal X. Preserve this card and X as the interior motif and place them INSIDE one unmistakable filter funnel.
+> Composition: a single large, front-facing, open-mouth filter funnel silhouette, wide at the top, tapering down to a short squared outlet stem. A bold seafoam-green enamel outline and a restrained deep teal interior give the filter a clear shape on dark or light tiles. The opening occupies the upper three-quarters of the symbol, wide enough to hold the complete small ivory job card and its coral X. The card tilts very slightly and sits centered high within the funnel opening. The solid cobalt briefcase on the ivory card and the vivid coral X over the card’s lower-right corner are both prominent and keep separate clear silhouettes. Keep the X inside the outer bounds of the funnel. Keep the card as large as possible while leaving an obvious gap to the funnel outline. Use simple bold strokes that retain clarity at 32 pixels, disciplined subtle enamel highlights, and one unified compact silhouette. Fill about 88% of the square. Use high contrast and precise clean edges.
+> Output true alpha outside the icon. No backing tile, no letters, no wordmark, no text, no exact LinkedIn logo, no detached badges, no orbiting decorations, no cast shadow, no background and no faded fragments.
+
 ## Chrome extensions shortcut prompt
 
 `extensions.png` was generated with the built-in image generation tool on 2026-10-31, with a transparent background, then resized to 192 × 192 PNG for local packaging.

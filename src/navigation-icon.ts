@@ -1,6 +1,13 @@
 /** Image-generated, locally packaged navigation artwork. Accessible names belong to the controls. */
 export function navigationIcon(
-  kind: 'applications' | 'profile' | 'settings' | 'analytics' | 'sidepane' | 'extensions',
+  kind:
+    | 'applications'
+    | 'profile'
+    | 'settings'
+    | 'analytics'
+    | 'sidepane'
+    | 'extensions'
+    | 'job-filters',
 ): HTMLImageElement {
   const image = document.createElement('img');
   image.className = 'navigation-icon';

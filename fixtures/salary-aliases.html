@@ -88,7 +88,12 @@
       document.getElementById('load-sample').addEventListener('click', async () => {
         const fields = [
           ['current-generic', 'Current CTC', '9', []],
-          ['current-inr', 'Current CTC in INR', '900000', ['Current Salary']],
+          [
+            'current-inr',
+            'Current CTC in INR',
+            '800000',
+            ['Current Salary', 'What is your fixed salary'],
+          ],
           ['expected-generic', 'Expected CTC', '9', []],
           ['expected-inr', 'Expected CTC in INR', '900000', ['Desired Salary', 'Expected Salary*']],
         ].map(([id, label, value, aliases]) => ({

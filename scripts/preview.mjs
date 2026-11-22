@@ -33,6 +33,28 @@ await build({
   format: 'iife',
   target: 'chrome120',
 });
+// Run the real Job Filters watcher against synthetic result cards on localhost.
+await build({
+  entryPoints: [root + 'fixtures/job-filters-preview.ts'],
+  outfile: root + '.local/job-filters-preview.js',
+  bundle: true,
+  format: 'iife',
+  target: 'chrome120',
+  plugins: [
+    {
+      name: 'preview-job-filters-host',
+      setup(build) {
+        build.onLoad({ filter: /src\/linkedin-job-filters\.ts$/ }, async (args) => ({
+          contents: (await readFile(args.path, 'utf8')).replace(
+            'isLinkedInHost(location.hostname)',
+            "isLinkedInHost('www.linkedin.com')",
+          ),
+          loader: 'ts',
+        }));
+      },
+    },
+  ],
+});
 await build({
   entryPoints: [root + 'fixtures/searchable-dropdown-preview.ts'],
   outfile: root + '.local/searchable-dropdown.js',
@@ -115,6 +137,8 @@ await build({
   target: 'chrome120',
 });
 const routes = {
+  '/jobs/search-results/': ['fixtures/job-filters.html', 'text/html'],
+  '/job-filters-preview.js': ['.local/job-filters-preview.js', 'text/javascript'],
   '/cv-transfer-demo.js': ['.local/cv-transfer-demo.js', 'text/javascript'],
   '/cv-tray-demo.js': ['.local/cv-tray-demo.js', 'text/javascript'],
   '/cv-tray.html': ['fixtures/cv-tray.html', 'text/html'],
@@ -192,6 +216,10 @@ const routes = {
     'image/png',
   ],
   '/custom/navigation/sidepane.png': ['dist/extension/custom/navigation/sidepane.png', 'image/png'],
+  '/custom/navigation/job-filters.png': [
+    'dist/extension/custom/navigation/job-filters.png',
+    'image/png',
+  ],
   '/custom/cv-controls/download.png': [
     'dist/extension/custom/cv-controls/download.png',
     'image/png',

@@ -531,7 +531,7 @@ textarea::placeholder {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   margin: 14px 0 20px;
 }
 .popup-shortcut {

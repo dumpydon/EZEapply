@@ -76,4 +76,51 @@ describe('radio markup captured from LinkedIn Easy Apply', () => {
     expect(result.filled).toBe(0);
     expect(controls.every((input) => !input.checked)).toBe(true);
   });
+  it.each([false, true])(
+    'fills an ordinary Yes/No question and reports consent for manual review (automatic: %s)',
+    async (automatic) => {
+      const ordinary = mount();
+      const agreement = 'I agree to be considered for other positions.';
+      const form = document.querySelector('form')!;
+      form.insertAdjacentHTML(
+        'beforeend',
+        markup
+          .replaceAll('_r_5', '_r_8')
+          .replaceAll(question, agreement)
+          .replace('>Yes<', '>YES<')
+          .replace('>No<', '>NO<') +
+          '<label>I consent to processing my personal data.<input id="privacy-consent"></label>',
+      );
+      const saved: CustomField = {
+        id: 'agreement',
+        label: agreement,
+        value: 'Yes',
+        aliases: ['I consent to processing my personal data.'],
+        exclude: [],
+        enabled: true,
+        category: 'Personal questions',
+        scope: '',
+        matchMode: 'exact',
+      };
+
+      const report = await fillFormWithWidgets(document, [saved], '', automatic, undefined, yes);
+      expect(report.filled).toBe(1);
+      expect(ordinary.map((input) => input.checked)).toEqual([true, false]);
+      expect([...form.querySelectorAll('input:checked')]).toEqual([ordinary[0]]);
+      expect(form.querySelector<HTMLInputElement>('#privacy-consent')!.value).toBe('');
+      for (const result of [report, scanForm(document, [saved])]) {
+        const review = result.questions.filter((item) => item.requiresReview);
+        expect(review.map((item) => item.label)).toEqual([
+          `${agreement}*`,
+          'I consent to processing my personal data.',
+        ]);
+        for (const item of review) {
+          expect(item.filled).toBe(false);
+          expect(item.reason).toContain('Review and answer on the form');
+          expect(item.matchedField).toBeUndefined();
+          expect(item.canDraftWithAI).toBeUndefined();
+        }
+      }
+    },
+  );
 });

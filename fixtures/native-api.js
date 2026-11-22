@@ -77,7 +77,11 @@
     },
   };
   const preferencesKey = 'eze-native-preview-preferences',
-    preferenceNames = ['eze.showFloatingRestore', 'eze.linkedin.disableAutoFollow'];
+    preferenceNames = [
+      'eze.showFloatingRestore',
+      'eze.linkedin.disableAutoFollow',
+      'eze.linkedin.jobFilters.v1',
+    ];
   const demoKey = 'eze-preview-v1',
     customKey = 'eze.customFields.v1',
     defaultYesKey = 'eze.defaultYes.v1';
@@ -108,7 +112,7 @@
   });
   const savedPreferences = JSON.parse(localStorage.getItem(preferencesKey) || '{}');
   for (const name of preferenceNames)
-    if (typeof savedPreferences[name] === 'boolean') data[name] = savedPreferences[name];
+    if (name in savedPreferences) data[name] = savedPreferences[name];
   window.addEventListener('storage', (event) => {
     if (event.key !== preferencesKey) return;
     const saved = JSON.parse(event.newValue || '{}'),
@@ -146,9 +150,7 @@
       if (preferenceNames.some((name) => name in values))
         localStorage.setItem(
           preferencesKey,
-          JSON.stringify(
-            Object.fromEntries(preferenceNames.map((name) => [name, data[name] === true])),
-          ),
+          JSON.stringify(Object.fromEntries(preferenceNames.map((name) => [name, data[name]]))),
         );
       if (countsKey in values)
         localStorage.setItem(countsPreviewKey, JSON.stringify(values[countsKey]));

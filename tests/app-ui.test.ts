@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { mountApp, safeWebsite, profileDate } from '../src/app-ui';
 import { TRACKING_DAILY_TOTALS_KEY } from '../src/tracking-types';
 import { utcDayKey } from '../src/application-day';
+import { JOB_FILTERS_KEY } from '../src/job-filter-rules';
 let data: Record<string, unknown>, cleanup: (() => void) | undefined;
 beforeEach(() => {
   data = {
@@ -30,7 +31,12 @@ beforeEach(() => {
     tabs: { create: vi.fn() },
     sidePanel: { open: vi.fn(async () => {}) },
     storage: {
-      local: { get: vi.fn(async () => data) },
+      local: {
+        get: vi.fn(async () => data),
+        set: vi.fn(async (values: Record<string, unknown>) => {
+          Object.assign(data, values);
+        }),
+      },
       onChanged: { addListener: vi.fn(), removeListener: vi.fn() },
     },
   });
@@ -71,10 +77,92 @@ describe('independent application host', () => {
     history.replaceState({}, '', '/popup.html');
     cleanup = await mountApp(document.getElementById('root')!);
     expect(document.querySelector('.daily-total')?.textContent).toBe('14');
-    expect(document.querySelectorAll('.popup-shortcuts>*')).toHaveLength(4);
+    expect(document.querySelectorAll('.popup-shortcuts>*')).toHaveLength(5);
+    expect(
+      document
+        .querySelector('.popup-shortcuts [aria-label="Job Filters"] img')
+        ?.getAttribute('src'),
+    ).toContain('navigation/job-filters.png');
     expect(document.querySelector('[aria-label="Edit daily goal"]')).not.toBeNull();
     expect(document.querySelectorAll('.popup-switches input')).toHaveLength(4);
     expect(document.querySelector('.daily-goal')?.textContent).toBe('Goal: 10');
+  });
+  it('carries over the old title filter and saves the company list and switch independently', async () => {
+    history.replaceState({}, '', '/popup.html');
+    const old = {
+      enabled: true,
+      keywords: ['Sales', 'Data Engineer, Platform', 'Drones & Robotics'],
+    };
+    data[JOB_FILTERS_KEY] = old;
+    const root = document.getElementById('root')!;
+    cleanup = await mountApp(root);
+    const open = async () => {
+      root.querySelector<HTMLButtonElement>('button[aria-label="Job Filters"]')!.click();
+      const dialog = document.querySelector<HTMLDialogElement>('.job-filters-dialog')!;
+      const titleToggle = dialog.querySelector<HTMLInputElement>('input[name="titles-enabled"]')!;
+      const companyToggle = dialog.querySelector<HTMLInputElement>(
+        'input[name="companies-enabled"]',
+      )!;
+      await vi.waitFor(() => expect(companyToggle.disabled).toBe(false));
+      return {
+        dialog,
+        titleToggle,
+        companyToggle,
+        titles: dialog.querySelector<HTMLTextAreaElement>('#job-filter-titles-list')!,
+        companies: dialog.querySelector<HTMLTextAreaElement>('#job-filter-companies-list')!,
+      };
+    };
+    const first = await open();
+    expect(first.titleToggle.checked).toBe(true);
+    expect(first.titles.value).toBe(old.keywords.join('\n'));
+    expect(first.companyToggle.checked).toBe(false);
+    expect(first.companies.value).toBe('');
+    first.companyToggle.checked = true;
+    const titleExpand = first.dialog.querySelector<HTMLButtonElement>(
+      '[aria-controls="job-filter-titles-list"]',
+    )!;
+    const companyExpand = first.dialog.querySelector<HTMLButtonElement>(
+      '[aria-controls="job-filter-companies-list"]',
+    )!;
+    titleExpand.click();
+    expect(titleExpand.getAttribute('aria-expanded')).toBe('true');
+    expect(first.companies.closest('section')?.hidden).toBe(true);
+    first.dialog.querySelector('form')!.requestSubmit();
+    expect(first.companies.getAttribute('aria-invalid')).toBe('true');
+    expect(first.dialog.querySelector('[role="alert"]')?.textContent).toContain('company name');
+    expect(companyExpand.getAttribute('aria-expanded')).toBe('true');
+    expect(first.companies.closest('section')?.hidden).toBe(false);
+    expect(document.activeElement).toBe(first.companies);
+    expect(data[JOB_FILTERS_KEY]).toEqual(old);
+
+    first.titleToggle.checked = false;
+    first.companies.value = 'Jobgether\n JOBGETHER \nCrossing Hurdles, Inc.\n***';
+    first.dialog.dispatchEvent(new Event('cancel', { cancelable: true }));
+    expect(companyExpand.getAttribute('aria-expanded')).toBe('false');
+    expect(first.titles.closest('section')?.hidden).toBe(false);
+    expect(first.companies.value).toContain('Crossing Hurdles');
+    expect(document.activeElement).toBe(companyExpand);
+    first.dialog.querySelector('form')!.requestSubmit();
+    await vi.waitFor(() => expect(first.dialog.isConnected).toBe(false));
+    expect(data[JOB_FILTERS_KEY]).toEqual({
+      titles: { ...old, enabled: false },
+      companies: { enabled: true, keywords: ['Jobgether', 'Crossing Hurdles, Inc.'] },
+    });
+    cleanup();
+    cleanup = await mountApp(root);
+    const reopened = await open();
+    expect(reopened.titles.value).toBe(old.keywords.join('\n'));
+    expect(reopened.titleToggle.checked).toBe(false);
+    expect(reopened.companies.value).toBe('Jobgether\nCrossing Hurdles, Inc.');
+    expect(reopened.companyToggle.checked).toBe(true);
+    reopened.companyToggle.checked = false;
+    reopened.titleToggle.checked = true;
+    reopened.dialog.querySelector('form')!.requestSubmit();
+    await vi.waitFor(() => expect(reopened.dialog.isConnected).toBe(false));
+    expect(data[JOB_FILTERS_KEY]).toEqual({
+      titles: old,
+      companies: { enabled: false, keywords: ['Jobgether', 'Crossing Hurdles, Inc.'] },
+    });
   });
   it('opens the native side panel directly from a popup gesture', async () => {
     history.replaceState({}, '', '/popup.html');

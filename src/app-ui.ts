@@ -6,6 +6,7 @@ import {
   type ApplicantProfile,
 } from './app-profile';
 import { mountPopupControls } from './popup-controls';
+import { mountJobFilters } from './job-filters-popup';
 import { navigationIcon } from './navigation-icon';
 import { mountThemePicker } from './appearance';
 import { mountProfileView } from './profile-view';
@@ -426,6 +427,11 @@ export async function mountApp(root: HTMLElement): Promise<() => void> {
     paintCount();
     const count = mountApplicationCount(),
       activity = mountActivityControls();
+    if (popup) {
+      const filters = mountJobFilters();
+      root.querySelector('.popup-shortcuts')!.append(filters.button);
+      cleanup.push(filters.dispose);
+    }
     cleanup.push(
       () => count.dispose(),
       () => activity.dispose(),

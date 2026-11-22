@@ -77,10 +77,12 @@
       function render() {
         step++;
         const accepted = {};
-        form.innerHTML =
-          '<label for="current-salary">Current Salary*</label><input id="current-salary" type="text" inputmode="numeric" maxlength="20"><label for="expected-salary">Expected Salary*</label><input id="expected-salary" type="text" inputmode="numeric" maxlength="20"><label for="employer">Current Employer*</label><input id="employer">';
+        form.innerHTML = `<label for="current-salary">Current Salary*</label><input id="current-salary" type="text" inputmode="numeric" maxlength="20">
+          <label for="fixed-salary">What is your current fixed Salary ?*</label><input id="fixed-salary" type="text" inputmode="numeric" maxlength="20" required>
+          <label for="expected-salary">Expected Salary*</label><input id="expected-salary" type="text" inputmode="numeric" maxlength="20">
+          <label for="employer">Current Employer*</label><input id="employer">`;
         function show() {
-          output.textContent = `Step ${step} · Accepted form state: current ${accepted['current-salary'] || 'empty'}; expected ${accepted['expected-salary'] || 'empty'}; employer ${accepted.employer || 'empty'}.`;
+          output.textContent = `Step ${step} · Current: ${accepted['current-salary'] || 'empty'} · Fixed: ${accepted['fixed-salary'] || 'empty'} · Expected: ${accepted['expected-salary'] || 'empty'} · Employer: ${accepted.employer || 'empty'}`;
         }
         for (const input of form.querySelectorAll('input'))
           input.addEventListener('input', () => {

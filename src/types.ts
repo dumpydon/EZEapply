@@ -45,6 +45,7 @@ export interface Question {
   filled: boolean;
   matchedField?: string;
   reason?: string;
+  requiresReview?: boolean;
   canDraftWithAI?: boolean;
   /** Browser document identity prevents opening a stale question after navigation. */
   documentId?: string;

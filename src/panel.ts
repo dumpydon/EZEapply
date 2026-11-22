@@ -200,11 +200,11 @@ export async function mountPanel(host: HTMLElement): Promise<() => void> {
   yesNo.setAttribute('aria-label', 'Default Yes for Yes/No questions');
   yesNo.setAttribute('aria-describedby', 'eze-default-yes-help');
   const yesNoCopy = element('span');
-  const yesNoHelp = element('small', '', 'Unanswered Yes/No questions');
+  const yesNoHelp = element('small', '', 'Unanswered Yes/No · consent requires review');
   yesNoHelp.id = 'eze-default-yes-help';
   yesNoCopy.append(element('strong', '', 'Default Yes'), yesNoHelp);
   yesNoLabel.title =
-    'Automatically choose Yes when a job question offers only Yes and No. Existing choices are kept.';
+    'Automatically choose Yes when a job question offers only Yes and No. Review consent and agreement questions on the form.';
   yesNoLabel.append(yesNo, yesNoCopy);
 
   const list = element('div', 'eze-field-list');
@@ -821,7 +821,7 @@ export async function mountPanel(host: HTMLElement): Promise<() => void> {
     const aliasesInput = field(
       'Other ways the question is asked',
       element('textarea', 'eze-input'),
-      'Optional: one phrase per line. Matching phrases use this answer as saved; any units shown on the form must agree.',
+      'One phrase per line. Case, question marks and required stars are ignored. Match any currency, units and pay period specified on the form.',
     );
     aliasesInput.rows = 3;
     aliasesInput.maxLength = 10000;
@@ -1065,6 +1065,11 @@ export async function mountPanel(host: HTMLElement): Promise<() => void> {
       const content = element('div');
       content.append(element('span', '', question.label));
       if (question.reason) content.append(element('small', 'eze-help', question.reason));
+      if (question.requiresReview) {
+        item.append(content);
+        questionList.append(item);
+        continue;
+      }
       const questionActions = element('div', 'eze-question-actions');
       const matchingField = activeFields.fields.find((field) => field.id === question.matchedField);
       if (question.kind === 'file') {

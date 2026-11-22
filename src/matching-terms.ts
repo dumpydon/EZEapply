@@ -38,6 +38,8 @@ const CURRENCIES = new Map<string, string>(
     sgd: 'SGD',
   }),
 );
+const INCLUDED_VARIABLE_PAY =
+  /\b(?:including|inclusive of) (?:any |all |both |the |your )?(?:fixed and )?variable (?:components?|pay|compensation|bonus)\b/g;
 
 type Topic = 'ctc' | 'salary' | 'compensation' | 'notice' | 'experience' | 'institution';
 type ResponseKind =
@@ -99,6 +101,7 @@ export interface MatchingTerms {
   amountUnit?: 'base' | 'lakh' | 'crore' | 'thousand' | 'million';
   payPeriod?: PayPeriod;
   payComponent?: 'total' | 'fixed' | 'variable' | 'bonus' | 'equity';
+  explicitPayComponent?: boolean;
   noticeUnit?: 'day' | 'week' | 'month' | 'year';
   noticeSubjects?: string[];
   experienceUnit?: 'year' | 'month' | 'combined';
@@ -136,6 +139,7 @@ export function matchingTerms(raw: string): MatchingTerms {
   let kind: ResponseKind | undefined;
   let payPeriod: PayPeriod | undefined;
   let payComponent: MatchingTerms['payComponent'];
+  let explicitPayComponent: boolean | undefined;
   const joiningDuration =
     /\b(join|joining|start|starting)\b/.test(text) &&
     (/\b(?:how many|number of) (?:calendar |working |business )?(?:days?|weeks?|months?|years?)\b|\bhow (?:soon|long)\b/.test(
@@ -144,18 +148,18 @@ export function matchingTerms(raw: string): MatchingTerms {
       /\b(?:availability|available|joining|join)\b.*\bin (?:days?|weeks?|months?)\b/.test(text)) &&
     !/\bdate\b|\bwhen\b/.test(text);
   if (compensation) {
+    const specifiesTotal =
+      /\b(?:total|overall)\b/.test(text) || text.search(INCLUDED_VARIABLE_PAY) !== -1;
     text = text
       .replace(/\b(desired|target)\b/g, 'expected')
       .replace(/\bpresent\b/g, 'current')
       .replace(/\blast drawn\b/g, 'current')
       .replace(/\b(salary|compensation|pay) expectations?\b/g, 'expected $1')
       .replace(/\bexpectations? (?:for|of)\b/g, 'expected')
+      .replace(/\bbase\b/g, 'fixed')
       // CTC already includes these components; the clarification is not a
       // request for the variable component by itself.
-      .replace(
-        /\b(?:including|inclusive of) (?:any |all |both |the |your )?(?:fixed and )?variable (?:components?|pay|compensation|bonus)\b/g,
-        ' ',
-      );
+      .replace(INCLUDED_VARIABLE_PAY, ' ');
     // "CTC salary" and "CTC compensation" repeat the same noun. Keep
     // current/expected, fixed/variable and all currency/unit qualifiers.
     if (topic === 'ctc') text = text.replace(/\b(salary|compensation|pay|remuneration)\b/g, ' ');
@@ -166,7 +170,7 @@ export function matchingTerms(raw: string): MatchingTerms {
         : /\b(negotiable|negotiability)\b/.test(text)
           ? 'boolean'
           : 'amount';
-    payComponent = /\b(?:fixed|base)\b|\bexcluding variable\b/.test(text)
+    payComponent = /\bfixed\b|\bexcluding variable\b/.test(text)
       ? 'fixed'
       : /\bvariable\b/.test(text)
         ? 'variable'
@@ -175,6 +179,7 @@ export function matchingTerms(raw: string): MatchingTerms {
           : /\b(equity|stock)\b/.test(text)
             ? 'equity'
             : 'total';
+    explicitPayComponent = specifiesTotal || payComponent !== 'total';
     const { periods } = monetaryFormat(text);
     payPeriod = periods.length > 1 ? 'mixed' : periods[0] || (topic === 'ctc' ? 'year' : undefined);
   } else if (/\bnotice (?:period|duration)\b/.test(text) || joiningDuration) {
@@ -272,6 +277,7 @@ export function matchingTerms(raw: string): MatchingTerms {
     amountUnit,
     payPeriod,
     payComponent,
+    explicitPayComponent,
     noticeUnit,
     experienceUnit,
     experienceScope,
@@ -303,14 +309,32 @@ function sameList(left: string[], right: string[]): boolean {
   return left.length === right.length && left.every((word, index) => word === right[index]);
 }
 
-/** An alias can add detail, but cannot discard the saved field's meaningful qualifiers. */
-export function aliasTerms(label: MatchingTerms, alias: MatchingTerms): MatchingTerms | undefined {
+/** A deliberate alias can specify a component when the field name only
+ * implies total pay. The saved answer keeps its currency, scale and period. */
+export function aliasTerms(
+  label: MatchingTerms,
+  alias: MatchingTerms,
+  explicitAlias = false,
+): MatchingTerms | undefined {
+  const useAliasComponent =
+    explicitAlias &&
+    label.payComponent === 'total' &&
+    !label.explicitPayComponent &&
+    alias.explicitPayComponent &&
+    alias.payComponent !== 'total';
   if (
     (label.currency && alias.currency && label.currency !== alias.currency) ||
     (label.amountUnit && alias.amountUnit && label.amountUnit !== alias.amountUnit) ||
     (label.noticeUnit && alias.noticeUnit && label.noticeUnit !== alias.noticeUnit) ||
     (label.payPeriod && alias.payPeriod && label.payPeriod !== alias.payPeriod) ||
-    (label.payComponent && alias.payComponent && label.payComponent !== alias.payComponent) ||
+    (!useAliasComponent &&
+      label.payComponent &&
+      alias.payComponent &&
+      label.payComponent !== alias.payComponent) ||
+    (label.compensation &&
+      alias.compensation &&
+      ((label.keywords.includes('current') && alias.keywords.includes('expected')) ||
+        (label.keywords.includes('expected') && alias.keywords.includes('current')))) ||
     (label.responseKind && alias.responseKind && label.responseKind !== alias.responseKind) ||
     (label.noticeSubjects?.length &&
       alias.noticeSubjects?.length &&
@@ -337,7 +361,7 @@ export function aliasTerms(label: MatchingTerms, alias: MatchingTerms): Matching
     currency: label.currency || alias.currency,
     amountUnit: label.amountUnit || alias.amountUnit,
     payPeriod: label.payPeriod || alias.payPeriod,
-    payComponent: label.payComponent || alias.payComponent,
+    payComponent: useAliasComponent ? alias.payComponent : label.payComponent || alias.payComponent,
     noticeUnit: label.noticeUnit || alias.noticeUnit,
     noticeSubjects: label.noticeSubjects?.length ? label.noticeSubjects : alias.noticeSubjects,
     experienceUnit: label.experienceUnit || alias.experienceUnit,
@@ -351,11 +375,28 @@ export function aliasTerms(label: MatchingTerms, alias: MatchingTerms): Matching
   };
 }
 
-export function sameKeywords(left: MatchingTerms, right: MatchingTerms): boolean {
+export function sameKeywords(
+  left: MatchingTerms,
+  right: MatchingTerms,
+  { allowImplicitCurrentPay = false }: { allowImplicitCurrentPay?: boolean } = {},
+): boolean {
   const enough =
     left.keywords.length >= 2 ||
     (left.topic === 'experience' && right.topic === 'experience' && left.keywords.length > 0);
-  return enough && sameList(left.keywords, right.keywords);
+  if (!enough) return false;
+  if (sameList(left.keywords, right.keywords)) return true;
+  // A current-pay field anchors a named component alias such as “fixed salary”
+  // when the form adds or omits “current”. Other qualifiers still have to match.
+  return (
+    allowImplicitCurrentPay &&
+    !!left.explicitPayComponent &&
+    left.payComponent !== 'total' &&
+    left.payComponent === right.payComponent &&
+    sameList(
+      left.keywords.filter((word) => word !== 'current'),
+      right.keywords.filter((word) => word !== 'current'),
+    )
+  );
 }
 
 export interface MatchCompatibility {

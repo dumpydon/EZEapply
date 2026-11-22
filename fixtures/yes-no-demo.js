@@ -21,6 +21,7 @@ function render() {
     radio('python', 'Do you have strong experience in Python?') +
     radio('tools', 'Are you comfortable with Git and Docker?') +
     radio('existing', 'An answer you already chose', 'No') +
+    radio('consent', 'I consent to the collection of my personal ID information.') +
     `<div role="radiogroup" aria-label="Ready to complete onboarding?"><div class="question">Ready to complete onboarding?</div><button type="button" role="radio" aria-checked="false">Yes</button><button type="button" role="radio" aria-checked="false">No</button></div>
     <div class="field"><label for="select">Can you work with this team?<select id="select"><option value="">Select an option</option><option>Yes</option><option>No</option></select></label></div>
     <fieldset><legend>Three choices are left for you</legend><label><input type="radio" name="three" value="Yes">Yes</label><label><input type="radio" name="three" value="No">No</label><label><input type="radio" name="three" value="Maybe">Maybe</label></fieldset>`;

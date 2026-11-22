@@ -90,26 +90,28 @@ export function matchField(
       const alias = normalize(rawAlias);
       if (!alias) continue;
       const declaredTerms = matchingTerms(rawAlias);
-      const terms = aliasTerms(fieldTerms, declaredTerms);
-      if (!terms) continue;
       questions.forEach((question, index) => {
         const exact = question === alias;
         const phrase = field.matchMode !== 'exact' && includesPhrase(question, alias);
-        const keywords = field.matchMode !== 'exact' && sameKeywords(terms, questionTerms[index]);
+        const primaryAlias = aliasIndex > 0 && index === 0;
+        const keywords =
+          field.matchMode !== 'exact' &&
+          sameKeywords(declaredTerms, questionTerms[index], {
+            allowImplicitCurrentPay: primaryAlias && fieldTerms.keywords.includes('current'),
+          });
         if (!exact && !phrase && !keywords) return;
+        const explicitAlias = primaryAlias && (exact || keywords);
+        const terms = aliasTerms(fieldTerms, declaredTerms, explicitAlias);
+        if (!terms) return;
         // Visible monetary labels govern format even when a lower-priority
         // machine name happens to match a broader alias.
         const units = questionTerms[0]?.topic ? questionTerms[0] : questionTerms[index];
         // A deliberately saved alternative may omit the answer's currency or
         // scale. Only trust an exact/equivalent match to the primary question;
         // a broad substring or a secondary machine name cannot grant this.
-        const explicitAlias =
-          aliasIndex > 0 &&
-          index === 0 &&
-          !declaredTerms.currency &&
-          !declaredTerms.amountUnit &&
-          (exact || keywords);
-        const { priority, reason } = matchCompatibility(terms, units, { explicitAlias });
+        const { priority, reason } = matchCompatibility(terms, units, {
+          explicitAlias: explicitAlias && !declaredTerms.currency && !declaredTerms.amountUnit,
+        });
         if (!priority) {
           if (reason === 'units') differentUnits = true;
           else if (reason === 'notice-units') differentNoticeUnits = true;

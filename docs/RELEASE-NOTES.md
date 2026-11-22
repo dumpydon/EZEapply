@@ -1,5 +1,38 @@
 EZEapply is created by **Piyush Agarwal (@dumpydon)**.
 
+## EZEapply 3.0.20
+
+- Job Filters retries once when LinkedIn leaves a matching Dismiss button available after a click. A saved `Editor` rule matches `AI video Editor`, and LinkedIn’s Undo continues to restore individual listings.
+
+## EZEapply 3.0.19 — local build
+
+- Job Filters uses blue switches with visible On and Off states. The shorter heading and section descriptions give both lists more room.
+- Each editor shows five lines by default. **Expand** uses the available popup height for that list and keeps **Save filters** in view. **Collapse** or Escape returns to both lists with your edits intact.
+
+## EZEapply 3.0.18 — local build
+
+- The **Job Filters** shortcut opens separate **Job titles** and **Job companies** controls. Each has a switch and a list, with one entry per line. **Save filters** applies both together.
+- Company rules match the full employer name shown on the LinkedIn card, ignoring case and extra spaces. Existing title phrases and their switch carry over. The company switch starts off.
+
+## EZEapply 3.0.17 — local build
+
+- Job Filters matches each saved line as a consecutive, whole-word phrase. For example, `Data Engineer` matches `Senior Data Engineer` and leaves `Data & AI Engineer` visible. Case and repeated spaces are ignored. Spellings, plurals, and punctuation within the phrase are preserved.
+- Each dismissal requires LinkedIn’s visible card title and its Dismiss control to agree. Job Filters checks the current results again after each click, and LinkedIn’s Undo restores individual cards.
+
+## EZEapply 3.0.16 — local build
+
+- Open **Job Filters** in the toolbar popup to save words or phrases that dismiss matching LinkedIn job titles. Enable the switch and save the list to apply it. Title matching runs locally and treats “presales” and “pre-sales”, “drone” and “drones”, and “&” and “and” as equivalent.
+- The filter sees results as their page loads. LinkedIn’s own dismiss action provides its faded card and Undo control. Switching the filter off stops new dismissals.
+
+## EZEapply 3.0.15 — local build
+
+- A saved phrase such as “What is your current fixed salary” can map a fixed-pay question to an answer saved under a general compensation label such as “Current CTC in INR.” Case, punctuation and required stars do not affect the match. Smart matching recognizes equivalent wording such as “base salary.”
+- This mapping requires the saved phrase to match the visible question. Currency, amount scale, pay period and explicitly named components must still agree.
+
+## EZEapply 3.0.14 — local build
+
+- The Default Yes switch explains that consent needs review. **Questions** and **Fill this page** list unanswered consent and agreement questions with a reason to review them on the form. Ordinary Yes/No questions still use the enabled default.
+
 ## EZEapply 3.0.13
 
 - Fixed Default Yes detection for slotted web-component radio controls, using the SAP SmartRecruiters markup supplied by the user. Radio choices now resolve their group through assigned slots and shadow-root hosts, and custom controls can expose their choice through a label attribute.

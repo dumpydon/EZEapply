@@ -26,7 +26,11 @@ const field = (
 });
 const fields = () => [
   field('current-generic', 'Current CTC', '9'),
-  field('current-inr', 'current ctc in INR', '900000', ['current ctc in rupees', 'Current Salary']),
+  field('current-inr', 'current ctc in INR', '900000', [
+    'current ctc in rupees',
+    'Current Salary',
+    'What is your current fixed Salary',
+  ]),
   field('expected-generic', 'expected CTC', '9'),
   field('expected-inr', 'expected ctc in INR', '900000', ['Desired Salary *', 'Expected Salary*']),
 ];
@@ -49,6 +53,66 @@ describe('explicit saved aliases with omitted monetary units', () => {
     const match = matchField([question], fields(), 'www.linkedin.com');
     expect(match.field?.id).toBe(id);
     expect(match.field?.value).toBe('900000');
+  });
+
+  it.each(['phrase', 'exact'] as const)(
+    'uses the saved fixed salary alias with different punctuation and case in %s mode',
+    (matchMode) => {
+      const saved = { ...fields()[1], matchMode };
+      const match = matchField(['What is your CURRENT fixed SALARY ?*'], [saved], '');
+      expect(match.field?.value).toBe('900000');
+    },
+  );
+
+  it.each([
+    ['What is your fixed salary?', 'What is your current fixed Salary ?*'],
+    ['What is your current fixed Salary', 'Fixed salary'],
+    ['What is your current fixed Salary', 'Please enter your current base salary in INR'],
+  ])('recognizes equivalent fixed salary wording: %s → %s', (alias, question) => {
+    const saved = { ...fields()[1], aliases: [alias] };
+    expect(matchField([question], [saved], '').field?.value).toBe('900000');
+  });
+
+  it('requires a matching pay component alias on the visible question', () => {
+    const saved = fields()[1];
+    expect(
+      matchField(['What is your current fixed Salary ?*'], [{ ...saved, aliases: [] }], '').field,
+    ).toBeUndefined();
+    expect(
+      matchField(
+        ['Minimum current fixed salary'],
+        [{ ...saved, aliases: ['Current fixed salary'] }],
+        '',
+      ).field,
+    ).toBeUndefined();
+    expect(
+      matchField(['Current total salary', 'What is your current fixed Salary'], [saved], '').field,
+    ).toBeUndefined();
+  });
+
+  it.each([
+    'Current fixed salary in lakhs',
+    'Current fixed salary in USD',
+    'Current monthly fixed salary',
+    'Expected fixed salary',
+    'Current variable salary',
+  ])('keeps incompatible amounts separate from the saved fixed salary alias: %s', (question) => {
+    const saved = fields()[1];
+    expect(matchField([question], [saved], '').field).toBeUndefined();
+  });
+
+  it('protects a saved field that names a different component explicitly', () => {
+    for (const label of ['Current total CTC in INR', 'Current variable salary in INR']) {
+      const saved = { ...fields()[1], label };
+      expect(matchField(['What is your current fixed salary?'], [saved], '').field).toBeUndefined();
+    }
+  });
+
+  it('does not use a current amount for a saved phrase that asks for salary expectations', () => {
+    const saved = { ...fields()[1], aliases: ['Fixed salary expectations'] };
+    expect(
+      matchField(['What are your fixed salary expectations?'], [saved], '').field,
+    ).toBeUndefined();
   });
 
   it('supports explicit aliases for other monetary topics and currencies without converting the answer', () => {
@@ -134,7 +198,7 @@ describe('explicit saved aliases with omitted monetary units', () => {
   });
 
   it.each([false, true])(
-    'fills both salary aliases from persisted fields (automatic: %s), emits events and supports Undo',
+    'fills salary and fixed salary aliases from persisted fields (automatic: %s) and supports Undo',
     async (automatic) => {
       const saved = fields();
       saved[1].value = '800000';
@@ -151,14 +215,16 @@ describe('explicit saved aliases with omitted monetary units', () => {
       document.body.innerHTML = `<div role="dialog" aria-label="Apply to Example">
       <h2>Additional Questions</h2>
       <label for="current">Current Salary*</label><input id="current" type="text" inputmode="numeric" maxlength="20">
+      <label for="fixed">What is your current fixed Salary ?*</label><input id="fixed" type="text" inputmode="numeric" maxlength="20" aria-invalid="true" required>
       <label for="expected">Expected Salary*</label><input id="expected" type="text" inputmode="numeric" maxlength="20">
       <label for="unrelated">Current Employer*</label><input id="unrelated">
     </div>`;
       const events = vi.fn();
-      document.getElementById('current')!.addEventListener('change', events);
+      document.getElementById('fixed')!.addEventListener('change', events);
       const data = await getAutofillData();
       const before = scanForm(document, data.fields, 'www.linkedin.com');
-      expect(before.questions.slice(0, 2).map((question) => question.matchedField)).toEqual([
+      expect(before.questions.slice(0, 3).map((question) => question.matchedField)).toEqual([
+        'current-inr',
         'current-inr',
         'expected-inr',
       ]);
@@ -168,12 +234,14 @@ describe('explicit saved aliases with omitted monetary units', () => {
         'www.linkedin.com',
         automatic,
       );
-      expect(result.filled).toBe(2);
+      expect(result.filled).toBe(3);
       expect((document.getElementById('current') as HTMLInputElement).value).toBe('800000');
+      expect((document.getElementById('fixed') as HTMLInputElement).value).toBe('800000');
       expect((document.getElementById('expected') as HTMLInputElement).value).toBe('900000');
       expect((document.getElementById('unrelated') as HTMLInputElement).value).toBe('');
       expect(events).toHaveBeenCalled();
-      expect(undoFill().filled).toBe(2);
+      expect(undoFill().filled).toBe(3);
+      expect((document.getElementById('fixed') as HTMLInputElement).value).toBe('');
       expect((document.getElementById('expected') as HTMLInputElement).value).toBe('');
     },
   );

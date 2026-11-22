@@ -517,6 +517,30 @@ describe('custom field panel', () => {
     expect(control('Field name').value).toBe('What is your notice period?');
     expect(control('Your answer').value).toBe('');
   });
+  it('shows consent questions for manual review without offering to save a reusable answer', async () => {
+    const label = 'I consent to processing my personal data.';
+    state.sendMessage.mockResolvedValue({
+      filled: 0,
+      skipped: 1,
+      questions: [
+        {
+          id: '1',
+          label,
+          kind: 'radio',
+          filled: false,
+          requiresReview: true,
+          reason: 'Consent or agreement. Review and answer on the form.',
+        },
+      ],
+    });
+    await mount();
+    click('Find questions');
+    await settle();
+    const row = document.querySelector('.eze-question');
+    expect(row?.textContent).toContain(label);
+    expect(row?.textContent).toContain('Review and answer on the form');
+    expect(row?.querySelector('button')).toBeNull();
+  });
   it('offers a distinct Draft with AI action and passes its original tab/frame reference', async () => {
     const label = 'Describe the best AI agent you built';
     state.sendMessage

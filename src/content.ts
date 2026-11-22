@@ -21,6 +21,7 @@ import { radioOptionContext, radioQuestionContext } from './radio-context';
 import { attachResume, scanResumeInputs } from './resume';
 import { mountPanelDock } from './panel-dock';
 import { mountLinkedInFollow } from './linkedin-follow';
+import { mountLinkedInJobFilters } from './linkedin-job-filters';
 import { fieldMatchingLabels } from './field-format';
 import { isApplicationField } from './application-context';
 import { mountSubmissionCapture } from './submission-capture';
@@ -41,6 +42,7 @@ interface Target {
   controls: FormControl[];
   autocomplete?: string;
   blocked?: string;
+  requiresReview?: boolean;
   labels: string[];
   kind: string;
 }
@@ -66,7 +68,8 @@ const UNSAFE_TYPES = new Set([
   'color',
 ]);
 const PROTECTED =
-  /\b(password|passcode|verification code|one time code|otp|captcha|social security|ssn|credit card|debit card|card number|cvv|cvc|routing number|bank account|account number|consent|agree|agreement|terms and conditions|signature)\b/i;
+  /\b(password|passcode|verification code|one time code|otp|captcha|social security|ssn|credit card|debit card|card number|cvv|cvc|routing number|bank account|account number|signature)\b/i;
+const CONSENT_OR_AGREEMENT = /\b(consent|agree|agreement|terms and conditions)\b/i;
 const identities = new WeakMap<Element, string>();
 let nextIdentity = 0;
 let previousChanges: Change[] = [];
@@ -305,20 +308,25 @@ function collect(root: Document): Target[] {
       if (labels.some((label) => PROTECTED.test(normalize(label)))) continue;
       const token = autocompleteToken(control);
       if (token?.match(/^(cc-|one-time-code|current-password|new-password)/)) continue;
+      const requiresReview = labels.some((label) => CONSENT_OR_AGREEMENT.test(normalize(label)));
+      if (requiresReview && !isApplicationField(radio ? radioPresentation(control)! : control))
+        continue;
       const context = normalize(fieldContext(control));
-      const blocked =
-        presentation.blocked ||
-        (/\b(reference|referee|emergency contact|recruiter|recommender|previous employer|previous employment|employment history|work history|education history)\b/.test(
-          context,
-        )
-          ? 'This field belongs to a separate person or history entry; choose the matching history entry manually'
-          : undefined);
+      const blocked = requiresReview
+        ? 'Consent or agreement. Review and answer on the form.'
+        : presentation.blocked ||
+          (/\b(reference|referee|emergency contact|recruiter|recommender|previous employer|previous employment|employment history|work history|education history)\b/.test(
+            context,
+          )
+            ? 'This field belongs to a separate person or history entry; choose the matching history entry manually'
+            : undefined);
       result.push({
         id: identity(control),
         controls: members,
         labels,
         autocomplete: token,
         blocked,
+        requiresReview,
         kind: radio
           ? 'radio'
           : control.tagName === 'SELECT'
@@ -483,14 +491,17 @@ function isYesNoQuestion(target: Target): boolean {
 }
 
 function question(target: Target, fields: CustomField[], hostname: string): Question {
-  const match = matchField(target.labels, fields, hostname, target.autocomplete);
+  const match = target.requiresReview
+    ? undefined
+    : matchField(target.labels, fields, hostname, target.autocomplete);
   const filled = hasValue(target);
   return {
     id: target.id,
     label: target.labels[0] || target.autocomplete || 'Unlabelled question',
     kind: target.kind,
     filled,
-    matchedField: match.field?.id,
+    matchedField: match?.field?.id,
+    ...(target.requiresReview ? { requiresReview: true } : {}),
     ...(aiEligible(target) ? { canDraftWithAI: true } : {}),
     reason:
       target.blocked ||
@@ -500,7 +511,7 @@ function question(target: Target, fields: CustomField[], hostname: string): Ques
           : 'Cleared by you; click Fill this page to refill'
         : filled
           ? 'Existing answer preserved'
-          : match.reason),
+          : match?.reason),
   };
 }
 
@@ -538,6 +549,11 @@ function fillNativeForm(
   const report: FillReport = { filled: 0, skipped: 0, questions: [] };
   for (const target of collect(root)) {
     const item = question(target, fields, hostname);
+    report.questions.push(item);
+    if (item.requiresReview) {
+      report.skipped++;
+      continue;
+    }
     const focused = automatic && target.controls.some((control) => control === activeControl(root));
     const applicationField =
       (automatic || options.defaultYes === true) &&
@@ -595,7 +611,6 @@ function fillNativeForm(
       }
     }
     if (!filledNow) report.skipped++;
-    report.questions.push(item);
   }
   // Preserve the previous useful undo batch when dynamic observation finds nothing new.
   if (changes.length) previousChanges.push(...changes);
@@ -1116,6 +1131,7 @@ if (
   mountCVFileDrop();
   mountPanelDock();
   mountLinkedInFollow();
+  mountLinkedInJobFilters();
   mountSubmissionCapture();
   const aiUI = mountAIFieldUI({
     fields: () => aiFields(),
