@@ -4,6 +4,7 @@ import { mountApp, safeWebsite, profileDate } from '../src/app-ui';
 import { TRACKING_DAILY_TOTALS_KEY } from '../src/tracking-types';
 import { utcDayKey } from '../src/application-day';
 import { JOB_FILTERS_KEY } from '../src/job-filter-rules';
+import { FEED_FOCUS_KEY } from '../src/feed-focus-settings';
 let data: Record<string, unknown>, cleanup: (() => void) | undefined;
 beforeEach(() => {
   data = {
@@ -77,15 +78,60 @@ describe('independent application host', () => {
     history.replaceState({}, '', '/popup.html');
     cleanup = await mountApp(document.getElementById('root')!);
     expect(document.querySelector('.daily-total')?.textContent).toBe('14');
-    expect(document.querySelectorAll('.popup-shortcuts>*')).toHaveLength(5);
+    expect(document.querySelectorAll('.popup-shortcuts>*')).toHaveLength(6);
     expect(
       document
         .querySelector('.popup-shortcuts [aria-label="Job Filters"] img')
         ?.getAttribute('src'),
     ).toContain('navigation/job-filters.png');
+    expect(document.querySelector('[aria-label="Feed Focus"] img')?.getAttribute('src')).toContain(
+      'navigation/feed-focus.png',
+    );
     expect(document.querySelector('[aria-label="Edit daily goal"]')).not.toBeNull();
     expect(document.querySelectorAll('.popup-switches input')).toHaveLength(4);
     expect(document.querySelector('.daily-goal')?.textContent).toBe('Goal: 10');
+  });
+  it('configures Feed Focus from the popup and remembers a custom quote when switched off', async () => {
+    history.replaceState({}, '', '/popup.html');
+    cleanup = await mountApp(document.getElementById('root')!);
+    const button = document.querySelector<HTMLButtonElement>('[aria-label="Feed Focus"]')!;
+    const open = async () => {
+      button.click();
+      const dialog = document.querySelector<HTMLDialogElement>('.feed-focus-dialog')!;
+      const toggle = dialog.querySelector('input')!;
+      await vi.waitFor(() => expect(toggle.disabled).toBe(false));
+      return {
+        dialog,
+        toggle,
+        choice: dialog.querySelector('select')!,
+        custom: dialog.querySelector('textarea')!,
+        form: dialog.querySelector('form')!,
+      };
+    };
+    const first = await open();
+    expect(first.toggle.checked).toBe(false);
+    expect(first.choice.options).toHaveLength(4);
+    first.toggle.checked = true;
+    first.choice.value = 'custom';
+    first.choice.dispatchEvent(new Event('change', { bubbles: true }));
+    expect(first.custom.parentElement?.hidden).toBe(false);
+    first.form.requestSubmit();
+    expect(first.custom.getAttribute('aria-invalid')).toBe('true');
+    expect(data[FEED_FOCUS_KEY]).toBeUndefined();
+    first.custom.value = 'Finish the application.';
+    first.form.requestSubmit();
+    await vi.waitFor(() => expect(first.dialog.isConnected).toBe(false));
+    expect(button.dataset.enabled).toBe('true');
+    const settings = { enabled: true, quote: 'custom', customQuote: 'Finish the application.' };
+    expect(data[FEED_FOCUS_KEY]).toEqual(settings);
+
+    const reopened = await open();
+    expect(reopened.toggle.checked).toBe(true);
+    expect(reopened.custom.value).toBe(settings.customQuote);
+    reopened.toggle.checked = false;
+    reopened.form.requestSubmit();
+    await vi.waitFor(() => expect(reopened.dialog.isConnected).toBe(false));
+    expect(data[FEED_FOCUS_KEY]).toEqual({ ...settings, enabled: false });
   });
   it('carries over the old title filter and saves the company list and switch independently', async () => {
     history.replaceState({}, '', '/popup.html');
@@ -147,6 +193,7 @@ describe('independent application host', () => {
     expect(data[JOB_FILTERS_KEY]).toEqual({
       titles: { ...old, enabled: false },
       companies: { enabled: true, keywords: ['Jobgether', 'Crossing Hurdles, Inc.'] },
+      exceptions: { enabled: false, keywords: [] },
     });
     cleanup();
     cleanup = await mountApp(root);
@@ -155,6 +202,22 @@ describe('independent application host', () => {
     expect(reopened.titleToggle.checked).toBe(false);
     expect(reopened.companies.value).toBe('Jobgether\nCrossing Hurdles, Inc.');
     expect(reopened.companyToggle.checked).toBe(true);
+    const keep = reopened.dialog.querySelector<HTMLButtonElement>('.job-filter-exceptions-link')!;
+    const keepGroup = reopened.dialog.querySelector<HTMLElement>('#job-filter-exceptions-group')!;
+    expect(keepGroup.hidden).toBe(true);
+    keep.click();
+    expect(keepGroup.hidden).toBe(false);
+    const keepToggle = keepGroup.querySelector('input')!;
+    const keepRules = keepGroup.querySelector('textarea')!;
+    expect(keepToggle.checked).toBe(false);
+    keepToggle.checked = true;
+    keepRules.value = 'Intern +';
+    reopened.dialog.querySelector('form')!.requestSubmit();
+    expect(keepRules.getAttribute('aria-invalid')).toBe('true');
+    keepRules.value = 'Intern + Remote\nC++ + Hybrid';
+    keep.click();
+    expect(keepGroup.hidden).toBe(true);
+    expect(keepRules.value).toBe('Intern + Remote\nC++ + Hybrid');
     reopened.companyToggle.checked = false;
     reopened.titleToggle.checked = true;
     reopened.dialog.querySelector('form')!.requestSubmit();
@@ -162,6 +225,7 @@ describe('independent application host', () => {
     expect(data[JOB_FILTERS_KEY]).toEqual({
       titles: old,
       companies: { enabled: false, keywords: ['Jobgether', 'Crossing Hurdles, Inc.'] },
+      exceptions: { enabled: true, keywords: ['Intern + Remote', 'C++ + Hybrid'] },
     });
   });
   it('opens the native side panel directly from a popup gesture', async () => {

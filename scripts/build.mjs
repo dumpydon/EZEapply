@@ -48,6 +48,13 @@ try {
     options_ui: { page: 'options.html', open_in_tab: true },
     content_scripts: [
       {
+        matches: ['https://www.linkedin.com/*', 'https://linkedin.com/*'],
+        css: ['custom/linkedin-feed-focus.css'],
+        js: ['custom/feed-focus.js'],
+        run_at: 'document_start',
+        all_frames: false,
+      },
+      {
         matches: ['http://*/*', 'https://*/*'],
         js: ['custom/content.js'],
         run_at: 'document_idle',
@@ -103,6 +110,7 @@ try {
       content: join(root, 'src/content.ts'),
       background: join(root, 'src/background.ts'),
       'app-ui': join(root, 'src/app-ui.ts'),
+      'feed-focus': join(root, 'src/feed-focus-content.ts'),
       'ai-settings': join(root, 'src/ai/settings.ts'),
       analytics: join(root, 'src/analytics.ts'),
     },
@@ -118,6 +126,7 @@ try {
     ['panel.css', 'panel.css'],
     ['theme.css', 'theme.css'],
     ['app-controls.css', 'app-controls.css'],
+    ['linkedin-feed-focus.css', 'linkedin-feed-focus.css'],
     ['profile-view.css', 'profile-view.css'],
     ['ai/settings.css', 'ai-settings.css'],
     ['analytics.css', 'analytics.css'],

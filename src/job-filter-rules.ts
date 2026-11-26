@@ -8,6 +8,7 @@ interface JobFilterList {
 export interface JobFilterSettings {
   titles: JobFilterList;
   companies: JobFilterList;
+  exceptions: JobFilterList;
 }
 
 const TITLE_WORD = /[\p{L}\p{N}\p{M}\p{Pc}+#]/u.source;
@@ -21,7 +22,15 @@ export function compileTitleFilter(keyword: string): RegExp {
   return new RegExp(`(?<!${TITLE_WORD})${phrase}(?!${TITLE_WORD})`, 'u');
 }
 
-function readFilterList(value: unknown): JobFilterList {
+const hasKeyword = (text: string) => /[\p{L}\p{N}]/u.test(text);
+
+export function keepRuleTerms(rule: string): string[] {
+  // A standalone plus joins phrases. Preserve literal plus signs in titles such as C++.
+  const terms = rule.split(/(?:^|\s)\+(?=\s|$)/u).map(normalizeJobFilterText);
+  return terms.every(hasKeyword) ? terms : [];
+}
+
+function readFilterList(value: unknown, valid = hasKeyword): JobFilterList {
   const saved = value as Partial<JobFilterList> | null | undefined;
   const keywords: string[] = [];
   const seen = new Set<string>();
@@ -30,7 +39,7 @@ function readFilterList(value: unknown): JobFilterList {
       if (typeof item !== 'string') continue;
       const keyword = item.trim();
       const normalized = normalizeJobFilterText(keyword);
-      if (!/[\p{L}\p{N}]/u.test(normalized) || seen.has(normalized)) continue;
+      if (!valid(normalized) || seen.has(normalized)) continue;
       seen.add(normalized);
       keywords.push(keyword);
     }
@@ -44,5 +53,6 @@ export function readJobFilters(value: unknown): JobFilterSettings {
     // The original settings stored the title filter directly under this key.
     titles: readFilterList(saved?.titles ?? value),
     companies: readFilterList(saved?.companies),
+    exceptions: readFilterList(saved?.exceptions, (rule) => keepRuleTerms(rule).length > 0),
   };
 }

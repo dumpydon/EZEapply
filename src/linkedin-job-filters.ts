@@ -2,6 +2,7 @@ import { isLinkedInHost } from './linkedin-follow';
 import {
   compileTitleFilter,
   JOB_FILTERS_KEY,
+  keepRuleTerms,
   normalizeJobFilterText,
   readJobFilters,
 } from './job-filter-rules';
@@ -13,6 +14,7 @@ const CARD = `${MODERN_CARD},[data-job-id],[data-occludable-job-id]`;
 const LEGACY_TITLE =
   '.job-card-list__title,.job-card-list__title--link,a[data-control-name="job_card_title"]';
 const LEGACY_COMPANY = '.job-card-container__primary-description,.job-card-container__company-name';
+const LEGACY_LOCATION = '.job-card-container__metadata-item';
 const DISMISS = /^Dismiss\s+(.+?)\s+job$/i;
 const UNDO = /^.+\s+job is dismissed,\s*undo$/i;
 const MODAL = 'dialog[open],[role="dialog"][aria-modal="true"],.jobs-easy-apply-modal';
@@ -66,6 +68,7 @@ export function mountLinkedInJobFilters(): () => void {
   let changedSinceLoad = false;
   let titleFilters: RegExp[] = [];
   let companyFilters = new Set<string>();
+  let keepRules: RegExp[][] = [];
   let timer: ReturnType<typeof setTimeout> | undefined;
   const attempts = new Map<string, { count: number; retryAt: number }>();
   const restored = new Set<string>();
@@ -99,11 +102,23 @@ export function mountLinkedInJobFilters(): () => void {
         const modern = result.card.matches(MODERN_CARD);
         const heading = result.card.querySelector(modern ? '[role="button"] p' : LEGACY_TITLE);
         if (!heading || resultText(heading, result.id) !== title) continue;
-        if (
-          !titleMatch &&
-          !companyFilters.has(resultText(resultCompany(result.card, heading, modern), result.id))
-        )
-          continue;
+        const company = resultCompany(result.card, heading, modern);
+        const companyMatch = companyFilters.has(resultText(company, result.id));
+        if (!companyMatch) {
+          if (!titleMatch) continue;
+          if (keepRules.length) {
+            const locations = modern
+              ? [company?.parentElement?.nextElementSibling ?? null]
+              : [...result.card.querySelectorAll(LEGACY_LOCATION)];
+            const fields = [title, ...locations.map((location) => resultText(location, result.id))];
+            if (
+              keepRules.some((rule) =>
+                rule.every((term) => fields.some((field) => term.test(field))),
+              )
+            )
+              continue;
+          }
+        }
         if (
           button.matches(':disabled') ||
           (button.form && button.type !== 'button') ||
@@ -155,6 +170,9 @@ export function mountLinkedInJobFilters(): () => void {
     companyFilters = new Set(
       settings.companies.enabled ? settings.companies.keywords.map(normalizeJobFilterText) : [],
     );
+    keepRules = settings.exceptions.enabled
+      ? settings.exceptions.keywords.map((rule) => keepRuleTerms(rule).map(compileTitleFilter))
+      : [];
     if (!enabled()) return;
     observer.observe(document.documentElement, {
       childList: true,

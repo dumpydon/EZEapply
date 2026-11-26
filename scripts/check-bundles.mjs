@@ -12,6 +12,7 @@ await build({
     'src/content.ts',
     'src/background.ts',
     'src/app-ui.ts',
+    'src/feed-focus-content.ts',
     'src/ai/settings.ts',
     'src/analytics.ts',
   ],

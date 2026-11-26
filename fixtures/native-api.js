@@ -81,6 +81,7 @@
       'eze.showFloatingRestore',
       'eze.linkedin.disableAutoFollow',
       'eze.linkedin.jobFilters.v1',
+      'eze.linkedin.feedFocus.v1',
     ];
   const demoKey = 'eze-preview-v1',
     customKey = 'eze.customFields.v1',

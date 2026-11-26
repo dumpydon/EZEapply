@@ -1,5 +1,14 @@
 # EZEapply navigation artwork
 
+## Feed Focus prompt
+
+`feed-focus.png` was created and refined with built-in ImageGen, then resized to 192 × 192 while preserving its transparency.
+
+> Use case: precise-object-edit.
+> Asset type: Feed Focus toolbar icon, displayed at roughly 32 × 32 pixels inside a dark EZEapply popup.
+> Input image: the attached ivory feed tile with two teal lines and a cobalt badge with white pause bars. Keep its recognizable two-part silhouette and palette. Refine it as a clean, almost flat icon with crisp mint edging and restrained highlights entirely INSIDE the filled shapes.
+> Change the cutout to a hard, clean silhouette with 100% transparent space around it. The interior edges and rounded corners may have one pixel of normal antialiasing. Outside the silhouette remove every white or green glow, halo, shadow, reflection, fringe, or cloud. No backing shape, text, watermark, checkerboard, or background. Center the icon with consistent transparent padding.
+
 ## Job Filters prompt
 
 `job-filters.png` was refined using built-in ImageGen on 2026-11-18, then resized to a 192 × 192 PNG with its alpha channel intact.

@@ -1,4 +1,4 @@
-import { JOB_FILTERS_KEY, readJobFilters } from './job-filter-rules';
+import { JOB_FILTERS_KEY, keepRuleTerms, readJobFilters } from './job-filter-rules';
 import { navigationIcon } from './navigation-icon';
 
 const filterFields = [
@@ -17,6 +17,14 @@ const filterFields = [
     listLabel: 'Company names',
     placeholder: 'Jobgether&#10;Crossing Hurdles',
     empty: 'Add a company name to enable Job companies.',
+  },
+  {
+    key: 'exceptions',
+    label: 'Keep exceptions',
+    description: 'Override matching title rules',
+    listLabel: 'Keep rules',
+    placeholder: 'Intern + Remote',
+    empty: 'Add a rule to enable Keep exceptions.',
   },
 ] as const;
 
@@ -61,8 +69,12 @@ export function mountJobFilters(): { button: HTMLButtonElement; dispose(): void 
     const form = document.createElement('form');
     form.innerHTML = `
       <header class="job-filters-heading">
-        <div>
-          <h2 id="job-filters-title" tabindex="-1">Job Filters</h2>
+        <div class="job-filters-heading-text">
+          <div class="job-filters-heading-row">
+            <h2 id="job-filters-title" tabindex="-1">Job Filters</h2>
+            <button type="button" class="job-filter-expand job-filter-exceptions-link"
+              aria-expanded="false" aria-controls="job-filter-exceptions-group" disabled>Keep exceptions</button>
+          </div>
           <p>Auto-dismiss matching LinkedIn jobs</p>
         </div>
       </header>
@@ -70,7 +82,8 @@ export function mountJobFilters(): { button: HTMLButtonElement; dispose(): void 
         ${filterFields
           .map(
             ({ key, label, description, listLabel, placeholder }) => `
-          <section class="job-filter-group" aria-labelledby="job-filter-${key}-heading">
+          <section class="job-filter-group" id="job-filter-${key}-group"
+            aria-labelledby="job-filter-${key}-heading" ${key === 'exceptions' ? 'hidden' : ''}>
             <header class="job-filter-group-heading">
               <div>
                 <h3 id="job-filter-${key}-heading">${label}</h3>
@@ -89,14 +102,24 @@ export function mountJobFilters(): { button: HTMLButtonElement; dispose(): void 
             <div class="job-filter-field-heading">
               <label for="job-filter-${key}-list">${listLabel}</label>
               <small id="job-filter-${key}-hint">One per line</small>
-              <button type="button" class="job-filter-expand" aria-expanded="false"
+              ${
+                key === 'exceptions'
+                  ? ''
+                  : `<button type="button" class="job-filter-expand" aria-expanded="false"
                 aria-label="Expand ${listLabel.toLowerCase()}" aria-controls="job-filter-${key}-list"
-                disabled>Expand</button>
+                disabled>Expand</button>`
+              }
             </div>
             <div class="job-filter-editor">
               <textarea id="job-filter-${key}-list" rows="5" maxlength="5000"
-                placeholder="${placeholder}" aria-describedby="job-filter-${key}-hint" disabled></textarea>
+                placeholder="${placeholder}" aria-describedby="job-filter-${key}-hint${key === 'exceptions' ? ' job-filter-keep-help job-filter-keep-priority' : ''}" disabled></textarea>
             </div>
+            ${
+              key === 'exceptions'
+                ? `<p class="job-filter-keep-help" id="job-filter-keep-help">Join required phrases with a spaced +. Each phrase can match the title or location shown on the card.</p>
+              <p class="job-filter-keep-help" id="job-filter-keep-priority">Company filters always take priority.</p>`
+                : ''
+            }
           </section>`,
           )
           .join('')}
@@ -120,7 +143,10 @@ export function mountJobFilters(): { button: HTMLButtonElement; dispose(): void 
         group,
         toggle: group.querySelector<HTMLInputElement>('input')!,
         list: group.querySelector<HTMLTextAreaElement>('textarea')!,
-        expand: group.querySelector<HTMLButtonElement>('.job-filter-expand')!,
+        expand:
+          field.key === 'exceptions'
+            ? form.querySelector<HTMLButtonElement>('.job-filter-exceptions-link')!
+            : group.querySelector<HTMLButtonElement>('.job-filter-expand')!,
       };
     });
     let expanded: (typeof fields)[number] | undefined;
@@ -150,10 +176,14 @@ export function mountJobFilters(): { button: HTMLButtonElement; dispose(): void 
       for (const field of fields) {
         const isExpanded = next === field;
         const action = isExpanded ? 'Collapse' : 'Expand';
-        field.group.hidden = Boolean(next && !isExpanded);
+        field.group.hidden = next ? !isExpanded : field.key === 'exceptions';
         field.expand.setAttribute('aria-expanded', String(isExpanded));
-        field.expand.setAttribute('aria-label', `${action} ${field.listLabel.toLowerCase()}`);
-        field.expand.textContent = action;
+        if (field.key === 'exceptions') {
+          field.expand.textContent = isExpanded ? 'Back to filters' : 'Keep exceptions';
+        } else {
+          field.expand.setAttribute('aria-label', `${action} ${field.listLabel.toLowerCase()}`);
+          field.expand.textContent = action;
+        }
       }
       if (next) lists.scrollTop = 0;
     };
@@ -198,21 +228,30 @@ export function mountJobFilters(): { button: HTMLButtonElement; dispose(): void 
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       if (save.disabled) return;
-      const next = readJobFilters(
-        Object.fromEntries(
-          fields.map(({ key, toggle, list }) => [
-            key,
-            { enabled: toggle.checked, keywords: list.value.split(/[\r\n]+/) },
-          ]),
-        ),
+      const drafts = Object.fromEntries(
+        fields.map(({ key, toggle, list }) => [
+          key,
+          { enabled: toggle.checked, keywords: list.value.split(/[\r\n]+/) },
+        ]),
       );
+      const next = readJobFilters(drafts);
       clearError();
-      const empty = fields.find(({ key, toggle }) => toggle.checked && !next[key].keywords.length);
-      if (empty) {
-        showError(empty.empty);
-        if (expanded && expanded !== empty) setExpanded(empty);
-        empty.list.setAttribute('aria-invalid', 'true');
-        empty.list.focus();
+      const invalidRule = drafts.exceptions.keywords.some(
+        (rule) => rule.trim() && !keepRuleTerms(rule).length,
+      );
+      const invalid = fields.find(
+        ({ key, toggle }) =>
+          (key === 'exceptions' && invalidRule) || (toggle.checked && !next[key].keywords.length),
+      );
+      if (invalid) {
+        showError(
+          invalid.key === 'exceptions' && invalidRule
+            ? 'Enter a phrase on each side of +, or use a single phrase.'
+            : invalid.empty,
+        );
+        if (invalid.group.hidden) setExpanded(invalid);
+        invalid.list.setAttribute('aria-invalid', 'true');
+        invalid.list.focus();
         return;
       }
       setEditingDisabled(true);

@@ -2,6 +2,9 @@ import { mountLinkedInJobFilters } from '../src/linkedin-job-filters';
 
 const pages = [
   [
+    ['111', 'Engineering Intern', 'Example Labs', 'Bengaluru (On-site)'],
+    ['112', 'Design Intern', 'Example Studio', 'Bengaluru (Remote)'],
+    ['113', 'Software Intern (Remote)', 'Example Hiring', 'India'],
     ['109', 'AI video Editor', 'Example Media'],
     ['110', 'AI Editorial Engineer', 'Example Studio'],
     ['105', 'Senior Data Engineer', 'Example Data'],
@@ -29,7 +32,7 @@ let ignoredEditorClick = false;
 function render() {
   const page = new URL(location.href).searchParams.get('start') === '25' ? 1 : 0;
   list.replaceChildren();
-  for (const [id, title, company] of pages[page]) {
+  for (const [id, title, company, place = 'Remote'] of pages[page]) {
     const card = document.createElement('article');
     card.setAttribute('componentkey', `job-card-component-ref-${id}`);
     const opener = document.createElement('div');
@@ -50,7 +53,7 @@ function render() {
     employer.textContent = company;
     employerGroup.append(employer);
     const location = document.createElement('p');
-    location.textContent = 'Remote';
+    location.textContent = place;
     const info = document.createElement('p');
     info.className = 'dismissed-caption';
     info.textContent = 'Dismissed from recommendations.';

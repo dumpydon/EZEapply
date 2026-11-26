@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Feed Focus preview</title>
+    <link rel="stylesheet" href="/custom/linkedin-feed-focus.css" />
+    <script src="/native-api.js"></script>
+    <script defer src="/feed-focus-preview.js"></script>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        align-items: start;
+        margin: 0;
+        background: #090b0d;
+        color: #e6edf5;
+        font:
+          14px/1.55 system-ui,
+          sans-serif;
+      }
+      header {
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px 22px;
+        min-height: 52px;
+        padding: 8px 18px;
+        border-bottom: 1px solid #34414d;
+        background: #19222c;
+      }
+      nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 14px;
+      }
+      a {
+        color: #b7cee7;
+        text-decoration: none;
+      }
+      a[aria-current='page'] {
+        color: white;
+        text-decoration: underline;
+        text-underline-offset: 4px;
+      }
+      main,
+      #eze-linkedin-feed-focus {
+        grid-column: 1;
+        grid-row: 2;
+      }
+      main {
+        min-height: calc(100dvh - 52px);
+        padding: 28px;
+        background: #111922;
+      }
+      main article {
+        max-width: 480px;
+        padding: 18px;
+        border: 1px solid #34414d;
+        border-radius: 12px;
+        background: #1d2935;
+      }
+      main h1,
+      main p:first-child {
+        margin-top: 0;
+      }
+      iframe {
+        grid-column: 2;
+        grid-row: 2;
+        display: block;
+        width: 340px;
+        height: 586px;
+        border: 1px solid #34414d;
+      }
+      @media (max-width: 700px) {
+        body {
+          grid-template-columns: 1fr;
+        }
+        main,
+        #eze-linkedin-feed-focus {
+          min-height: 340px;
+        }
+        iframe {
+          grid-column: 1;
+          grid-row: 3;
+          max-width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <strong>Feed Focus preview</strong>
+      <nav aria-label="Preview navigation">
+        <a href="/feed/foryou/">Home</a>
+        <a href="/in/example/">Profile</a>
+        <a href="/in/example/recent-activity/all/">Profile activity</a>
+        <a href="/feed/update/example-post/">Post</a>
+        <a
+          href="/feed/?highlightedUpdateUrn=urn%3Ali%3Aactivity%3A123&amp;origin=inapp&amp;showCommentBox=true"
+          >Notification post</a
+        >
+        <a href="/jobs/">Jobs</a>
+        <a href="/messaging/">Messaging</a>
+      </nav>
+    </header>
+    <main id="workspace"></main>
+    <iframe title="EZEapply popup" src="/popup.html"></iframe>
+  </body>
+</html>

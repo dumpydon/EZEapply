@@ -3,6 +3,27 @@ import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 const root = fileURLToPath(new URL('../', import.meta.url));
+await build({
+  entryPoints: [root + 'fixtures/feed-focus-preview.ts'],
+  outfile: root + '.local/feed-focus-preview.js',
+  bundle: true,
+  format: 'iife',
+  target: 'chrome120',
+  plugins: [
+    {
+      name: 'preview-feed-focus-host',
+      setup(build) {
+        build.onLoad({ filter: /src\/linkedin-feed-focus\.ts$/ }, async (args) => ({
+          contents: (await readFile(args.path, 'utf8')).replace(
+            'isLinkedInHost(location.hostname)',
+            "isLinkedInHost('www.linkedin.com')",
+          ),
+          loader: 'ts',
+        }));
+      },
+    },
+  ],
+});
 // Exercise the complete production watcher on a synthetic localhost page.
 // Only the test bundle substitutes the hostname; this is not in packaged code.
 await build({
@@ -136,7 +157,17 @@ await build({
   format: 'iife',
   target: 'chrome120',
 });
+const feedFocusPage = ['fixtures/feed-focus.html', 'text/html'];
 const routes = {
+  '/feed/': feedFocusPage,
+  '/feed/foryou/': feedFocusPage,
+  '/in/example/': feedFocusPage,
+  '/in/example/recent-activity/all/': feedFocusPage,
+  '/feed/update/example-post/': feedFocusPage,
+  '/jobs/': feedFocusPage,
+  '/messaging/': feedFocusPage,
+  '/feed-focus-preview.js': ['.local/feed-focus-preview.js', 'text/javascript'],
+  '/custom/linkedin-feed-focus.css': ['dist/extension/custom/linkedin-feed-focus.css', 'text/css'],
   '/jobs/search-results/': ['fixtures/job-filters.html', 'text/html'],
   '/job-filters-preview.js': ['.local/job-filters-preview.js', 'text/javascript'],
   '/cv-transfer-demo.js': ['.local/cv-transfer-demo.js', 'text/javascript'],
@@ -218,6 +249,10 @@ const routes = {
   '/custom/navigation/sidepane.png': ['dist/extension/custom/navigation/sidepane.png', 'image/png'],
   '/custom/navigation/job-filters.png': [
     'dist/extension/custom/navigation/job-filters.png',
+    'image/png',
+  ],
+  '/custom/navigation/feed-focus.png': [
+    'dist/extension/custom/navigation/feed-focus.png',
     'image/png',
   ],
   '/custom/cv-controls/download.png': [

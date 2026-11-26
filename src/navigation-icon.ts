@@ -7,7 +7,8 @@ export function navigationIcon(
     | 'analytics'
     | 'sidepane'
     | 'extensions'
-    | 'job-filters',
+    | 'job-filters'
+    | 'feed-focus',
 ): HTMLImageElement {
   const image = document.createElement('img');
   image.className = 'navigation-icon';

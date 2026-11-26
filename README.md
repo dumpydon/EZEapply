@@ -4,7 +4,7 @@
 
 <p align="center"><a href="https://github.com/dumpydon/EZEapply/releases/latest/download/EZEapply.zip"><strong>↓ Download EZEapply for Chrome</strong></a> · <a href="docs/media/install-ezeapply.mp4">Watch the 30-second install film</a></p>
 
-Current stable version: **3.0.20** · [Release notes](https://github.com/dumpydon/EZEapply/releases/tag/v3.0.20) · [Download checksum](https://github.com/dumpydon/EZEapply/releases/latest/download/SHA256SUMS.txt)
+Current stable version: **3.0.23** · [Release notes](https://github.com/dumpydon/EZEapply/releases/tag/v3.0.23) · [Download checksum](https://github.com/dumpydon/EZEapply/releases/latest/download/SHA256SUMS.txt)
 
 ## Install
 
@@ -24,7 +24,8 @@ _Original illustrated macOS/Chrome walkthrough · [Full-resolution MP4](docs/med
 - **Smart autofill:** matches question meaning through keywords, synonyms and units; handles supported text fields, dropdowns, radios, frames and open web components. Optional automatic filling catches new form steps.
 - **Your AI:** connect OpenAI, Anthropic, Gemini or another supported provider using your own key. Choose models and draft answers from your profile, résumé and background, then review them.
 - **Application analytics:** confirmed LinkedIn Easy Apply and external submissions, daily goals, manual corrections, and 7-, 15- and 30-day charts. LinkedIn is blue; external forms are teal.
-- **Job Filters:** dismiss LinkedIn search listings by a saved title phrase or full company name, with separate switches in the toolbar popup.
+- **Job Filters:** dismiss LinkedIn search listings by a saved title phrase or full company name. Keep exceptions can override title rules.
+- **Feed Focus:** replace LinkedIn’s Home feed with a preset or custom quote while keeping profiles and notification posts accessible.
 - **Small conveniences:** résumé attachment, undo for supported changes, editable profile shortcuts, optional closed-panel floating button, and a LinkedIn company-follow opt-out.
 - **Compact profile cards:** expandable work descriptions, one-click portfolio links and skills, with a small shortcut to Chrome’s extension manager in the popup.
 

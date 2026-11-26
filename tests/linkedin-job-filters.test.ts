@@ -5,7 +5,7 @@ import { JOB_FILTERS_KEY, type JobFilterSettings } from '../src/job-filter-rules
 import { mountLinkedInJobFilters } from '../src/linkedin-job-filters';
 
 type StorageListener = Parameters<typeof chrome.storage.onChanged.addListener>[0];
-type Settings = JobFilterSettings | JobFilterSettings['titles'];
+type Settings = Partial<JobFilterSettings> | JobFilterSettings['titles'];
 const enabled = { enabled: true, keywords: ['Sales', 'drone', 'business development'] };
 let settings: Settings | undefined;
 let get: ReturnType<typeof vi.fn<() => Promise<Record<string, unknown>>>>;
@@ -101,6 +101,52 @@ afterEach(() => {
 });
 
 describe('LinkedIn job filters', () => {
+  it('keeps title matches only when every exception term matches, with company filters taking priority', async () => {
+    settings = {
+      titles: { enabled: true, keywords: ['Intern', 'Editor', 'C++'] },
+      companies: { enabled: true, keywords: ['Joblet-AI'] },
+      exceptions: {
+        enabled: true,
+        keywords: ['Intern + Remote', 'Editor + London', 'C++ + Hybrid'],
+      },
+    };
+    const list = results();
+    card('1', 'Engineering Intern', list).location.textContent = 'Boston (On-site)';
+    card('2', 'Engineering Intern', list);
+    card('3', 'Design Intern (Remote)', list).location.textContent = 'United States';
+    card('4', 'Software Intern (Remote)', list, 'JOBLET-AI');
+    card('5', 'Software Engineer (Remote)', list, 'Joblet-AI');
+    card('6', 'Engineering Intern', list, 'Remote Labs').location.textContent = 'Boston (On-site)';
+    card('7', 'Video Editor', list).location.textContent = 'London (Hybrid)';
+    card('8', 'Video Editor', list);
+    card('9', 'C++ Engineer', list).location.textContent = 'Boston (Hybrid)';
+    card('10', 'Design Intern', list).location.hidden = true;
+    dispose = mountLinkedInJobFilters();
+    await settle();
+    expect(dismiss.mock.calls).toEqual([['1'], ['4'], ['5'], ['6'], ['8'], ['10']]);
+  });
+
+  it('reads the card location on legacy results and responds to exception changes', async () => {
+    const titles = { enabled: true, keywords: ['Intern'] };
+    const exceptions = { enabled: true, keywords: ['Intern + Remote'] };
+    settings = { titles, exceptions };
+    const list = document.createElement('div');
+    list.className = 'jobs-search-results-list';
+    document.body.append(list);
+    const legacy = card('1', 'Marketing Intern', list, 'Example Media');
+    legacy.row.removeAttribute('componentkey');
+    legacy.row.setAttribute('data-job-id', '1');
+    legacy.visibleTitle.parentElement!.className = 'job-card-list__title';
+    legacy.companyName.className = 'job-card-container__primary-description';
+    legacy.location.className = 'job-card-container__metadata-item';
+    dispose = mountLinkedInJobFilters();
+    await settle();
+    expect(dismiss).not.toHaveBeenCalled();
+    save({ titles, exceptions: { ...exceptions, enabled: false } });
+    await settle();
+    expect(dismiss.mock.calls).toEqual([['1']]);
+  });
+
   it('retries an ignored native click for AI video Editor and respects Undo', async () => {
     settings = { enabled: true, keywords: ['Editor'] };
     const list = results();

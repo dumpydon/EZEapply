@@ -1,0 +1,46 @@
+#eze-linkedin-feed-focus + main {
+  display: none !important;
+}
+
+#eze-linkedin-feed-focus {
+  box-sizing: border-box;
+  display: grid;
+  grid-column: 1 / -1;
+  place-items: center;
+  width: 100%;
+  min-height: max(220px, calc(100dvh - var(--eze-feed-offset, 0px)));
+  margin: 0;
+  padding: 24px 18px;
+  background: #090b0d;
+  font-family: system-ui, sans-serif;
+}
+
+#eze-linkedin-feed-focus .eze-feed-focus-card {
+  box-sizing: border-box;
+  width: fit-content;
+  max-width: min(100%, 440px);
+  padding: 22px 30px;
+  border: 1px solid #c8d8ec;
+  border-radius: 14px;
+  background: #f5f8fd;
+  color: #143555;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+#eze-linkedin-feed-focus h1 {
+  margin: 0;
+  color: #125bb2;
+  font:
+    700 18px/1.35 system-ui,
+    sans-serif;
+}
+
+#eze-linkedin-feed-focus p {
+  margin: 7px 0 0;
+  color: inherit;
+  font:
+    500 15px/1.5 system-ui,
+    sans-serif;
+  white-space: pre-wrap;
+}

@@ -7,6 +7,7 @@ import {
 } from './app-profile';
 import { mountPopupControls } from './popup-controls';
 import { mountJobFilters } from './job-filters-popup';
+import { mountFeedFocus } from './feed-focus-popup';
 import { navigationIcon } from './navigation-icon';
 import { mountThemePicker } from './appearance';
 import { mountProfileView } from './profile-view';
@@ -429,8 +430,9 @@ export async function mountApp(root: HTMLElement): Promise<() => void> {
       activity = mountActivityControls();
     if (popup) {
       const filters = mountJobFilters();
-      root.querySelector('.popup-shortcuts')!.append(filters.button);
-      cleanup.push(filters.dispose);
+      const focus = mountFeedFocus();
+      root.querySelector('.popup-shortcuts')!.append(filters.button, focus.button);
+      cleanup.push(filters.dispose, focus.dispose);
     }
     cleanup.push(
       () => count.dispose(),

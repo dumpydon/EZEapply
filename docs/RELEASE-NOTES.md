@@ -1,5 +1,18 @@
 EZEapply is created by **Piyush Agarwal (@dumpydon)**.
 
+## EZEapply 3.0.23
+
+- Feed Focus leaves highlighted posts opened from LinkedIn Notifications accessible, including links that use the Home feed URL. Ordinary Home visits still show the blocker.
+
+## EZEapply 3.0.22 — local build
+
+- **Feed Focus** adds a popup shortcut to block LinkedIn’s Home feed while keeping the site navigation and profile pages accessible. Choose one of three focus quotes or enter your own. The switch starts off.
+
+## EZEapply 3.0.21 — local build
+
+- **Keep exceptions** overrides job-title filters when all phrases on a rule line appear in the title or location shown on the card. Join required phrases with a spaced `+`, as in `Intern + Remote`. Each line works independently.
+- Enabled company filters take priority over exceptions and dismiss listings from matching companies.
+
 ## EZEapply 3.0.20
 
 - Job Filters retries once when LinkedIn leaves a matching Dismiss button available after a click. A saved `Editor` rule matches `AI video Editor`, and LinkedIn’s Undo continues to restore individual listings.

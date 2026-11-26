@@ -21,7 +21,9 @@ Custom endpoints must use HTTPS; local model endpoints may use HTTP on loopback.
 
 Automatic filling and inline AI controls are gated by application context and per-field eligibility. Chats, email composition, search bars and unrelated forms are excluded. A manual **Fill this page** action is a separate user-directed action. The optional LinkedIn follow setting unticks only company-follow controls in application dialogs.
 
-**Job Filters** keeps your title phrases and company names on this device and matches them against the corresponding fields in rendered LinkedIn results. Each list has its own switch. A match uses LinkedIn’s normal dismiss button, which updates recommendations just as a manual click does.
+**Job Filters** keeps your title phrases, company names, and keep exceptions on this device. It checks the title, company, and location shown in rendered LinkedIn results. Each list has its own switch. Company matches take priority over keep exceptions. A dismissal uses LinkedIn’s normal dismiss button, which updates recommendations just as a manual click does.
+
+**Feed Focus** keeps its switch and quote in your Chrome profile. It replaces LinkedIn’s Home feed workspace and clears that replacement when you open another page. The quote is rendered as text on the blocked feed. Profiles, posts, and their activity pages remain accessible.
 
 EZEapply never clicks Submit, Next or Review. The explicit **Resume** action can trigger a website’s upload handler; it does not prove the server accepted the file. Undo cannot recall an uploaded file. Application tracking listens for affirmative confirmation after a submission intent and stores job metadata, not form-answer snapshots.
 

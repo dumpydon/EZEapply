@@ -528,13 +528,15 @@ textarea::placeholder {
   font-weight: 600;
 }
 .popup-shortcuts {
-  display: flex;
-  justify-content: center;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   margin: 14px 0 20px;
 }
 .popup-shortcut {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -542,9 +544,11 @@ textarea::placeholder {
   background: linear-gradient(155deg, var(--ui-hover), var(--ui-fill));
   color: #fff;
   border-radius: 12px;
-  width: 48px;
-  height: 48px;
-  padding: 6px;
+  width: 100%;
+  max-width: 48px;
+  aspect-ratio: 1;
+  margin-inline: auto;
+  padding: 5px;
   box-shadow:
     inset 0 1px 0 #d8ffef2e,
     0 3px 0 var(--ui-input),
@@ -571,8 +575,8 @@ textarea::placeholder {
 }
 .popup-shortcut .navigation-icon {
   display: block;
-  width: 34px;
-  height: 34px;
+  width: min(100%, 34px);
+  height: auto;
   flex: none;
   object-fit: contain;
 }
