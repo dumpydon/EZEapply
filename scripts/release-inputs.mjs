@@ -21,6 +21,7 @@ export async function releaseInputs(root) {
   ];
   async function walk(prefix) {
     for (const entry of await readdir(join(root, prefix), { withFileTypes: true })) {
+      if (entry.name === '.DS_Store') continue;
       const name = `${prefix}/${entry.name}`;
       if (entry.isDirectory()) await walk(name);
       else if (entry.isFile()) names.push(name);
